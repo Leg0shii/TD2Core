@@ -1,0 +1,121 @@
+section1:
+  1:
+    name: Initial TD2
+    weight: 2
+    estimated_difficulty: 4
+    start_location: 0,70,0
+    end_location: 10,70,0
+  2:
+    name: Green Stretch
+    weight: 3
+    estimated_difficulty: 5
+    start_location: 0,70,10
+    end_location: 0,70,10
+  3:
+    name: Black Stretch
+    weight: 5
+    estimated_difficulty: 7
+  4:
+    name: Initial TD2 Rework
+    weight: 2
+    estimated_difficulty: 7
+
+section2:
+  1:
+    name: Cubes
+    weight: 15
+    estimated_difficulty: 7
+
+section3:
+  1:
+    name: Overworld
+    weight: 5
+    estimated_difficulty: 5
+  2:
+    name: Cave
+    weight: 7
+    estimated_difficulty: 6
+  3:
+    name: Lava
+    weight: 10
+    estimated_difficulty: 7
+  4:
+    name: Final Stretch
+    weight: 1
+    estimated_difficulty: 5
+
+section5:
+  1:
+    name: 160 OneJumps
+    weight: 8
+    estimated_difficulty: 6
+
+section6:
+  1:
+    name: Library
+    weight: 4
+    estimated_difficulty: 8
+  2:
+    name: City
+    weight: 3
+    estimated_difficulty: 6
+  3:
+    name: Arcade
+    weight: 3
+    estimated_difficulty: 6
+  4:
+    name: Castle
+    weight: 4
+    estimated_difficulty: 8
+  5:
+    name: Space
+    weight: 3
+    estimated_difficulty: 5
+  6:
+    name: Redstone Hallway
+    weight: 2
+    estimated_difficulty: 5
+  7:
+    name: Redstone Sky
+    weight: 1
+    estimated_difficulty: 5
+
+section7:
+  1:
+    name: Speed 0
+    weight: 2
+    estimated_difficulty: 5
+  2:
+    name: Speed 1
+    weight: 2
+    estimated_difficulty: 5
+  3:
+    name: Speed 2
+    weight: 2
+    estimated_difficulty: 5
+  4:
+    name: Speed 3
+    weight: 2
+    estimated_difficulty: 5
+  5:
+    name: Speed 4
+    weight: 2
+    estimated_difficulty: 5
+
+section9:
+  1:
+    name: XXL TD1
+    weight: 5
+    estimated_difficulty: 7
+
+section10:
+  1:
+    name: Slime Drop
+    weight: 5
+    estimated_difficulty: 9
+
+section11:
+  1:
+    name: Final Jump
+    weight: 1
+    estimated_difficulty: 3

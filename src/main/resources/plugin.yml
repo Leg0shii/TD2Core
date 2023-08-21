@@ -1,0 +1,29 @@
+name: TD2Core
+version: '${project.version}'
+main: de.legoshi.td2core.TD2Core
+softdepend: [ViaVersion, ViaBackwards, ViaRewind]
+
+commands:
+    spawn:
+    help:
+    prac:
+    unprac:
+    kit:
+    leave:
+    delete:
+    td2reload:
+    nv:
+    reset:
+    spc:
+    staff:
+    hide:
+    show:
+    hideall:
+    showall:
+
+permissions:
+  td2core:
+    build: allows the user to build on td2
+    staff: allows to switch into the staff mode
+    edit_cp: allows staff members to edit and destroy block data
+    deleteplayer: allows staff members to delete the entire user data
