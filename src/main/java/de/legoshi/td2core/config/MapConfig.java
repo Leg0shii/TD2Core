@@ -16,7 +16,6 @@ public class MapConfig extends ConfigAccessor {
     
     public MapConfig(JavaPlugin plugin) {
         super(plugin, fileName);
-        loadMapsFromConfig();
     }
     
     public void loadMapsFromConfig() {

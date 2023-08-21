@@ -32,7 +32,6 @@ public class BlockManager implements Listener {
         this.blockInformation = new HashMap<>();
         this.playerPreciseData = new HashMap<>();
         this.playerNextData = new HashMap<>();
-        loadBlockData();
     }
     
     @EventHandler
@@ -41,6 +40,7 @@ public class BlockManager implements Listener {
         
         Material blockType = event.getClickedBlock().getType();
         if (blockType != Material.IRON_PLATE & blockType != Material.WOOD_PLATE && blockType != Material.STONE_PLATE) return;
+        
         
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = PlayerManager.get(player);
@@ -140,7 +140,7 @@ public class BlockManager implements Listener {
         return playerPreciseData.containsKey(player);
     }
     
-    private void loadBlockData() {
+    public void loadBlockData() {
         String sqlQuery = "SELECT * FROM block_data";
         try {
             PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlQuery);

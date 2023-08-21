@@ -1,6 +1,7 @@
 package de.legoshi.td2core.map;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.MapConfig;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -34,6 +35,7 @@ public class MapManager {
     }
     
     public static void loadMaps() {
+        TD2Core.getInstance().configManager.getConfigAccessor(MapConfig.class).loadMapsFromConfig();
         pkMapHashMap.keySet().forEach(MapManager::loadMapStats);
     }
     

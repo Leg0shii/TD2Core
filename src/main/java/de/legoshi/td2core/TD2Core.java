@@ -64,6 +64,7 @@ public final class TD2Core extends JavaPlugin {
         discordManager.startLeaderboardScheduler();
         globalLBCache.startGlobalCacheScheduler();
         mapLBCache.startMapCacheScheduler();
+        blockManager.loadBlockData();
         
         loadSpawnLocation();
         registerEvents();
