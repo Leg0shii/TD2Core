@@ -1,4 +1,4 @@
-package de.legoshi.td2core.player.invis;
+package de.legoshi.td2core.player.hide;
 
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.util.Message;
@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 
-public class InvisManager implements Listener {
+public class HideManager implements Listener {
     
     private final Set<Player> hideAllPlayers = new HashSet<>();
     private final HashMap<Player, List<Player>> hidePlayers = new HashMap<>();

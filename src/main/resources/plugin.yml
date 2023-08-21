@@ -11,7 +11,6 @@ commands:
     kit:
     leave:
     delete:
-    td2reload:
     nv:
     reset:
     spc:

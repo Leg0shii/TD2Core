@@ -54,7 +54,7 @@ public class MapLBGUI extends GUILeaderboard<MapLBStats> {
     
         String prefix = getRankPrefix(count + page * pageVolume);
     
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
+        PlayerConfig playerConfig = TD2Core.getInstance().configManager.getConfigAccessor(PlayerConfig.class);
         ItemStack playerHead = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
     
         if (playerConfig.getConfig().contains(uuid + ".skin")) {

@@ -33,6 +33,7 @@ public class GlobalLBGUI extends GUILeaderboard<GlobalLBStats> {
     @Override
     protected GuiElement loadGUIElement(UUID uuid, GlobalLBStats stats, int count) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+        PlayerConfig playerConfig = TD2Core.getInstance().configManager.getConfigAccessor(PlayerConfig.class);
         String name = player.getName();
         String playTime;
         String jumps;
@@ -41,14 +42,11 @@ public class GlobalLBGUI extends GUILeaderboard<GlobalLBStats> {
             playTime = player.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / (20 * 60 * 60) + " h";
             jumps = player.getPlayer().getStatistic(Statistic.JUMP) + "";
         } else {
-            PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
             playTime = playerConfig.getTime(uuid) / (20 * 60 * 60) + " h";
             jumps = playerConfig.getJumps(uuid) + "";
         }
         
         String prefix = getRankPrefix(count + page * pageVolume);
-        
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
         ItemStack playerHead = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         
         if (playerConfig.getConfig().contains(uuid + ".skin")) {

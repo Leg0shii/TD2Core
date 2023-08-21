@@ -37,10 +37,6 @@ public class MapManager {
         pkMapHashMap.keySet().forEach(MapManager::loadMapStats);
     }
     
-    public static double getTotalWeight() {
-        return pkMapHashMap.values().stream().map(ParkourMap::getWeight).reduce(Integer::sum).orElse(0);
-    }
-    
     public static CompletableFuture<Boolean> hasPassed(Player player, ParkourMap parkourMap) {
         return CompletableFuture.supplyAsync(() -> {
             String sqlString = "SELECT * FROM player_log WHERE mapname = ? AND passed = 1 AND userid = ?;";

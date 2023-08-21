@@ -16,7 +16,7 @@ public abstract class ConfigAccessor {
     private final JavaPlugin plugin;
     private final File configFile;
     private FileConfiguration fileConfiguration;
-
+    
     public ConfigAccessor(JavaPlugin plugin, String fileName) {
         if (plugin == null) throw new IllegalArgumentException("Plugin cannot be null.");
         this.plugin = plugin;
@@ -25,15 +25,7 @@ public abstract class ConfigAccessor {
         if (dataFolder == null) throw new IllegalStateException();
         this.configFile = new File(plugin.getDataFolder(), fileName);
     }
-
-    public ConfigAccessor(JavaPlugin plugin, File folder, String fileName) {
-        if (plugin == null) throw new IllegalArgumentException("Plugin cannot be null.");
-        this.plugin = plugin;
-        this.fileName = fileName;
-        if (folder == null) throw new IllegalStateException();
-        this.configFile = new File(folder, fileName);
-    }
-
+    
     public void reloadConfig() {
         this.fileConfiguration = YamlConfiguration.loadConfiguration(this.configFile);
         InputStream defConfigStream = this.plugin.getResource(this.fileName);
@@ -57,11 +49,6 @@ public abstract class ConfigAccessor {
             }
         }
     }
-
-    public void saveDefaultConfig() {
-        if (!this.configFile.exists()) {
-            this.plugin.saveResource(this.fileName, false);
-        }
-    }
+    
 }
 

@@ -20,8 +20,8 @@ public class MapLBCache {
     private final HashMap<ParkourMap, HashMap<UUID, MapLBStats>> cache = new HashMap<>();
     private final Object cacheLock = new Object();
     
-    public MapLBCache() {
-        startScheduler();
+    public void startMapCacheScheduler() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), this::reloadCache, 0, 20L*60*10);
     }
     
     public void invalidateCache(UUID uuid, ParkourMap parkourMap) {
@@ -217,10 +217,6 @@ public class MapLBCache {
         }
     
         return hashMap;
-    }
-    
-    private void startScheduler() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), this::reloadCache, 0, 20L*60*10);
     }
     
 }

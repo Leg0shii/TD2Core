@@ -2,12 +2,14 @@ package de.legoshi.td2core.listener;
 
 import com.viaversion.viaversion.api.Via;
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.player.tag.PlayerTag;
 import de.legoshi.td2core.util.Message;
 import de.legoshi.td2core.util.ScoreboardUtil;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
@@ -20,7 +22,14 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+@RequiredArgsConstructor
 public class GeneralListener implements Listener {
+    
+    private final PlayerConfig playerConfig;
+    
+    public GeneralListener(ConfigManager configManager) {
+        this.playerConfig = configManager.getConfigAccessor(PlayerConfig.class);
+    }
     
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
@@ -75,7 +84,6 @@ public class GeneralListener implements Listener {
         player.teleport(TD2Core.getInstance().spawnLocation);
         event.setJoinMessage("");
     
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
         playerConfig.savePlayer(player);
         
         ParkourPlayer parkourPlayer = new ParkourPlayer(player);
@@ -92,8 +100,6 @@ public class GeneralListener implements Listener {
     private void playerLeave(Player player) {
         ParkourPlayer parkourPlayer = PlayerManager.get(player);
         parkourPlayer.serverLeave(false);
-    
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
         playerConfig.savePlayer(player);
     }
     
