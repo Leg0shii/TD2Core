@@ -212,7 +212,7 @@ public class ParkourListener implements Listener {
                     if (pressurePlate == Material.IRON_PLATE) {
                         boolean isCP = blockManager.isCheckpoint(event.getClickedBlock().getLocation());
                         if (isCP) {
-                            parkourPlayer.activateCheckPoint(cpLocation, true);
+                            parkourPlayer.activateCheckPoint(cpLocation, true, true);
                         }
                         parkourPlayer.checkClickedBlock(event.getClickedBlock().getLocation(), isCP);
                         return;
@@ -224,7 +224,7 @@ public class ParkourListener implements Listener {
                 cpLocation = cpLocation.clone().add(0.5, 0, 0.5);
                 boolean isCP = blockManager.isCheckpoint(event.getClickedBlock().getLocation());
                 if (isCP) {
-                    parkourPlayer.activateCheckPoint(cpLocation, false);
+                    parkourPlayer.activateCheckPoint(cpLocation, false, true);
                 }
                 parkourPlayer.checkClickedBlock(event.getClickedBlock().getLocation(), isCP);
                 player.getPlayer().playSound(player.getPlayer().getLocation(), Sound.BLOCK_WOOD_BUTTON_CLICK_ON, 1.0F, 1.0F);

@@ -165,7 +165,7 @@ public class ParkourPlayer {
         }
     }
     
-    public void activateCheckPoint(Location location, boolean custom) {
+    public void activateCheckPoint(Location location, boolean custom, boolean isCP) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
         
         if (!custom) {
@@ -184,6 +184,9 @@ public class ParkourPlayer {
         if (playerState == PlayerState.STAFF_MODE) {
             session.setPracCPLocation(null);
         }
+        if (isCP) {
+            player.sendMessage(Message.CHECKPOINT_REACHED.getInfoMessage());
+        }
     }
     
     public void checkClickedBlock(Location clickedBlock, boolean isCP) {
@@ -193,12 +196,6 @@ public class ParkourPlayer {
         
         ParkourSession session = sessionManager.get(player, currentParkourMap);
         if (session.isPassed()) return;
-    
-        if (isCP) {
-            player.sendMessage(Message.CHECKPOINT_REACHED.getInfoMessage());
-        } else {
-            player.sendMessage(Message.PLAYER_STEP_PROGRESS.getInfoMessage());
-        }
         
         Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
             String checkQuery = "SELECT 1 FROM collected_cp WHERE userid = ? AND mapname = ? AND block_location = ?";
@@ -224,6 +221,9 @@ public class ParkourPlayer {
                     Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
                         TD2Core.getInstance().getDiscordManager().sendCheckPointMessage(player);
                     });
+                    if (!isCP) {
+                        player.sendMessage(Message.PLAYER_STEP_PROGRESS.getInfoMessage());
+                    }
                 }
                 
             } catch (SQLException e) {
