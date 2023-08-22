@@ -3,6 +3,7 @@ package de.legoshi.td2core.command;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.util.Message;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -12,9 +13,11 @@ import org.bukkit.entity.Player;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Map;
 
+@RequiredArgsConstructor
 public class DeletePlayerCommand implements CommandExecutor {
+    
+    private final MapManager mapManager;
     
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
@@ -57,8 +60,8 @@ public class DeletePlayerCommand implements CommandExecutor {
                 commandSender.sendMessage(Message.ERROR_PLAYER_DELETE.getWarningMessage(deleteName));
             }
         });
-        
-        MapManager.getPkMapHashMap().keySet().forEach(MapManager::loadMapStats);
+    
+        mapManager.getPkMapHashMap().keySet().forEach(mapManager::loadMapStats);
         return false;
     }
     

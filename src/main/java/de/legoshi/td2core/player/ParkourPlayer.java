@@ -3,7 +3,6 @@ package de.legoshi.td2core.player;
 import com.viaversion.viaversion.api.Via;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.kit.*;
-import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
@@ -321,7 +320,7 @@ public class ParkourPlayer {
     
                     clearPotionEffects();
                     updateState(state);
-                    ParkourMap parkourMap = MapManager.get("Initial TD2");
+                    ParkourMap parkourMap = TD2Core.getInstance().mapManager.get("Initial TD2");
                     currentParkourMap = parkourMap;
                     
                     ParkourSession parkourSession = new ParkourSession();

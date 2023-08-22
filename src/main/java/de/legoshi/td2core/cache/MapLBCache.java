@@ -19,6 +19,11 @@ public class MapLBCache {
     private static final int PAGE_VOLUME = 40;
     private final HashMap<ParkourMap, HashMap<UUID, MapLBStats>> cache = new HashMap<>();
     private final Object cacheLock = new Object();
+    private final MapManager mapManager;
+    
+    public MapLBCache(MapManager mapManager) {
+        this.mapManager = mapManager;
+    }
     
     public void startMapCacheScheduler() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), this::reloadCache, 0, 20L*60*10);
@@ -46,7 +51,7 @@ public class MapLBCache {
     }
     
     public void reloadCache() {
-        MapManager.getPkMapHashMap().values().forEach(parkourMap -> {
+        mapManager.getPkMapHashMap().values().forEach(parkourMap -> {
             synchronized (cacheLock) {
                 HashMap<UUID, MapLBStats> stats = loadLeaderboardData(parkourMap);
                 cache.put(parkourMap, stats);

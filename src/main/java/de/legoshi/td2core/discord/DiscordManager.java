@@ -43,8 +43,8 @@ public class DiscordManager {
     private final JDA jda;
     private final List<String> authors = new ArrayList<>();
     private final ConfigAccessor configAccessor;
-    private int page = 0;
-    private int pageVolume = 15;
+    private final int page = 0;
+    private final int pageVolume = 15;
     
     public DiscordManager(ConfigManager configManager) {
         this.configAccessor = configManager.getConfigAccessor(DiscordConfig.class);

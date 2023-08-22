@@ -2,10 +2,10 @@ package de.legoshi.td2core.listener;
 
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.block.BlockManager;
-import de.legoshi.td2core.cache.GlobalLBCache;
 import de.legoshi.td2core.gui.GlobalLBGUI;
 import de.legoshi.td2core.gui.SectionGUI;
 import de.legoshi.td2core.listener.item.ItemInteractManager;
+import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.SessionManager;
 import de.legoshi.td2core.player.ParkourPlayer;
@@ -34,6 +34,7 @@ import org.bukkit.material.TrapDoor;
 public class ParkourListener implements Listener {
     
     private final BlockManager blockManager;
+    private final MapManager mapManager;
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -150,7 +151,7 @@ public class ParkourListener implements Listener {
     
     private void selectClick(PlayerInteractEvent event) {
         event.setCancelled(true);
-        new SectionGUI().openGui(event.getPlayer(), null);
+        new SectionGUI(mapManager).openGui(event.getPlayer(), null);
     }
     
     private void leaderBoardClick(PlayerInteractEvent event) {

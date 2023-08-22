@@ -3,7 +3,6 @@ package de.legoshi.td2core.player;
 import com.viaversion.viaversion.util.Pair;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.map.ParkourMap;
-import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
 import de.legoshi.td2core.util.Utils;
@@ -90,7 +89,7 @@ public class PlayerManager {
             e.printStackTrace();
         } finally {
             if (!TD2Core.isShuttingDown) {
-                MapManager.loadMapStats(mapName);
+                TD2Core.getInstance().mapManager.loadMapStats(mapName);
             }
         }
     }

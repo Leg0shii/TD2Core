@@ -1,10 +1,15 @@
 package de.legoshi.td2core.map;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.MapConfig;
+import de.legoshi.td2core.util.Utils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,32 +19,68 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Getter
 public class MapManager {
     
-    @Getter
-    private static final ConcurrentHashMap<String, ParkourMap> pkMapHashMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ParkourMap> pkMapHashMap;
+    private final FileConfiguration config;
     
-    public static void put(ParkourMap parkourMap) {
+    public MapManager(ConfigManager configManager) {
+        pkMapHashMap = new ConcurrentHashMap<>();
+        this.config = configManager.getConfig(MapConfig.class);
+    }
+    
+    public void put(ParkourMap parkourMap) {
         if (parkourMap == null || parkourMap.getMapName() == null) {
             throw new IllegalArgumentException("ParkourMap or its name cannot be null");
         }
         pkMapHashMap.put(parkourMap.getMapName(), parkourMap);
     }
     
-    public static ParkourMap get(String mapName) {
+    public ParkourMap get(String mapName) {
         return pkMapHashMap.get(mapName);
     }
     
-    public static void remove(String mapName) {
+    public void remove(String mapName) {
         pkMapHashMap.remove(mapName);
     }
     
-    public static void loadMaps() {
-        TD2Core.getInstance().configManager.getConfigAccessor(MapConfig.class).loadMapsFromConfig();
-        pkMapHashMap.keySet().forEach(MapManager::loadMapStats);
+    public void loadMaps() {
+        loadMapsFromConfig();
+        pkMapHashMap.keySet().forEach(this::loadMapStats);
     }
     
-    public static CompletableFuture<Boolean> hasPassed(Player player, ParkourMap parkourMap) {
+    private void loadMapsFromConfig() {
+        config.getKeys(false).forEach(key -> {
+            String mapName;
+            for (int i = 1; true; i++) {
+                String indexKey = key + "." + i;
+                mapName = config.getString(indexKey + ".name");
+                if (mapName == null) break;
+                
+                ParkourMap parkourMap = new ParkourMap(mapName);
+                parkourMap.setCategory(key);
+                parkourMap.setOrder(i);
+                parkourMap.setBuildTime(config.getString(indexKey + ".build"));
+                parkourMap.setWeight(config.getInt(indexKey + ".weight"));
+                parkourMap.setDisplayName(config.getString(indexKey + ".displayname"));
+                parkourMap.setHead(config.getString(indexKey + ".head"));
+                parkourMap.setEstimatedDifficulty(config.getInt(indexKey + ".estimated_difficulty"));
+                parkourMap.setStartLocation(Utils.getLocationFromString(config.getString(indexKey + ".start_location")));
+                parkourMap.setEndLocation(Utils.getLocationFromString(config.getString(indexKey + ".end_location")));
+                if (key.equals("section7")) {
+                    if (i != 1) {
+                        List<PotionEffect> list = new ArrayList<>();
+                        list.add(new PotionEffect(PotionEffectType.SPEED, 10000000, i-2));
+                        parkourMap.setPotionEffects(list);
+                    }
+                }
+                put(parkourMap);
+            }
+        });
+    }
+    
+    public CompletableFuture<Boolean> hasPassed(Player player, ParkourMap parkourMap) {
         return CompletableFuture.supplyAsync(() -> {
             String sqlString = "SELECT * FROM player_log WHERE mapname = ? AND passed = 1 AND userid = ?;";
             try {
@@ -57,7 +98,7 @@ public class MapManager {
         });
     }
     
-    public static List<ParkourMap> getAll(String section) {
+    public List<ParkourMap> getAll(String section) {
         return pkMapHashMap
             .values()
             .stream()
@@ -66,8 +107,8 @@ public class MapManager {
             .collect(Collectors.toList());
     }
     
-    public static void loadMapStats(String mapName) {
-        ParkourMap parkourMap = MapManager.get(mapName);
+    public void loadMapStats(String mapName) {
+        ParkourMap parkourMap = get(mapName);
         String sqlString = "SELECT p.userid, p.passed, p.playtime, p.fails, m.total_cp " +
             "FROM player_log as p " +
             "JOIN maps as m ON p.mapname = m.mapname " +
@@ -118,7 +159,7 @@ public class MapManager {
         }, 60L);
     }
     
-    public static void deletePlay(String playerID, String mapName) {
+    public void deletePlay(String playerID, String mapName) {
         Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
             String sqlString = "DELETE FROM player_log WHERE mapname = ? AND userid = ? AND passed = 0;";
             try {

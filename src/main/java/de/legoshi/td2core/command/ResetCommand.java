@@ -8,12 +8,16 @@ import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.player.PlayerState;
 import de.legoshi.td2core.util.Message;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public class ResetCommand implements CommandExecutor {
+    
+    private final MapManager mapManager;
     
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -35,7 +39,7 @@ public class ResetCommand implements CommandExecutor {
         parkourSession.reset();
         player.teleport(parkourMap.getStartLocation());
     
-        MapManager.deletePlay(player.getUniqueId().toString(), parkourMap.mapName);
+        mapManager.deletePlay(player.getUniqueId().toString(), parkourMap.mapName);
         player.sendMessage(Message.SUCCESS_RESET.getSuccessMessage());
         return false;
     }
