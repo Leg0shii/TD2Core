@@ -1,6 +1,7 @@
 package de.legoshi.td2core.cache;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -20,10 +21,15 @@ public class GlobalLBCache {
     
     private HashMap<UUID, GlobalLBStats> cache = null;
     private final Object cacheLock = new Object();
+    private final ConfigManager configManager;
     
-    public GlobalLBCache() {
+    public GlobalLBCache(ConfigManager configManager) {
         super();
-        startScheduler();
+        this.configManager = configManager;
+    }
+    
+    public void startGlobalCacheScheduler() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), this::reloadCache, 0, 20L*60*10);
     }
     
     /**
@@ -107,7 +113,7 @@ public class GlobalLBCache {
                     jumps = player.getPlayer().getStatistic(Statistic.JUMP);
                     playTime = player.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / 20;
                 } else {
-                    PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
+                    PlayerConfig playerConfig = configManager.getConfigAccessor(PlayerConfig.class);
                     jumps = playerConfig.getJumps(uuid);
                     playTime = playerConfig.getTime(uuid);
                 }
@@ -118,10 +124,6 @@ public class GlobalLBCache {
             e.printStackTrace();
         }
         return hashMap;
-    }
-    
-    private void startScheduler() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), this::reloadCache, 0, 20L*60*10);
     }
     
 }

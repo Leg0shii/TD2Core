@@ -23,16 +23,17 @@ import java.util.HashMap;
 
 public class BlockManager implements Listener {
     
+    private final PlayerManager playerManager;
     private final HashMap<Location, BlockData> blockInformation;
     
     private final HashMap<Player, Location> playerPreciseData;
     private final HashMap<Player, Location> playerNextData;
     
-    public BlockManager() {
+    public BlockManager(PlayerManager playerManager) {
+        this.playerManager = playerManager;
         this.blockInformation = new HashMap<>();
         this.playerPreciseData = new HashMap<>();
         this.playerNextData = new HashMap<>();
-        loadBlockData();
     }
     
     @EventHandler
@@ -42,8 +43,9 @@ public class BlockManager implements Listener {
         Material blockType = event.getClickedBlock().getType();
         if (blockType != Material.IRON_PLATE & blockType != Material.WOOD_PLATE && blockType != Material.STONE_PLATE) return;
         
+        
         Player player = event.getPlayer();
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE || player.hasPermission("td2core.edit_cp")) {
             Location clickedBlock = event.getClickedBlock().getLocation();
             new CheckPointGUI().openGui(player, this, clickedBlock);
@@ -140,7 +142,7 @@ public class BlockManager implements Listener {
         return playerPreciseData.containsKey(player);
     }
     
-    private void loadBlockData() {
+    public void loadBlockData() {
         String sqlQuery = "SELECT * FROM block_data";
         try {
             PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlQuery);

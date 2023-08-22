@@ -1,6 +1,7 @@
 package de.legoshi.td2core.gui;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.session.SessionManager;
@@ -23,13 +24,25 @@ import java.util.concurrent.ExecutionException;
 
 public class MapGUI extends GUIPane {
     
-    private int id;
+    private final MapManager mapManager;
+    private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
+    private final ConfigManager configManager;
     
     private final String[] guiSetup = {
         "ggggggggg",
         "gaaaaaaag",
         "ggggggggq"
     };
+    
+    private int id;
+    
+    public MapGUI(MapManager mapManager, PlayerManager playerManager, SessionManager sessionManager, ConfigManager configManager) {
+        this.mapManager = mapManager;
+        this.playerManager = playerManager;
+        this.sessionManager = sessionManager;
+        this.configManager = configManager;
+    }
     
     public void openGui(Player player, InventoryGui parent, int id) {
         super.openGui(player, parent);
@@ -43,15 +56,15 @@ public class MapGUI extends GUIPane {
     
     @Override
     protected void registerGuiElements() {
-        List<ParkourMap> parkourMaps = MapManager.getAll("section" + id);
+        List<ParkourMap> parkourMaps = mapManager.getAll("section" + id);
         GuiElementGroup group = new GuiElementGroup('a');
     
         List<CompletableFuture<DynamicGuiElement>> futures = new ArrayList<>();
     
         for (ParkourMap parkourMap : parkourMaps) {
-            ParkourPlayer parkourPlayer = PlayerManager.get(holder.getPlayer());
+            ParkourPlayer parkourPlayer = playerManager.get(holder.getPlayer());
         
-            CompletableFuture<DynamicGuiElement> future = MapManager.hasPassed(parkourPlayer.getPlayer(), parkourMap).thenApply(passed -> {
+            CompletableFuture<DynamicGuiElement> future = mapManager.hasPassed(parkourPlayer.getPlayer(), parkourMap).thenApply(passed -> {
                 ItemStack item = CustomHeads.create(parkourMap.getHead());
                 return retrieveItem(item, parkourPlayer, parkourMap, passed);
             });
@@ -78,7 +91,7 @@ public class MapGUI extends GUIPane {
     }
     
     private DynamicGuiElement retrieveItem(ItemStack item, ParkourPlayer player, ParkourMap map, boolean passed) {
-        PlayerManager.loadIndividualStats(player.getPlayer(), map).join();
+        playerManager.loadIndividualStats(player.getPlayer(), map).join();
         return new DynamicGuiElement(
             'a',
             () -> new StaticGuiElement(
@@ -86,7 +99,7 @@ public class MapGUI extends GUIPane {
                 item,
                 click -> {
                     if (click.getType().isRightClick()) {
-                        new MapLBGUI().openGui(player.getPlayer(), this.current, map);
+                        new MapLBGUI(configManager).openGui(player.getPlayer(), this.current, map);
                         return true;
                     }
                     if (map.mapName.equals("Final Jump")) {
@@ -105,7 +118,7 @@ public class MapGUI extends GUIPane {
                     this.current.close();
                     return true;
                 },
-                getMapString(map, SessionManager.get(player.getPlayer(), map), passed)
+                getMapString(map, sessionManager.get(player.getPlayer(), map), passed)
             )
         );
     }

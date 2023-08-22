@@ -2,11 +2,12 @@ package de.legoshi.td2core.player;
 
 import com.viaversion.viaversion.util.Pair;
 import de.legoshi.td2core.TD2Core;
-import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.MapManager;
+import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
 import de.legoshi.td2core.util.Utils;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.sql.Date;
@@ -18,32 +19,32 @@ import java.util.concurrent.CompletableFuture;
 
 public class PlayerManager {
     
-    private static final HashMap<Player, ParkourPlayer> playerHashMap = new HashMap<>();
+    @Getter private final MapManager mapManager;
+    private final SessionManager sessionManager;
+    private final HashMap<Player, ParkourPlayer> playerHashMap;
     
-    public static void put(ParkourPlayer parkourPlayer) {
-        playerHashMap.put(parkourPlayer.getPlayer(), parkourPlayer);
+    public PlayerManager(MapManager mapManager, SessionManager sessionManager) {
+        this.mapManager = mapManager;
+        this.sessionManager = sessionManager;
+        this.playerHashMap = new HashMap<>();
     }
     
-    public static ParkourPlayer get(Player player) {
-        return playerHashMap.get(player);
+    public ParkourPlayer create(Player player) {
+        return new ParkourPlayer(this, sessionManager, player);
     }
     
-    public static void remove(ParkourPlayer parkourPlayer) {
-        playerHashMap.remove(parkourPlayer.getPlayer());
-    }
-    
-    public static CompletableFuture<Void> loadPercentage(Player player) {
-        return PlayerManager.getCompPercentage(player.getUniqueId().toString()).thenApply(percentage -> {
+    public CompletableFuture<Void> loadPercentage(Player player) {
+        return getCompPercentage(player.getUniqueId().toString()).thenApply(percentage -> {
             get(player).setPercentage(percentage.key());
             get(player).setRank(percentage.value());
             return null;
         });
     }
     
-    public static void saveIndividualStats(Player player, ParkourMap parkourMap) {
+    public void saveIndividualStats(Player player, ParkourMap parkourMap) {
         if (parkourMap == null) return;
         String mapName = parkourMap.getMapName();
-        ParkourSession session = SessionManager.get(player, parkourMap);
+        ParkourSession session = sessionManager.get(player, parkourMap);
         ParkourPlayer parkourPlayer = get(player);
         
         if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) return;
@@ -90,12 +91,12 @@ public class PlayerManager {
             e.printStackTrace();
         } finally {
             if (!TD2Core.isShuttingDown) {
-                MapManager.loadMapStats(mapName);
+                mapManager.loadMapStats(mapName);
             }
         }
     }
     
-    public static CompletableFuture<Void> loadIndividualStats(Player player, ParkourMap parkourMap) {
+    public CompletableFuture<Void> loadIndividualStats(Player player, ParkourMap parkourMap) {
         if (parkourMap == null) new CompletableFuture<>();
         
         String mapName = parkourMap.getMapName();
@@ -103,8 +104,8 @@ public class PlayerManager {
         
         return CompletableFuture.supplyAsync(() -> {
             try {
-                SessionManager.put(player, parkourMap);
-                ParkourSession session = SessionManager.get(player, parkourMap);
+                sessionManager.put(player, parkourMap);
+                ParkourSession session = sessionManager.get(player, parkourMap);
                 
                 PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlString);
                 preparedStatement.setString(1, mapName);
@@ -150,7 +151,7 @@ public class PlayerManager {
         });
     }
     
-    public static CompletableFuture<Pair<Double, Integer>> getCompPercentage(String uuid) {
+    public CompletableFuture<Pair<Double, Integer>> getCompPercentage(String uuid) {
         return CompletableFuture.supplyAsync(() -> {
             String sqlQuery =
                 "SELECT" +
@@ -203,6 +204,18 @@ public class PlayerManager {
                 throw new RuntimeException("Error fetching player percentage.", e);
             }
         });
+    }
+    
+    public void put(ParkourPlayer parkourPlayer) {
+        playerHashMap.put(parkourPlayer.getPlayer(), parkourPlayer);
+    }
+    
+    public ParkourPlayer get(Player player) {
+        return playerHashMap.get(player);
+    }
+    
+    public void remove(ParkourPlayer parkourPlayer) {
+        playerHashMap.remove(parkourPlayer.getPlayer());
     }
     
 }

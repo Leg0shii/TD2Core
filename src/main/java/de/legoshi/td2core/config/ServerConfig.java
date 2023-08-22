@@ -10,12 +10,6 @@ public class ServerConfig extends ConfigAccessor {
     
     public ServerConfig(JavaPlugin plugin) {
         super(plugin, fileName);
-        loadConfig();
-    }
-    
-    public void loadConfig() {
-        TD2Core.getInstance().spawnLocation = Utils.getLocationFromString(getConfig().getString("spawn"));
-        TD2Core.getInstance().discordToken = getConfig().getString("discord_token");
     }
     
 }

@@ -2,6 +2,7 @@ package de.legoshi.td2core.gui;
 
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.cache.MapLBStats;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.util.CustomHeads;
@@ -9,6 +10,7 @@ import de.legoshi.td2core.util.Utils;
 import de.themoep.inventorygui.GuiElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,8 +19,10 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class MapLBGUI extends GUILeaderboard<MapLBStats> {
     
+    private final ConfigManager configManager;
     private ParkourMap parkourMap;
     
     public void openGui(Player player, InventoryGui parent, ParkourMap parkourMap) {
@@ -54,7 +58,7 @@ public class MapLBGUI extends GUILeaderboard<MapLBStats> {
     
         String prefix = getRankPrefix(count + page * pageVolume);
     
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
+        PlayerConfig playerConfig = configManager.getConfigAccessor(PlayerConfig.class);
         ItemStack playerHead = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
     
         if (playerConfig.getConfig().contains(uuid + ".skin")) {

@@ -2,12 +2,14 @@ package de.legoshi.td2core.listener;
 
 import com.viaversion.viaversion.api.Via;
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.player.tag.PlayerTag;
 import de.legoshi.td2core.util.Message;
 import de.legoshi.td2core.util.ScoreboardUtil;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
@@ -22,11 +24,19 @@ import org.bukkit.inventory.ItemStack;
 
 public class GeneralListener implements Listener {
     
+    private final PlayerConfig playerConfig;
+    private final PlayerManager playerManager;
+    
+    public GeneralListener(ConfigManager configManager, PlayerManager playerManager) {
+        this.playerConfig = configManager.getConfigAccessor(PlayerConfig.class);
+        this.playerManager = playerManager;
+    }
+    
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
         Player player = event.getPlayer();
-        PlayerTag tag = PlayerManager.get(player).getPlayerTag();
+        PlayerTag tag = playerManager.get(player).getPlayerTag();
         Bukkit.broadcastMessage(tag.getTag() + "§7" + player.getDisplayName() + ": " + event.getMessage());
     }
     
@@ -72,14 +82,11 @@ public class GeneralListener implements Listener {
     
     private void initPlayer(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        player.teleport(TD2Core.getInstance().spawnLocation);
+        player.teleport(TD2Core.getSpawn());
         event.setJoinMessage("");
     
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
         playerConfig.savePlayer(player);
-        
-        ParkourPlayer parkourPlayer = new ParkourPlayer(player);
-        parkourPlayer.serverJoin();
+        playerManager.create(player).serverJoin(); // creates new ParkourPlayer
     }
     
     @EventHandler
@@ -90,10 +97,8 @@ public class GeneralListener implements Listener {
     }
     
     private void playerLeave(Player player) {
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         parkourPlayer.serverLeave(false);
-    
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
         playerConfig.savePlayer(player);
     }
     

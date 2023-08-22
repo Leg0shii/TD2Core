@@ -1,10 +1,12 @@
 package de.legoshi.td2core.gui;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.cache.GlobalLBStats;
 import de.legoshi.td2core.util.CustomHeads;
 import de.themoep.inventorygui.*;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +15,10 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class GlobalLBGUI extends GUILeaderboard<GlobalLBStats> {
+    
+    private final ConfigManager configManager;
     
     public void openGui(Player player, InventoryGui parent) {
         super.openGui(player, parent, "§7§lLeaderboard");
@@ -33,6 +38,7 @@ public class GlobalLBGUI extends GUILeaderboard<GlobalLBStats> {
     @Override
     protected GuiElement loadGUIElement(UUID uuid, GlobalLBStats stats, int count) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+        PlayerConfig playerConfig = configManager.getConfigAccessor(PlayerConfig.class);
         String name = player.getName();
         String playTime;
         String jumps;
@@ -41,14 +47,11 @@ public class GlobalLBGUI extends GUILeaderboard<GlobalLBStats> {
             playTime = player.getPlayer().getStatistic(Statistic.PLAY_ONE_TICK) / (20 * 60 * 60) + " h";
             jumps = player.getPlayer().getStatistic(Statistic.JUMP) + "";
         } else {
-            PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
             playTime = playerConfig.getTime(uuid) / (20 * 60 * 60) + " h";
             jumps = playerConfig.getJumps(uuid) + "";
         }
         
         String prefix = getRankPrefix(count + page * pageVolume);
-        
-        PlayerConfig playerConfig = (PlayerConfig) TD2Core.getInstance().config.get(PlayerConfig.fileName);
         ItemStack playerHead = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         
         if (playerConfig.getConfig().contains(uuid + ".skin")) {

@@ -8,34 +8,38 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
     
-    private static final ConcurrentHashMap<Player, HashMap<ParkourMap, ParkourSession>> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Player, HashMap<ParkourMap, ParkourSession>> sessionMap;
     
-    public static void init(Player player) {
-        map.put(player, new HashMap<>());
+    public SessionManager() {
+        this.sessionMap = new ConcurrentHashMap<>();
     }
     
-    public static ParkourSession get(Player player, ParkourMap parkourMap) {
-        return map.get(player).get(parkourMap);
+    public void init(Player player) {
+        sessionMap.put(player, new HashMap<>());
     }
     
-    public static void put(Player player, ParkourMap parkourMap) {
-        map.get(player).put(parkourMap, new ParkourSession());
+    public ParkourSession get(Player player, ParkourMap parkourMap) {
+        return sessionMap.get(player).get(parkourMap);
     }
     
-    public static void put(Player player, ParkourMap parkourMap, ParkourSession session) {
-        map.get(player).put(parkourMap, session);
+    public void put(Player player, ParkourMap parkourMap) {
+        sessionMap.get(player).put(parkourMap, new ParkourSession());
     }
     
-    public static void removeAll(Player player) {
-        map.remove(player);
+    public void put(Player player, ParkourMap parkourMap, ParkourSession session) {
+        sessionMap.get(player).put(parkourMap, session);
     }
     
-    public static void remove(Player player, ParkourMap parkourMap) {
-        map.get(player).remove(parkourMap);
+    public void removeAll(Player player) {
+        sessionMap.remove(player);
     }
     
-    public static boolean contains(Player player, ParkourMap parkourMap) {
-        return map.get(player).containsKey(parkourMap);
+    public void remove(Player player, ParkourMap parkourMap) {
+        sessionMap.get(player).remove(parkourMap);
+    }
+    
+    public boolean contains(Player player, ParkourMap parkourMap) {
+        return sessionMap.get(player).containsKey(parkourMap);
     }
     
 }

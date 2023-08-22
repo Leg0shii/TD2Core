@@ -1,13 +1,12 @@
 package de.legoshi.td2core.discord;
 
 import de.legoshi.td2core.TD2Core;
-import de.legoshi.td2core.cache.GlobalLBCache;
 import de.legoshi.td2core.cache.GlobalLBStats;
 import de.legoshi.td2core.cache.MapLBStats;
 import de.legoshi.td2core.config.ConfigAccessor;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.DiscordConfig;
 import de.legoshi.td2core.gui.GlobalLBGUI;
-import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
@@ -23,6 +22,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.sql.Date;
@@ -42,10 +42,18 @@ public class DiscordManager {
     
     private final JDA jda;
     private final List<String> authors = new ArrayList<>();
-    private int page = 0;
-    private int pageVolume = 15;
+    private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
+    private final ConfigManager configManager;
+    private final ConfigAccessor configAccessor;
+    private final int page = 0;
+    private final int pageVolume = 15;
     
-    public DiscordManager() {
+    public DiscordManager(ConfigManager configManager, PlayerManager playerManager, SessionManager sessionManager) {
+        this.configManager = configManager;
+        this.configAccessor = configManager.getConfigAccessor(DiscordConfig.class);
+        this.playerManager = playerManager;
+        this.sessionManager = sessionManager;
         loadConfig();
         
         JDABuilder builder = JDABuilder.createDefault(token);
@@ -56,11 +64,10 @@ public class DiscordManager {
         jda = builder.build();
         
         registerListener();
-        startScheduler();
     }
     
     public void sendCheckPointMessage(Player player) {
-        ParkourMap currentParkourMap = PlayerManager.get(player).getCurrentParkourMap();
+        ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
         MapLBStats mapLBStats = TD2Core.getInstance().mapLBCache.getCache().get(currentParkourMap).get(player.getUniqueId());
         String checkpointActivationMessage = Message.CHECKPOINT_ACTIVATED.getMessage(
             player.getName(),
@@ -72,8 +79,8 @@ public class DiscordManager {
     }
     
     public void sendCompletionMessage(Player player) {
-        ParkourMap currentParkourMap = PlayerManager.get(player).getCurrentParkourMap();
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         String completionActivationMessage = Message.COMPLETION_ACTIVATED.getMessage(
             player.getName(),
             currentParkourMap.mapName,
@@ -89,8 +96,8 @@ public class DiscordManager {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String formattedDate = sdf.format(date);
     
-        ParkourMap currentParkourMap = PlayerManager.get(player).getCurrentParkourMap();
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         Location sessionLocation = session.getLastCheckpointLocation();
         if (sessionLocation == null) sessionLocation = player.getLocation();
     
@@ -108,7 +115,7 @@ public class DiscordManager {
     private void updateLeaderboard() {
         TD2Core.getInstance().globalLBCache.getLeaderboardData().thenApply(map -> {
             String leaderboardMessage = "🏆 Completion **LEADERBOARD** (updates every 10 mins)\n\n";
-            HashMap<UUID, GlobalLBStats> sortedMap = new GlobalLBGUI().sortMap(map, page, pageVolume);
+            HashMap<UUID, GlobalLBStats> sortedMap = new GlobalLBGUI(configManager).sortMap(map, page, pageVolume);
             int count = 1;
             for (UUID a : sortedMap.keySet()) {
                 GlobalLBStats b = sortedMap.get(a);
@@ -179,32 +186,20 @@ public class DiscordManager {
     }
     
     private void registerListener() {
-        this.jda.addEventListener(new MessageListener(authors));
+        this.jda.addEventListener(new MessageListener(authors, configAccessor));
     }
     
     private void loadConfig() {
-        ConfigAccessor configAccessor = TD2Core.getInstance().config.get(DiscordConfig.fileName);
-        if (configAccessor.getConfig().contains("token")) {
-            token = configAccessor.getConfig().getString("token");
-        }
-        if (configAccessor.getConfig().contains("completiontextchannel")) {
-            completionTextChannel = configAccessor.getConfig().getString("completiontextchannel");
-        }
-        if (configAccessor.getConfig().contains("checkpointtextchannel")) {
-            checkPointTextChannel = configAccessor.getConfig().getString("checkpointtextchannel");
-        }
-        if (configAccessor.getConfig().contains("stafftextchannel")) {
-            staffTextChannel = configAccessor.getConfig().getString("stafftextchannel");
-        }
-        if (configAccessor.getConfig().contains("stafftextchannel")) {
-            leaderboardChannel = configAccessor.getConfig().getString("leaderboardchannel");
-        }
-        if (configAccessor.getConfig().contains("authors")) {
-            authors.addAll(configAccessor.getConfig().getConfigurationSection("authors").getKeys(false));
-        }
+        FileConfiguration config = configAccessor.getConfig();
+        if (config.contains("token")) token = config.getString("token");
+        if (config.contains("completiontextchannel")) completionTextChannel = config.getString("completiontextchannel");
+        if (config.contains("checkpointtextchannel")) checkPointTextChannel = config.getString("checkpointtextchannel");
+        if (config.contains("stafftextchannel")) staffTextChannel = config.getString("stafftextchannel");
+        if (config.contains("stafftextchannel")) leaderboardChannel = config.getString("leaderboardchannel");
+        if (config.contains("authors")) authors.addAll(config.getConfigurationSection("authors").getKeys(false));
     }
     
-    private void startScheduler() {
+    public void startLeaderboardScheduler() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(TD2Core.getInstance(), this::updateLeaderboard, 20L, 20L * 60 * 10);
     }
     

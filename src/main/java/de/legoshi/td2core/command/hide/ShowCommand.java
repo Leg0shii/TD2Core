@@ -1,10 +1,8 @@
 package de.legoshi.td2core.command.hide;
 
-import de.legoshi.td2core.TD2Core;
-import de.legoshi.td2core.player.invis.InvisManager;
+import de.legoshi.td2core.player.hide.HideManager;
 import de.legoshi.td2core.util.Message;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +11,7 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public class ShowCommand implements CommandExecutor {
     
-    private final InvisManager invisManager;
+    private final HideManager hideManager;
     
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -28,7 +26,7 @@ public class ShowCommand implements CommandExecutor {
         }
         String playerName = strings[0];
         Player player = (Player) commandSender;
-        invisManager.unHidePlayer(player, playerName);
+        hideManager.unHidePlayer(player, playerName);
         return false;
     }
     

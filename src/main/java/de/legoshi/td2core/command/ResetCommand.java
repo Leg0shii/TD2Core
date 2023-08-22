@@ -8,12 +8,18 @@ import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.player.PlayerState;
 import de.legoshi.td2core.util.Message;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public class ResetCommand implements CommandExecutor {
+    
+    private final MapManager mapManager;
+    private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
     
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -23,7 +29,7 @@ public class ResetCommand implements CommandExecutor {
         }
         
         Player player = (Player) commandSender;
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         ParkourMap parkourMap = parkourPlayer.getCurrentParkourMap();
         
         if (parkourPlayer.getPlayerState() != PlayerState.PARKOUR) {
@@ -31,11 +37,11 @@ public class ResetCommand implements CommandExecutor {
             return false;
         }
     
-        ParkourSession parkourSession = SessionManager.get(player, parkourMap);
+        ParkourSession parkourSession = sessionManager.get(player, parkourMap);
         parkourSession.reset();
         player.teleport(parkourMap.getStartLocation());
     
-        MapManager.deletePlay(player.getUniqueId().toString(), parkourMap.mapName);
+        mapManager.deletePlay(player.getUniqueId().toString(), parkourMap.mapName);
         player.sendMessage(Message.SUCCESS_RESET.getSuccessMessage());
         return false;
     }

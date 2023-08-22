@@ -14,105 +14,119 @@ import de.legoshi.td2core.discord.DiscordManager;
 import de.legoshi.td2core.listener.GeneralListener;
 import de.legoshi.td2core.listener.ParkourListener;
 import de.legoshi.td2core.map.MapManager;
+import de.legoshi.td2core.map.session.SessionManager;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.cache.GlobalLBCache;
-import de.legoshi.td2core.player.invis.InvisManager;
+import de.legoshi.td2core.player.hide.HideManager;
+import de.legoshi.td2core.util.Utils;
 import de.legoshi.td2core.util.WorldLoader;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-
 public final class TD2Core extends JavaPlugin {
     
     public static boolean isShuttingDown = false;
+    public PlayerManager playerManager;
     public GlobalLBCache globalLBCache;
     public MapLBCache mapLBCache;
     
     private static TD2Core instance;
+    private Location spawnLocation;
     
-    public HashMap<String, ConfigAccessor> config = new HashMap<>();
-    public Location spawnLocation;
-    public String discordToken;
+    private MapManager mapManager;
+    private SessionManager sessionManager;
     
+    private ConfigManager configManager;
     private BlockManager blockManager;
     private DBManager dbManager;
-    @Getter private DiscordManager discordManager;
-    private InvisManager invisManager;
+    private DiscordManager discordManager;
+    private HideManager hideManager;
+    
+    @Override
+    public void onLoad() {
+        instance = this;
+        
+        configManager = new ConfigManager(this);
+        sessionManager = new SessionManager();
+        dbManager = new DBManager(this, configManager);
+        mapManager = new MapManager(configManager);
+        playerManager = new PlayerManager(mapManager, sessionManager);
+        discordManager = new DiscordManager(configManager, playerManager, sessionManager);
+        blockManager = new BlockManager(playerManager);
+        hideManager = new HideManager();
+    
+        globalLBCache = new GlobalLBCache(configManager);
+        mapLBCache = new MapLBCache(mapManager);
+    }
     
     @Override
     public void onEnable() {
-        instance = this;
-    
-        WorldLoader.loadWorlds(); // load before config
+        WorldLoader.loadWorlds();
         
-        loadConfig();
+        mapManager.loadMaps();
         
-        discordManager = new DiscordManager();
-        dbManager = new DBManager(this);
-        blockManager = new BlockManager();
-        invisManager = new InvisManager();
-    
+        discordManager.startLeaderboardScheduler();
+        globalLBCache.startGlobalCacheScheduler();
+        mapLBCache.startMapCacheScheduler();
+        blockManager.loadBlockData();
+        
+        loadSpawnLocation();
         registerEvents();
         registerCommands();
-        
-        MapManager.loadMaps();
-        globalLBCache = new GlobalLBCache();
-        mapLBCache = new MapLBCache();
     }
 
     @Override
     public void onDisable() {
         isShuttingDown = true;
-        Bukkit.getOnlinePlayers().forEach(all -> PlayerManager.get(all).serverLeave(true));
-        config.keySet().forEach(key -> config.get(key).saveConfig());
+        Bukkit.getOnlinePlayers().forEach(all -> playerManager.get(all).serverLeave(true));
     }
     
     private void registerCommands() {
         Bukkit.getPluginCommand("help").setExecutor(new HelpCommand());
-        Bukkit.getPluginCommand("prac").setExecutor(new PracticeCommand());
-        Bukkit.getPluginCommand("unprac").setExecutor(new UnPracCommand());
-        Bukkit.getPluginCommand("kit").setExecutor(new KitCommand());
-        Bukkit.getPluginCommand("leave").setExecutor(new LeaveCommand());
-        Bukkit.getPluginCommand("delete").setExecutor(new DeletePlayerCommand());
-        Bukkit.getPluginCommand("td2reload").setExecutor(new ReloadCommand());
-        Bukkit.getPluginCommand("spawn").setExecutor(new SpawnCommand());
+        Bukkit.getPluginCommand("prac").setExecutor(new PracticeCommand(playerManager));
+        Bukkit.getPluginCommand("unprac").setExecutor(new UnPracCommand(playerManager));
+        Bukkit.getPluginCommand("kit").setExecutor(new KitCommand(playerManager));
+        Bukkit.getPluginCommand("leave").setExecutor(new LeaveCommand(playerManager));
+        Bukkit.getPluginCommand("delete").setExecutor(new DeletePlayerCommand(mapManager));
+        Bukkit.getPluginCommand("spawn").setExecutor(new SpawnCommand(playerManager));
         Bukkit.getPluginCommand("nv").setExecutor(new NightVisionCommand());
-        Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand());
+        Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand(mapManager, playerManager, sessionManager));
         Bukkit.getPluginCommand("spc").setExecutor(new SPCCommand(blockManager));
-        Bukkit.getPluginCommand("staff").setExecutor(new StaffCommand());
-        Bukkit.getPluginCommand("hide").setExecutor(new HideCommand(invisManager));
-        Bukkit.getPluginCommand("show").setExecutor(new ShowCommand(invisManager));
-        Bukkit.getPluginCommand("hideall").setExecutor(new HideAllCommand(invisManager));
-        Bukkit.getPluginCommand("showall").setExecutor(new ShowAllCommand(invisManager));
+        Bukkit.getPluginCommand("staff").setExecutor(new StaffCommand(playerManager));
+        Bukkit.getPluginCommand("hide").setExecutor(new HideCommand(hideManager));
+        Bukkit.getPluginCommand("show").setExecutor(new ShowCommand(hideManager));
+        Bukkit.getPluginCommand("hideall").setExecutor(new HideAllCommand(hideManager));
+        Bukkit.getPluginCommand("showall").setExecutor(new ShowAllCommand(hideManager));
     }
     
     private void registerEvents() {
         PluginManager pluginManager = Bukkit.getServer().getPluginManager();
-        pluginManager.registerEvents(new GeneralListener(), this);
-        pluginManager.registerEvents(new ParkourListener(blockManager), this);
+        pluginManager.registerEvents(new GeneralListener(configManager, playerManager), this);
+        pluginManager.registerEvents(new ParkourListener(blockManager, mapManager, playerManager, sessionManager, configManager), this);
         pluginManager.registerEvents(blockManager, this);
-        pluginManager.registerEvents(invisManager, this);
-    }
-    
-    public void loadConfig() {
-        config.put(DBConfig.fileName, new DBConfig(this));
-        config.put(ServerConfig.fileName, new ServerConfig(this));
-        config.put(MapConfig.fileName, new MapConfig(this));
-        config.put(PlayerConfig.fileName, new PlayerConfig(this));
-        config.put(DiscordConfig.fileName, new DiscordConfig(this));
-        config.keySet().forEach(key -> config.get(key).reloadConfig());
+        pluginManager.registerEvents(hideManager, this);
     }
     
     public static TD2Core getInstance() {
         return instance;
     }
     
+    public static Location getSpawn() {
+        return instance.spawnLocation;
+    }
+    
     public static AsyncMySQL sql() {
         return instance.dbManager.mySQL;
+    }
+    
+    public DiscordManager getDiscordManager() {
+        return discordManager;
+    }
+    
+    private void loadSpawnLocation() {
+        spawnLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("spawn"));
     }
     
 }

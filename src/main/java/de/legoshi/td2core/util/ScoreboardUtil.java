@@ -1,5 +1,6 @@
 package de.legoshi.td2core.util;
 
+import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.player.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -52,7 +53,7 @@ public class ScoreboardUtil {
     public static void updatePercentage(Player player) {
         Scoreboard scoreboard = player.getScoreboard();
         if (scoreboard == null) return;
-        double percentage = PlayerManager.get(player).getPercentage();
+        double percentage = TD2Core.getInstance().playerManager.get(player).getPercentage();
         scoreboard.getTeam("rank").setPrefix("" + ChatColor.WHITE + ((int) (percentage*100))/100.0 + " %");
     }
     
