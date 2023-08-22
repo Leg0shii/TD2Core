@@ -35,12 +35,13 @@ public class ParkourListener implements Listener {
     
     private final BlockManager blockManager;
     private final MapManager mapManager;
+    private final PlayerManager playerManager;
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         ItemStack itemStack = event.getItem();
         
-        ParkourPlayer parkourPlayer = PlayerManager.get(event.getPlayer());
+        ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
         if (parkourPlayer.getPlayerState().equals(PlayerState.STAFF_MODE)) {
             onTrapDoorClick(event);
         }
@@ -68,7 +69,7 @@ public class ParkourListener implements Listener {
     private void setCPClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         event.setCancelled(true);
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         ParkourMap parkourMap = parkourPlayer.getCurrentParkourMap();
         ParkourSession session = SessionManager.get(player, parkourMap);
         session.setPracCPLocation(player.getLocation());
@@ -78,7 +79,7 @@ public class ParkourListener implements Listener {
     private void checkPointClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         event.setCancelled(true);
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         ParkourMap parkourMap = parkourPlayer.getCurrentParkourMap();
         ParkourSession session = SessionManager.get(player, parkourMap);
         parkourPlayer.triggerFail();
@@ -128,7 +129,7 @@ public class ParkourListener implements Listener {
     private void flyClick(PlayerInteractEvent event) {
         event.setCancelled(true);
         Player player = event.getPlayer();
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
             player.setAllowFlight(!player.getAllowFlight());
             
@@ -151,7 +152,7 @@ public class ParkourListener implements Listener {
     
     private void selectClick(PlayerInteractEvent event) {
         event.setCancelled(true);
-        new SectionGUI(mapManager).openGui(event.getPlayer(), null);
+        new SectionGUI(mapManager, playerManager).openGui(event.getPlayer(), null);
     }
     
     private void leaderBoardClick(PlayerInteractEvent event) {
@@ -162,7 +163,7 @@ public class ParkourListener implements Listener {
     
     private void buttonInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || player.hasPermission("td2core.build")) return;
         if (event.getItem() != null && event.getItem().getType().equals(Material.SHIELD)) return;
         event.setCancelled(true);
@@ -173,7 +174,7 @@ public class ParkourListener implements Listener {
         event.setCancelled(true);
     
         Player player = event.getPlayer();
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
     
         if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
     

@@ -30,6 +30,7 @@ public final class TD2Core extends JavaPlugin {
     private static TD2Core instance;
     
     public MapManager mapManager;
+    public PlayerManager playerManager;
     
     public GlobalLBCache globalLBCache;
     public MapLBCache mapLBCache;
@@ -50,9 +51,10 @@ public final class TD2Core extends JavaPlugin {
         dbManager = new DBManager(this, configManager);
     
         mapManager = new MapManager(configManager);
-        discordManager = new DiscordManager(configManager);
+        playerManager = new PlayerManager(mapManager);
+        discordManager = new DiscordManager(configManager, playerManager);
     
-        blockManager = new BlockManager();
+        blockManager = new BlockManager(playerManager);
         hideManager = new HideManager();
     
         globalLBCache = new GlobalLBCache(configManager);
@@ -78,21 +80,21 @@ public final class TD2Core extends JavaPlugin {
     @Override
     public void onDisable() {
         isShuttingDown = true;
-        Bukkit.getOnlinePlayers().forEach(all -> PlayerManager.get(all).serverLeave(true));
+        Bukkit.getOnlinePlayers().forEach(all -> playerManager.get(all).serverLeave(true));
     }
     
     private void registerCommands() {
         Bukkit.getPluginCommand("help").setExecutor(new HelpCommand());
-        Bukkit.getPluginCommand("prac").setExecutor(new PracticeCommand());
-        Bukkit.getPluginCommand("unprac").setExecutor(new UnPracCommand());
-        Bukkit.getPluginCommand("kit").setExecutor(new KitCommand());
-        Bukkit.getPluginCommand("leave").setExecutor(new LeaveCommand());
+        Bukkit.getPluginCommand("prac").setExecutor(new PracticeCommand(playerManager));
+        Bukkit.getPluginCommand("unprac").setExecutor(new UnPracCommand(playerManager));
+        Bukkit.getPluginCommand("kit").setExecutor(new KitCommand(playerManager));
+        Bukkit.getPluginCommand("leave").setExecutor(new LeaveCommand(playerManager));
         Bukkit.getPluginCommand("delete").setExecutor(new DeletePlayerCommand(mapManager));
-        Bukkit.getPluginCommand("spawn").setExecutor(new SpawnCommand());
+        Bukkit.getPluginCommand("spawn").setExecutor(new SpawnCommand(playerManager));
         Bukkit.getPluginCommand("nv").setExecutor(new NightVisionCommand());
-        Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand(mapManager));
+        Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand(mapManager, playerManager));
         Bukkit.getPluginCommand("spc").setExecutor(new SPCCommand(blockManager));
-        Bukkit.getPluginCommand("staff").setExecutor(new StaffCommand());
+        Bukkit.getPluginCommand("staff").setExecutor(new StaffCommand(playerManager));
         Bukkit.getPluginCommand("hide").setExecutor(new HideCommand(hideManager));
         Bukkit.getPluginCommand("show").setExecutor(new ShowCommand(hideManager));
         Bukkit.getPluginCommand("hideall").setExecutor(new HideAllCommand(hideManager));
@@ -101,8 +103,8 @@ public final class TD2Core extends JavaPlugin {
     
     private void registerEvents() {
         PluginManager pluginManager = Bukkit.getServer().getPluginManager();
-        pluginManager.registerEvents(new GeneralListener(configManager), this);
-        pluginManager.registerEvents(new ParkourListener(blockManager, mapManager), this);
+        pluginManager.registerEvents(new GeneralListener(configManager, playerManager), this);
+        pluginManager.registerEvents(new ParkourListener(blockManager, mapManager, playerManager), this);
         pluginManager.registerEvents(blockManager, this);
         pluginManager.registerEvents(hideManager, this);
     }

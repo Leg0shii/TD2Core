@@ -16,7 +16,7 @@ public class TagCreator {
             Scoreboard scoreboard = playerToUpdate.getScoreboard(); // Get the scoreboard of the player to update
             
             for (Player all : Bukkit.getOnlinePlayers()) {
-                ParkourPlayer parkourPlayer = PlayerManager.get(all);
+                ParkourPlayer parkourPlayer = TD2Core.getInstance().playerManager.get(all);
                 PlayerTag playerTag = getPlayerTag((
                     (int) (parkourPlayer.getPercentage() * 10)) / 10.0,
                     parkourPlayer.getRank(),

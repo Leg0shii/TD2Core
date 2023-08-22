@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 public class MapGUI extends GUIPane {
     
     private final MapManager mapManager;
+    private final PlayerManager playerManager;
     private final String[] guiSetup = {
         "ggggggggg",
         "gaaaaaaag",
@@ -32,8 +33,9 @@ public class MapGUI extends GUIPane {
     
     private int id;
     
-    public MapGUI(MapManager mapManager) {
+    public MapGUI(MapManager mapManager, PlayerManager playerManager) {
         this.mapManager = mapManager;
+        this.playerManager = playerManager;
     }
     
     public void openGui(Player player, InventoryGui parent, int id) {
@@ -54,7 +56,7 @@ public class MapGUI extends GUIPane {
         List<CompletableFuture<DynamicGuiElement>> futures = new ArrayList<>();
     
         for (ParkourMap parkourMap : parkourMaps) {
-            ParkourPlayer parkourPlayer = PlayerManager.get(holder.getPlayer());
+            ParkourPlayer parkourPlayer = playerManager.get(holder.getPlayer());
         
             CompletableFuture<DynamicGuiElement> future = mapManager.hasPassed(parkourPlayer.getPlayer(), parkourMap).thenApply(passed -> {
                 ItemStack item = CustomHeads.create(parkourMap.getHead());
@@ -83,7 +85,7 @@ public class MapGUI extends GUIPane {
     }
     
     private DynamicGuiElement retrieveItem(ItemStack item, ParkourPlayer player, ParkourMap map, boolean passed) {
-        PlayerManager.loadIndividualStats(player.getPlayer(), map).join();
+        playerManager.loadIndividualStats(player.getPlayer(), map).join();
         return new DynamicGuiElement(
             'a',
             () -> new StaticGuiElement(

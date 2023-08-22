@@ -2,6 +2,7 @@ package de.legoshi.td2core.gui;
 
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.map.MapManager;
+import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.util.CustomHeads;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
@@ -10,12 +11,14 @@ import org.bukkit.entity.Player;
 public class SectionGUI extends GUIPane {
     
     private final MapManager mapManager;
+    private final PlayerManager playerManager;
     private final String[] guiSetup = {
         "abcdefghi"
     };
     
-    public SectionGUI(MapManager mapManager) {
+    public SectionGUI(MapManager mapManager, PlayerManager playerManager) {
         this.mapManager = mapManager;
+        this.playerManager = playerManager;
     }
     
     public void openGui(Player player, InventoryGui parent) {
@@ -41,7 +44,7 @@ public class SectionGUI extends GUIPane {
     }
     
     protected boolean openMap(int id) {
-        new MapGUI(mapManager).openGui(holder.getPlayer(), this.current, id);
+        new MapGUI(mapManager, playerManager).openGui(holder.getPlayer(), this.current, id);
         return true;
     }
     

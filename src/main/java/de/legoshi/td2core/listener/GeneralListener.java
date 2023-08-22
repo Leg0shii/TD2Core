@@ -22,20 +22,21 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-@RequiredArgsConstructor
 public class GeneralListener implements Listener {
     
     private final PlayerConfig playerConfig;
+    private final PlayerManager playerManager;
     
-    public GeneralListener(ConfigManager configManager) {
+    public GeneralListener(ConfigManager configManager, PlayerManager playerManager) {
         this.playerConfig = configManager.getConfigAccessor(PlayerConfig.class);
+        this.playerManager = playerManager;
     }
     
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         event.setCancelled(true);
         Player player = event.getPlayer();
-        PlayerTag tag = PlayerManager.get(player).getPlayerTag();
+        PlayerTag tag = playerManager.get(player).getPlayerTag();
         Bukkit.broadcastMessage(tag.getTag() + "§7" + player.getDisplayName() + ": " + event.getMessage());
     }
     
@@ -86,7 +87,7 @@ public class GeneralListener implements Listener {
     
         playerConfig.savePlayer(player);
         
-        ParkourPlayer parkourPlayer = new ParkourPlayer(player);
+        ParkourPlayer parkourPlayer = new ParkourPlayer(playerManager, player);
         parkourPlayer.serverJoin();
     }
     
@@ -98,7 +99,7 @@ public class GeneralListener implements Listener {
     }
     
     private void playerLeave(Player player) {
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         parkourPlayer.serverLeave(false);
         playerConfig.savePlayer(player);
     }

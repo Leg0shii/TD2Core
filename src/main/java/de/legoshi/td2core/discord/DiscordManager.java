@@ -42,12 +42,14 @@ public class DiscordManager {
     
     private final JDA jda;
     private final List<String> authors = new ArrayList<>();
+    private final PlayerManager playerManager;
     private final ConfigAccessor configAccessor;
     private final int page = 0;
     private final int pageVolume = 15;
     
-    public DiscordManager(ConfigManager configManager) {
+    public DiscordManager(ConfigManager configManager, PlayerManager playerManager) {
         this.configAccessor = configManager.getConfigAccessor(DiscordConfig.class);
+        this.playerManager = playerManager;
         loadConfig();
         
         JDABuilder builder = JDABuilder.createDefault(token);
@@ -61,7 +63,7 @@ public class DiscordManager {
     }
     
     public void sendCheckPointMessage(Player player) {
-        ParkourMap currentParkourMap = PlayerManager.get(player).getCurrentParkourMap();
+        ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
         MapLBStats mapLBStats = TD2Core.getInstance().mapLBCache.getCache().get(currentParkourMap).get(player.getUniqueId());
         String checkpointActivationMessage = Message.CHECKPOINT_ACTIVATED.getMessage(
             player.getName(),
@@ -73,7 +75,7 @@ public class DiscordManager {
     }
     
     public void sendCompletionMessage(Player player) {
-        ParkourMap currentParkourMap = PlayerManager.get(player).getCurrentParkourMap();
+        ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
         ParkourSession session = SessionManager.get(player, currentParkourMap);
         String completionActivationMessage = Message.COMPLETION_ACTIVATED.getMessage(
             player.getName(),
@@ -90,7 +92,7 @@ public class DiscordManager {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String formattedDate = sdf.format(date);
     
-        ParkourMap currentParkourMap = PlayerManager.get(player).getCurrentParkourMap();
+        ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
         ParkourSession session = SessionManager.get(player, currentParkourMap);
         Location sessionLocation = session.getLastCheckpointLocation();
         if (sessionLocation == null) sessionLocation = player.getLocation();

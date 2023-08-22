@@ -28,6 +28,8 @@ import java.sql.SQLException;
 @Setter
 public class ParkourPlayer {
     
+    private final PlayerManager playerManager;
+    
     private final Player player;
     private PlayerTag playerTag;
     private PlayerState playerState;
@@ -42,7 +44,8 @@ public class ParkourPlayer {
     private double percentage;
     private int version;
     
-    public ParkourPlayer(Player player) {
+    public ParkourPlayer(PlayerManager playerManager, Player player) {
+        this.playerManager = playerManager;
         this.player = player;
         this.version = Via.getAPI().getPlayerVersion(player.getUniqueId());
         this.playerState = PlayerState.LOBBY;
@@ -54,10 +57,10 @@ public class ParkourPlayer {
     }
     
     public void serverJoin() {
-        PlayerManager.put(this);
+        playerManager.put(this);
         ScoreboardUtil.initializeScoreboard(player);
-        
-        PlayerManager.loadPercentage(player).thenApply(val -> {
+    
+        playerManager.loadPercentage(player).thenApply(val -> {
             ScoreboardUtil.setSpawnScoreboardValue(player);
             Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
             return null;
@@ -83,12 +86,12 @@ public class ParkourPlayer {
             session.setLastMapLocation(player.getLocation());
         }
         if (shutdown) {
-            PlayerManager.saveIndividualStats(player, currentParkourMap);
+            playerManager.saveIndividualStats(player, currentParkourMap);
         } else {
             Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
-                PlayerManager.saveIndividualStats(player, currentParkourMap);
+                playerManager.saveIndividualStats(player, currentParkourMap);
                 if (bukkitTask != null) bukkitTask.cancel();
-                PlayerManager.remove(this);
+                playerManager.remove(this);
                 SessionManager.removeAll(player);
                 Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(Message.PLAYER_LEAVE.getInfoMessage(player.getName())));
             });
@@ -103,8 +106,8 @@ public class ParkourPlayer {
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(false);
         }
-        
-        PlayerManager.loadIndividualStats(player, map).thenApply(value -> {
+    
+        playerManager.loadIndividualStats(player, map).thenApply(value -> {
             ParkourSession session = SessionManager.get(player, map);
             session.setSessionStarted(new Date(System.currentTimeMillis()));
             
@@ -139,7 +142,7 @@ public class ParkourPlayer {
         }
         
         Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
-            PlayerManager.saveIndividualStats(player, currentParkourMap);
+            playerManager.saveIndividualStats(player, currentParkourMap);
             currentParkourMap = null;
             if (playerState != PlayerState.STAFF_MODE) {
                 updateState(PlayerState.LOBBY);
@@ -252,7 +255,7 @@ public class ParkourPlayer {
     
     private void updatePercentage(ParkourMap parkourMap) {
         TD2Core.getInstance().mapLBCache.addCPCount(player.getUniqueId(), currentParkourMap);
-        PlayerManager.loadPercentage(player).thenApplyAsync(val -> {
+        playerManager.loadPercentage(player).thenApplyAsync(val -> {
             TD2Core.getInstance().mapLBCache.reloadCache(player.getUniqueId(), parkourMap);
             TD2Core.getInstance().globalLBCache.reloadCache();
             ScoreboardUtil.updatePercentage(player);
@@ -315,7 +318,7 @@ public class ParkourPlayer {
                 
                 Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
                     if (currentParkourMap != null) {
-                        PlayerManager.saveIndividualStats(player, currentParkourMap);
+                        playerManager.saveIndividualStats(player, currentParkourMap);
                     }
     
                     clearPotionEffects();

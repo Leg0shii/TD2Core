@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 public class ResetCommand implements CommandExecutor {
     
     private final MapManager mapManager;
+    private final PlayerManager playerManager;
     
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -27,7 +28,7 @@ public class ResetCommand implements CommandExecutor {
         }
         
         Player player = (Player) commandSender;
-        ParkourPlayer parkourPlayer = PlayerManager.get(player);
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         ParkourMap parkourMap = parkourPlayer.getCurrentParkourMap();
         
         if (parkourPlayer.getPlayerState() != PlayerState.PARKOUR) {
