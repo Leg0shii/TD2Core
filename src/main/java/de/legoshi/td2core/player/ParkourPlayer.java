@@ -193,6 +193,12 @@ public class ParkourPlayer {
         
         ParkourSession session = sessionManager.get(player, currentParkourMap);
         if (session.isPassed()) return;
+    
+        if (isCP) {
+            player.sendMessage(Message.CHECKPOINT_REACHED.getInfoMessage());
+        } else {
+            player.sendMessage(Message.PLAYER_STEP_PROGRESS.getInfoMessage());
+        }
         
         Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
             String checkQuery = "SELECT 1 FROM collected_cp WHERE userid = ? AND mapname = ? AND block_location = ?";
@@ -213,12 +219,6 @@ public class ParkourPlayer {
                     insertStatement.setString(2, currentParkourMap.mapName);
                     insertStatement.setString(3, Utils.getStringFromLocation(clickedBlock));
                     insertStatement.executeUpdate();
-    
-                    if (isCP) {
-                        player.sendMessage(Message.CHECKPOINT_REACHED.getInfoMessage());
-                    } else {
-                        player.sendMessage(Message.PLAYER_STEP_PROGRESS.getInfoMessage());
-                    }
                     
                     updatePercentage(currentParkourMap);
                     Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
