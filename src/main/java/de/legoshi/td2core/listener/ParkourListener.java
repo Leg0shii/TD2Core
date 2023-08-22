@@ -2,6 +2,7 @@ package de.legoshi.td2core.listener;
 
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.block.BlockManager;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.gui.GlobalLBGUI;
 import de.legoshi.td2core.gui.SectionGUI;
 import de.legoshi.td2core.listener.item.ItemInteractManager;
@@ -36,6 +37,8 @@ public class ParkourListener implements Listener {
     private final BlockManager blockManager;
     private final MapManager mapManager;
     private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
+    private final ConfigManager configManager;
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -71,7 +74,7 @@ public class ParkourListener implements Listener {
         event.setCancelled(true);
         ParkourPlayer parkourPlayer = playerManager.get(player);
         ParkourMap parkourMap = parkourPlayer.getCurrentParkourMap();
-        ParkourSession session = SessionManager.get(player, parkourMap);
+        ParkourSession session = sessionManager.get(player, parkourMap);
         session.setPracCPLocation(player.getLocation());
         player.sendMessage(Message.SET_CP.getInfoMessage());
     }
@@ -81,7 +84,7 @@ public class ParkourListener implements Listener {
         event.setCancelled(true);
         ParkourPlayer parkourPlayer = playerManager.get(player);
         ParkourMap parkourMap = parkourPlayer.getCurrentParkourMap();
-        ParkourSession session = SessionManager.get(player, parkourMap);
+        ParkourSession session = sessionManager.get(player, parkourMap);
         parkourPlayer.triggerFail();
         
         Location location = session.getLastCheckpointLocation();
@@ -98,7 +101,7 @@ public class ParkourListener implements Listener {
             Location pracLocation = session.getPracCPLocation();
             if (pracLocation == null) {
                 if (location == null) {
-                    player.teleport(TD2Core.getInstance().spawnLocation);
+                    player.teleport(TD2Core.getSpawn());
                 } else {
                     player.teleport(location);
                 }
@@ -152,12 +155,12 @@ public class ParkourListener implements Listener {
     
     private void selectClick(PlayerInteractEvent event) {
         event.setCancelled(true);
-        new SectionGUI(mapManager, playerManager).openGui(event.getPlayer(), null);
+        new SectionGUI(mapManager, playerManager, sessionManager, configManager).openGui(event.getPlayer(), null);
     }
     
     private void leaderBoardClick(PlayerInteractEvent event) {
         event.setCancelled(true);
-        new GlobalLBGUI().openGui(event.getPlayer(), null);
+        new GlobalLBGUI(configManager).openGui(event.getPlayer(), null);
         // event.getPlayer().sendMessage("Currently deactivated");
     }
     
@@ -178,7 +181,7 @@ public class ParkourListener implements Listener {
     
         if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
     
-            ParkourSession session = SessionManager.get(player, parkourPlayer.getCurrentParkourMap());
+            ParkourSession session = sessionManager.get(player, parkourPlayer.getCurrentParkourMap());
             Material pressurePlate = event.getClickedBlock().getType();
             Location cpLocation = event.getClickedBlock().getLocation();
             Location nextCP = session.getNextCP();

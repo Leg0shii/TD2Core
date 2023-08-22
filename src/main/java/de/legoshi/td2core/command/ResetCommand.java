@@ -19,6 +19,7 @@ public class ResetCommand implements CommandExecutor {
     
     private final MapManager mapManager;
     private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
     
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -36,7 +37,7 @@ public class ResetCommand implements CommandExecutor {
             return false;
         }
     
-        ParkourSession parkourSession = SessionManager.get(player, parkourMap);
+        ParkourSession parkourSession = sessionManager.get(player, parkourMap);
         parkourSession.reset();
         player.teleport(parkourMap.getStartLocation());
     

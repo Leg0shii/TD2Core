@@ -3,6 +3,7 @@ package de.legoshi.td2core.player;
 import com.viaversion.viaversion.api.Via;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.kit.*;
+import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
@@ -23,12 +24,15 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 @Getter
 @Setter
 public class ParkourPlayer {
     
     private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
+    private final MapManager mapManager;
     
     private final Player player;
     private PlayerTag playerTag;
@@ -44,8 +48,11 @@ public class ParkourPlayer {
     private double percentage;
     private int version;
     
-    public ParkourPlayer(PlayerManager playerManager, Player player) {
+    public ParkourPlayer(PlayerManager playerManager, SessionManager sessionManager, Player player) {
         this.playerManager = playerManager;
+        this.sessionManager = sessionManager;
+        this.mapManager = playerManager.getMapManager();
+        
         this.player = player;
         this.version = Via.getAPI().getPlayerVersion(player.getUniqueId());
         this.playerState = PlayerState.LOBBY;
@@ -65,18 +72,18 @@ public class ParkourPlayer {
             Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
             return null;
         });
-        
-        SessionManager.init(player);
+    
+        sessionManager.init(player);
         
         updateState(PlayerState.LOBBY);
         
-        player.teleport(TD2Core.getInstance().spawnLocation);
+        player.teleport(TD2Core.getSpawn());
         player.setAllowFlight(false);
         Bukkit.broadcastMessage(Message.PLAYER_JOIN.getInfoMessage(player.getName()));
     }
     
     public void serverLeave(boolean shutdown) {
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         if (playerState == PlayerState.STAFF_MODE) {
             if (bukkitTask != null) {
                 bukkitTask.cancel();
@@ -92,7 +99,7 @@ public class ParkourPlayer {
                 playerManager.saveIndividualStats(player, currentParkourMap);
                 if (bukkitTask != null) bukkitTask.cancel();
                 playerManager.remove(this);
-                SessionManager.removeAll(player);
+                sessionManager.removeAll(player);
                 Bukkit.getOnlinePlayers().forEach(all -> all.sendMessage(Message.PLAYER_LEAVE.getInfoMessage(player.getName())));
             });
         }
@@ -108,7 +115,7 @@ public class ParkourPlayer {
         }
     
         playerManager.loadIndividualStats(player, map).thenApply(value -> {
-            ParkourSession session = SessionManager.get(player, map);
+            ParkourSession session = sessionManager.get(player, map);
             session.setSessionStarted(new Date(System.currentTimeMillis()));
             
             Bukkit.getScheduler().runTask(TD2Core.getInstance(), () -> {
@@ -136,7 +143,7 @@ public class ParkourPlayer {
     public void mapLeave(boolean cleared) {
         if (currentParkourMap == null) return;
         
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         if (playerState == PlayerState.PARKOUR && session != null && !cleared) {
             session.setLastMapLocation(player.getLocation());
         }
@@ -154,12 +161,12 @@ public class ParkourPlayer {
         player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 1.0F, 1.0F);
         
         if (playerState != PlayerState.STAFF_MODE) {
-            player.teleport(TD2Core.getInstance().spawnLocation);
+            player.teleport(TD2Core.getSpawn());
         }
     }
     
     public void activateCheckPoint(Location location, boolean custom) {
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         
         if (!custom) {
             location.setYaw(player.getLocation().getYaw());
@@ -184,7 +191,7 @@ public class ParkourPlayer {
         if (playerState != PlayerState.PARKOUR) return;
         if (clickedBlock.add(0, -1, 0).getBlock().getType() == Material.BEDROCK) return;
         
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         if (session.isPassed()) return;
         
         Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
@@ -227,7 +234,7 @@ public class ParkourPlayer {
     
     public void activateGoal(Location location) {
         if (currentParkourMap.getEndLocation().equals(location)) {
-            ParkourSession session = SessionManager.get(player, currentParkourMap);
+            ParkourSession session = sessionManager.get(player, currentParkourMap);
             
             Location lastLocation = session.getLastCheckpointLocation();
             if (session.getLastCheckpointLocation() != null && lastLocation.getX() == location.getX()
@@ -266,7 +273,7 @@ public class ParkourPlayer {
     
     public void triggerFail() {
         if (playerState == PlayerState.PRACTICE || playerState == PlayerState.STAFF_MODE) return;
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         session.setFails(session.getFails() + 1);
         updateActionBar(session);
     }
@@ -286,7 +293,7 @@ public class ParkourPlayer {
     }
     
     public void switchPlayerState(PlayerState state) {
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         
         switch (state) {
             case PRACTICE: {
@@ -323,13 +330,13 @@ public class ParkourPlayer {
     
                     clearPotionEffects();
                     updateState(state);
-                    ParkourMap parkourMap = TD2Core.getInstance().mapManager.get("Initial TD2");
+                    ParkourMap parkourMap = mapManager.get("Initial TD2");
                     currentParkourMap = parkourMap;
                     
                     ParkourSession parkourSession = new ParkourSession();
                     parkourSession.setLastCheckpointLocation(player.getLocation());
-                    
-                    SessionManager.put(player, parkourMap, parkourSession);
+    
+                    sessionManager.put(player, parkourMap, parkourSession);
                     updateActionBar(session);
                     if (this.bukkitTask == null || this.bukkitTask.isCancelled()) {
                         bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> updateActionBar(session), 0L, 20L);
@@ -347,7 +354,7 @@ public class ParkourPlayer {
     
     public void startCPScheduler() {
         this.cpTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> {
-            ParkourSession session = SessionManager.get(player, currentParkourMap);
+            ParkourSession session = sessionManager.get(player, currentParkourMap);
             if (session != null && session.getNextCP() != null && (playerState == PlayerState.PARKOUR || playerState == PlayerState.STAFF_MODE)) {
                 player.spawnParticle(Particle.VILLAGER_HAPPY, session.getNextCP().clone().add(0.5, 0, 0.5), 50);
             }
@@ -355,7 +362,7 @@ public class ParkourPlayer {
     }
     
     public boolean isNextCP(Location location) {
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         if (session.getNextCP() == null) return true;
         return session.getNextCP().equals(location);
     }

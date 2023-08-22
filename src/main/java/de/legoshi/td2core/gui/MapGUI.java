@@ -1,6 +1,7 @@
 package de.legoshi.td2core.gui;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.session.SessionManager;
@@ -25,6 +26,9 @@ public class MapGUI extends GUIPane {
     
     private final MapManager mapManager;
     private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
+    private final ConfigManager configManager;
+    
     private final String[] guiSetup = {
         "ggggggggg",
         "gaaaaaaag",
@@ -33,9 +37,11 @@ public class MapGUI extends GUIPane {
     
     private int id;
     
-    public MapGUI(MapManager mapManager, PlayerManager playerManager) {
+    public MapGUI(MapManager mapManager, PlayerManager playerManager, SessionManager sessionManager, ConfigManager configManager) {
         this.mapManager = mapManager;
         this.playerManager = playerManager;
+        this.sessionManager = sessionManager;
+        this.configManager = configManager;
     }
     
     public void openGui(Player player, InventoryGui parent, int id) {
@@ -93,7 +99,7 @@ public class MapGUI extends GUIPane {
                 item,
                 click -> {
                     if (click.getType().isRightClick()) {
-                        new MapLBGUI().openGui(player.getPlayer(), this.current, map);
+                        new MapLBGUI(configManager).openGui(player.getPlayer(), this.current, map);
                         return true;
                     }
                     if (map.mapName.equals("Final Jump")) {
@@ -112,7 +118,7 @@ public class MapGUI extends GUIPane {
                     this.current.close();
                     return true;
                 },
-                getMapString(map, SessionManager.get(player.getPlayer(), map), passed)
+                getMapString(map, sessionManager.get(player.getPlayer(), map), passed)
             )
         );
     }

@@ -41,7 +41,7 @@ public class StaffCommand implements CommandExecutor {
             parkourPlayer.switchPlayerState(PlayerState.LOBBY);
             player.sendMessage(Message.STAFF_MODE_OFF.getInfoMessage());
             player.setGameMode(GameMode.ADVENTURE);
-            player.teleport(TD2Core.getInstance().spawnLocation);
+            player.teleport(TD2Core.getSpawn());
         } else {
             parkourPlayer.switchPlayerState(PlayerState.STAFF_MODE);
             player.setGameMode(GameMode.CREATIVE);

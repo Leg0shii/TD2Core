@@ -43,13 +43,17 @@ public class DiscordManager {
     private final JDA jda;
     private final List<String> authors = new ArrayList<>();
     private final PlayerManager playerManager;
+    private final SessionManager sessionManager;
+    private final ConfigManager configManager;
     private final ConfigAccessor configAccessor;
     private final int page = 0;
     private final int pageVolume = 15;
     
-    public DiscordManager(ConfigManager configManager, PlayerManager playerManager) {
+    public DiscordManager(ConfigManager configManager, PlayerManager playerManager, SessionManager sessionManager) {
+        this.configManager = configManager;
         this.configAccessor = configManager.getConfigAccessor(DiscordConfig.class);
         this.playerManager = playerManager;
+        this.sessionManager = sessionManager;
         loadConfig();
         
         JDABuilder builder = JDABuilder.createDefault(token);
@@ -76,7 +80,7 @@ public class DiscordManager {
     
     public void sendCompletionMessage(Player player) {
         ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         String completionActivationMessage = Message.COMPLETION_ACTIVATED.getMessage(
             player.getName(),
             currentParkourMap.mapName,
@@ -93,7 +97,7 @@ public class DiscordManager {
         String formattedDate = sdf.format(date);
     
         ParkourMap currentParkourMap = playerManager.get(player).getCurrentParkourMap();
-        ParkourSession session = SessionManager.get(player, currentParkourMap);
+        ParkourSession session = sessionManager.get(player, currentParkourMap);
         Location sessionLocation = session.getLastCheckpointLocation();
         if (sessionLocation == null) sessionLocation = player.getLocation();
     
@@ -111,7 +115,7 @@ public class DiscordManager {
     private void updateLeaderboard() {
         TD2Core.getInstance().globalLBCache.getLeaderboardData().thenApply(map -> {
             String leaderboardMessage = "🏆 Completion **LEADERBOARD** (updates every 10 mins)\n\n";
-            HashMap<UUID, GlobalLBStats> sortedMap = new GlobalLBGUI().sortMap(map, page, pageVolume);
+            HashMap<UUID, GlobalLBStats> sortedMap = new GlobalLBGUI(configManager).sortMap(map, page, pageVolume);
             int count = 1;
             for (UUID a : sortedMap.keySet()) {
                 GlobalLBStats b = sortedMap.get(a);

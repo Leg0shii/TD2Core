@@ -1,10 +1,12 @@
 package de.legoshi.td2core.gui;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.cache.GlobalLBStats;
 import de.legoshi.td2core.util.CustomHeads;
 import de.themoep.inventorygui.*;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +15,10 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class GlobalLBGUI extends GUILeaderboard<GlobalLBStats> {
+    
+    private final ConfigManager configManager;
     
     public void openGui(Player player, InventoryGui parent) {
         super.openGui(player, parent, "§7§lLeaderboard");
@@ -33,7 +38,7 @@ public class GlobalLBGUI extends GUILeaderboard<GlobalLBStats> {
     @Override
     protected GuiElement loadGUIElement(UUID uuid, GlobalLBStats stats, int count) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        PlayerConfig playerConfig = TD2Core.getInstance().configManager.getConfigAccessor(PlayerConfig.class);
+        PlayerConfig playerConfig = configManager.getConfigAccessor(PlayerConfig.class);
         String name = player.getName();
         String playTime;
         String jumps;

@@ -7,6 +7,7 @@ import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
 import de.legoshi.td2core.util.Utils;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.sql.Date;
@@ -18,12 +19,18 @@ import java.util.concurrent.CompletableFuture;
 
 public class PlayerManager {
     
-    private final MapManager mapManager;
+    @Getter private final MapManager mapManager;
+    private final SessionManager sessionManager;
     private final HashMap<Player, ParkourPlayer> playerHashMap;
     
-    public PlayerManager(MapManager mapManager) {
+    public PlayerManager(MapManager mapManager, SessionManager sessionManager) {
         this.mapManager = mapManager;
+        this.sessionManager = sessionManager;
         this.playerHashMap = new HashMap<>();
+    }
+    
+    public ParkourPlayer create(Player player) {
+        return new ParkourPlayer(this, sessionManager, player);
     }
     
     public CompletableFuture<Void> loadPercentage(Player player) {
@@ -37,7 +44,7 @@ public class PlayerManager {
     public void saveIndividualStats(Player player, ParkourMap parkourMap) {
         if (parkourMap == null) return;
         String mapName = parkourMap.getMapName();
-        ParkourSession session = SessionManager.get(player, parkourMap);
+        ParkourSession session = sessionManager.get(player, parkourMap);
         ParkourPlayer parkourPlayer = get(player);
         
         if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) return;
@@ -97,8 +104,8 @@ public class PlayerManager {
         
         return CompletableFuture.supplyAsync(() -> {
             try {
-                SessionManager.put(player, parkourMap);
-                ParkourSession session = SessionManager.get(player, parkourMap);
+                sessionManager.put(player, parkourMap);
+                ParkourSession session = sessionManager.get(player, parkourMap);
                 
                 PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlString);
                 preparedStatement.setString(1, mapName);

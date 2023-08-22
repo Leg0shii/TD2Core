@@ -14,6 +14,7 @@ import de.legoshi.td2core.discord.DiscordManager;
 import de.legoshi.td2core.listener.GeneralListener;
 import de.legoshi.td2core.listener.ParkourListener;
 import de.legoshi.td2core.map.MapManager;
+import de.legoshi.td2core.map.session.SessionManager;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.cache.GlobalLBCache;
 import de.legoshi.td2core.player.hide.HideManager;
@@ -27,17 +28,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class TD2Core extends JavaPlugin {
     
     public static boolean isShuttingDown = false;
-    private static TD2Core instance;
-    
-    public MapManager mapManager;
     public PlayerManager playerManager;
-    
     public GlobalLBCache globalLBCache;
     public MapLBCache mapLBCache;
     
-    public ConfigManager configManager;
-    public Location spawnLocation;
+    private static TD2Core instance;
+    private Location spawnLocation;
     
+    private MapManager mapManager;
+    private SessionManager sessionManager;
+    
+    private ConfigManager configManager;
     private BlockManager blockManager;
     private DBManager dbManager;
     private DiscordManager discordManager;
@@ -48,12 +49,11 @@ public final class TD2Core extends JavaPlugin {
         instance = this;
         
         configManager = new ConfigManager(this);
+        sessionManager = new SessionManager();
         dbManager = new DBManager(this, configManager);
-    
         mapManager = new MapManager(configManager);
-        playerManager = new PlayerManager(mapManager);
-        discordManager = new DiscordManager(configManager, playerManager);
-    
+        playerManager = new PlayerManager(mapManager, sessionManager);
+        discordManager = new DiscordManager(configManager, playerManager, sessionManager);
         blockManager = new BlockManager(playerManager);
         hideManager = new HideManager();
     
@@ -92,7 +92,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("delete").setExecutor(new DeletePlayerCommand(mapManager));
         Bukkit.getPluginCommand("spawn").setExecutor(new SpawnCommand(playerManager));
         Bukkit.getPluginCommand("nv").setExecutor(new NightVisionCommand());
-        Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand(mapManager, playerManager));
+        Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand(mapManager, playerManager, sessionManager));
         Bukkit.getPluginCommand("spc").setExecutor(new SPCCommand(blockManager));
         Bukkit.getPluginCommand("staff").setExecutor(new StaffCommand(playerManager));
         Bukkit.getPluginCommand("hide").setExecutor(new HideCommand(hideManager));
@@ -104,13 +104,17 @@ public final class TD2Core extends JavaPlugin {
     private void registerEvents() {
         PluginManager pluginManager = Bukkit.getServer().getPluginManager();
         pluginManager.registerEvents(new GeneralListener(configManager, playerManager), this);
-        pluginManager.registerEvents(new ParkourListener(blockManager, mapManager, playerManager), this);
+        pluginManager.registerEvents(new ParkourListener(blockManager, mapManager, playerManager, sessionManager, configManager), this);
         pluginManager.registerEvents(blockManager, this);
         pluginManager.registerEvents(hideManager, this);
     }
     
     public static TD2Core getInstance() {
         return instance;
+    }
+    
+    public static Location getSpawn() {
+        return instance.spawnLocation;
     }
     
     public static AsyncMySQL sql() {

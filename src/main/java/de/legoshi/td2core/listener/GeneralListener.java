@@ -82,13 +82,11 @@ public class GeneralListener implements Listener {
     
     private void initPlayer(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        player.teleport(TD2Core.getInstance().spawnLocation);
+        player.teleport(TD2Core.getSpawn());
         event.setJoinMessage("");
     
         playerConfig.savePlayer(player);
-        
-        ParkourPlayer parkourPlayer = new ParkourPlayer(playerManager, player);
-        parkourPlayer.serverJoin();
+        playerManager.create(player).serverJoin(); // creates new ParkourPlayer
     }
     
     @EventHandler
