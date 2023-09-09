@@ -22,6 +22,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -51,9 +52,9 @@ public class ParkourListener implements Listener {
         
         if (event.getHand() != null && event.getHand().equals(EquipmentSlot.OFF_HAND)) return;
         if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
-        if (ItemInteractManager.hasClicked(event.getPlayer())) return;
+        if (ItemInteractManager.hasClickedItem(event.getPlayer())) return;
         
-        ItemInteractManager.add(event.getPlayer());
+        ItemInteractManager.addItem(event.getPlayer());
         
         if (ItemUtils.hasNbtId(itemStack, "cp")) checkPointClick(event);
         if (ItemUtils.hasNbtId(itemStack, "prac")) practiceClick(event);
@@ -168,7 +169,7 @@ public class ParkourListener implements Listener {
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
         if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || player.hasPermission("td2core.build")) return;
-        if (event.getItem() != null && event.getItem().getType().equals(Material.SHIELD)) return;
+        if (event.getItem() != null && (event.getItem().getType().equals(Material.SHIELD) || event.getItem().getType().equals(Material.DIAMOND_SWORD))) return;
         event.setCancelled(true);
     }
     
@@ -194,6 +195,8 @@ public class ParkourListener implements Listener {
             }
         
             if (pressurePlate == Material.IRON_PLATE || pressurePlate == Material.WOOD_PLATE || pressurePlate == Material.STONE_PLATE) {
+                event.setUseInteractedBlock(Event.Result.DENY);
+                
                 if (blockManager.hasNext(cpLocation)) {
                     if (nextCP == null) {
                         Location nextCPLocation = blockManager.getNextCPLocation(cpLocation);
@@ -214,19 +217,23 @@ public class ParkourListener implements Listener {
                         if (isCP) {
                             parkourPlayer.activateCheckPoint(cpLocation, true, true);
                         }
-                        parkourPlayer.checkClickedBlock(event.getClickedBlock().getLocation(), isCP);
+                        int clickedCP = blockManager.getClickedCPIndex(event.getClickedBlock().getLocation());
+                        parkourPlayer.checkClickedBlock(event.getClickedBlock().getLocation(), isCP, clickedCP);
                         return;
                     }
                 }
             }
         
             if (pressurePlate == Material.IRON_PLATE) {
+                event.setUseInteractedBlock(Event.Result.DENY);
+                
                 cpLocation = cpLocation.clone().add(0.5, 0, 0.5);
                 boolean isCP = blockManager.isCheckpoint(event.getClickedBlock().getLocation());
                 if (isCP) {
                     parkourPlayer.activateCheckPoint(cpLocation, false, true);
                 }
-                parkourPlayer.checkClickedBlock(event.getClickedBlock().getLocation(), isCP);
+                int clickedCP = blockManager.getClickedCPIndex(event.getClickedBlock().getLocation());
+                parkourPlayer.checkClickedBlock(event.getClickedBlock().getLocation(), isCP, clickedCP);
                 player.getPlayer().playSound(player.getPlayer().getLocation(), Sound.BLOCK_WOOD_BUTTON_CLICK_ON, 1.0F, 1.0F);
             }
         

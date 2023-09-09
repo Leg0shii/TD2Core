@@ -155,13 +155,19 @@ public class PlayerManager {
         return CompletableFuture.supplyAsync(() -> {
             String sqlQuery =
                 "SELECT" +
-                    "    SUM(IF(p.passed = 1, m.weight, m.weight * (SELECT COUNT(*)" +
-                    "                                               FROM collected_cp cp" +
-                    "                                               WHERE cp.userid = p.userid" +
-                    "                                                 AND cp.mapname = p.mapname) / m.total_cp)) as total_weight " +
-                    "FROM player_log p " +
+                    "    p.userid," +
+                    "    SUM(m.weight * (CASE WHEN p.passed = 1 THEN 1 ELSE (SELECT cp_count" +
+                    "                                                        FROM player_log" +
+                    "                                                        WHERE userid = p.userid" +
+                    "                                                        AND mapname = p.mapname) / m.total_cp END)) as total_weight " +
+                    "FROM" +
+                    "    (" +
+                    "        SELECT userid, mapname, MAX(passed) as passed" +
+                    "        FROM player_log" +
+                    "        GROUP BY userid, mapname" +
+                    "    ) p " +
                     "JOIN maps m ON p.mapname = m.mapname " +
-                    "WHERE p.userid = ?";
+                    "WHERE p.userid = ?;";
             double percentage = 0;
             
             try {
@@ -177,10 +183,10 @@ public class PlayerManager {
                     "SELECT COUNT(*) + 1 AS td2rank " +
                         "FROM (" +
                         "    SELECT p.userid, " +
-                        "           SUM(IF(p.passed = 1, m.weight, m.weight * (SELECT COUNT(*)" +
-                        "                                                  FROM collected_cp cp" +
-                        "                                                  WHERE cp.userid = p.userid" +
-                        "                                                    AND cp.mapname = p.mapname) / m.total_cp)) as total_weight " +
+                        "           SUM(IF(p.passed = 1, m.weight, m.weight * (SELECT MIN(cp_count)" +
+                        "                                                  FROM player_log" +
+                        "                                                  WHERE userid = p.userid" +
+                        "                                                    AND mapname = p.mapname) / m.total_cp)) as total_weight " +
                         "    FROM player_log p " +
                         "    JOIN maps m ON p.mapname = m.mapname " +
                         "    GROUP BY p.userid" +

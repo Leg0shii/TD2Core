@@ -28,12 +28,14 @@ public class BlockManager implements Listener {
     
     private final HashMap<Player, Location> playerPreciseData;
     private final HashMap<Player, Location> playerNextData;
+    private final HashMap<Player, Location> playerCPData;
     
     public BlockManager(PlayerManager playerManager) {
         this.playerManager = playerManager;
         this.blockInformation = new HashMap<>();
         this.playerPreciseData = new HashMap<>();
         this.playerNextData = new HashMap<>();
+        this.playerCPData = new HashMap<>();
     }
     
     @EventHandler
@@ -101,11 +103,27 @@ public class BlockManager implements Listener {
         saveBlockInformation(checkpoint, blockData);
     }
     
+    public void saveCPIndex(Player player, int cpIndex) {
+        Location checkpoint = playerCPData.get(player);
+        BlockData blockData = blockInformation.getOrDefault(checkpoint, new BlockData());
+        blockData.setCpIndex(cpIndex);
+        
+        playerCPData.remove(player);
+        saveBlockInformation(checkpoint, blockData);
+    }
+    
     public Location getNextCPLocation(Location location) {
         if (hasEntry(location)) {
             return blockInformation.get(location).getNextCheckpoint();
         }
         return null;
+    }
+    
+    public int getClickedCPIndex(Location location) {
+        if (hasEntry(location)) {
+            return blockInformation.get(location).getCpIndex();
+        }
+        return -1;
     }
     
     public boolean hasTP(Location location) {
@@ -138,8 +156,16 @@ public class BlockManager implements Listener {
         saveBlockInformation(location, blockData);
     }
     
+    public void addIsCPIndex(Player player, Location location) {
+        playerCPData.put(player, location);
+    }
+    
     public boolean hasSPCTemp(Player player) {
         return playerPreciseData.containsKey(player);
+    }
+    
+    public boolean hasCPTemp(Player player) {
+        return playerCPData.containsKey(player);
     }
     
     public void loadBlockData() {
@@ -151,9 +177,10 @@ public class BlockManager implements Listener {
                 Location location = Utils.getLocationFromString(resultSet.getString("block_location"));
                 Location teleportLocation = Utils.getLocationFromString(resultSet.getString("teleport_location"));
                 Location nextCheckpoint = Utils.getLocationFromString(resultSet.getString("next_checkpoint"));
+                int cpIndex = resultSet.getInt("cp_index");
                 int timeTillNextCheckpoint = resultSet.getInt("time_till_next");
                 boolean isCheckpoint = resultSet.getBoolean("is_checkpoint");
-                blockInformation.put(location, new BlockData(teleportLocation, nextCheckpoint, timeTillNextCheckpoint, isCheckpoint));
+                blockInformation.put(location, new BlockData(teleportLocation, nextCheckpoint, cpIndex, timeTillNextCheckpoint, isCheckpoint));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -163,7 +190,7 @@ public class BlockManager implements Listener {
     
     private void saveBlockInformation(Location clickedLoc, BlockData blockData) {
         if (blockInformation.containsKey(clickedLoc)) {
-            String sqlQuery = "UPDATE block_data SET teleport_location = ?, next_checkpoint = ?, time_till_next = ?, is_checkpoint = ? WHERE block_location = ?";
+            String sqlQuery = "UPDATE block_data SET teleport_location = ?, next_checkpoint = ?, time_till_next = ?, is_checkpoint = ?, cp_index = ? WHERE block_location = ?";
             blockInformation.put(clickedLoc, blockData);
         
             try {
@@ -172,13 +199,14 @@ public class BlockManager implements Listener {
                 preparedStatement.setString(2, Utils.getStringFromLocation(blockData.getNextCheckpoint()));
                 preparedStatement.setInt(3, blockData.getTimeTillNextCheckpoint());
                 preparedStatement.setBoolean(4, blockData.isCheckpoint());
-                preparedStatement.setString(5, Utils.getStringFromLocation(clickedLoc));
+                preparedStatement.setInt(5, blockData.getCpIndex());
+                preparedStatement.setString(6, Utils.getStringFromLocation(clickedLoc));
                 preparedStatement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
-            String sqlQuery = "INSERT INTO block_data (block_location, teleport_location, next_checkpoint, time_till_next, is_checkpoint) VALUES (?, ?, ?, ?, ?)";
+            String sqlQuery = "INSERT INTO block_data (block_location, teleport_location, next_checkpoint, time_till_next, is_checkpoint, cp_index) VALUES (?, ?, ?, ?, ?, ?)";
             blockInformation.put(clickedLoc, blockData);
             
             try {
@@ -188,6 +216,7 @@ public class BlockManager implements Listener {
                 preparedStatement.setString(3, Utils.getStringFromLocation(blockData.getNextCheckpoint()));
                 preparedStatement.setInt(4, blockData.getTimeTillNextCheckpoint());
                 preparedStatement.setBoolean(5, blockData.isCheckpoint());
+                preparedStatement.setInt(6, blockData.getCpIndex());
                 preparedStatement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();

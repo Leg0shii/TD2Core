@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class GlobalLBCache {
     
@@ -87,15 +86,18 @@ public class GlobalLBCache {
         HashMap<UUID, GlobalLBStats> hashMap = new HashMap<>();
         
         String sqlQuery =
-            "SELECT p.userid," +
-                "       SUM(IF(p.passed = 1, m.weight, m.weight * (SELECT COUNT(*)" +
-                "                                                  FROM collected_cp cp" +
-                "                                                  WHERE cp.userid = p.userid" +
-                "                                                    AND cp.mapname = p.mapname) / m.total_cp)) as total_weight " +
-                "FROM (" +
-                "    SELECT DISTINCT userid, mapname, passed" +
-                "    FROM player_log" +
-                ") p " +
+            "SELECT" +
+                "    p.userid," +
+                "    SUM(m.weight * (CASE WHEN p.passed = 1 THEN 1 ELSE (SELECT cp_count" +
+                "                                                        FROM player_log" +
+                "                                                        WHERE userid = p.userid" +
+                "                                                        AND mapname = p.mapname) / m.total_cp END)) as total_weight " +
+                "FROM" +
+                "    (" +
+                "        SELECT userid, mapname, MAX(passed) as passed" +
+                "        FROM player_log" +
+                "        GROUP BY userid, mapname" +
+                "    ) p " +
                 "JOIN maps m ON p.mapname = m.mapname " +
                 "GROUP BY p.userid;";
     

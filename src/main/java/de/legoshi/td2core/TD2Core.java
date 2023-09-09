@@ -11,6 +11,8 @@ import de.legoshi.td2core.config.*;
 import de.legoshi.td2core.database.AsyncMySQL;
 import de.legoshi.td2core.database.DBManager;
 import de.legoshi.td2core.discord.DiscordManager;
+import de.legoshi.td2core.discord.RoleManager;
+import de.legoshi.td2core.discord.VerifyManager;
 import de.legoshi.td2core.listener.GeneralListener;
 import de.legoshi.td2core.listener.ParkourListener;
 import de.legoshi.td2core.map.MapManager;
@@ -18,6 +20,7 @@ import de.legoshi.td2core.map.session.SessionManager;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.cache.GlobalLBCache;
 import de.legoshi.td2core.player.hide.HideManager;
+import de.legoshi.td2core.util.AnnouncementManager;
 import de.legoshi.td2core.util.Utils;
 import de.legoshi.td2core.util.WorldLoader;
 import org.bukkit.Bukkit;
@@ -37,6 +40,9 @@ public final class TD2Core extends JavaPlugin {
     
     private MapManager mapManager;
     private SessionManager sessionManager;
+    private VerifyManager verifyManager;
+    private RoleManager roleManager;
+    private AnnouncementManager announcementManager;
     
     private ConfigManager configManager;
     private BlockManager blockManager;
@@ -49,11 +55,14 @@ public final class TD2Core extends JavaPlugin {
         instance = this;
         
         configManager = new ConfigManager(this);
+        
+        verifyManager = new VerifyManager();
         sessionManager = new SessionManager();
         dbManager = new DBManager(this, configManager);
+        announcementManager = new AnnouncementManager(verifyManager, configManager);
         mapManager = new MapManager(configManager);
         playerManager = new PlayerManager(mapManager, sessionManager);
-        discordManager = new DiscordManager(configManager, playerManager, sessionManager);
+        discordManager = new DiscordManager(configManager, playerManager, sessionManager, verifyManager);
         blockManager = new BlockManager(playerManager);
         hideManager = new HideManager();
     
@@ -68,6 +77,10 @@ public final class TD2Core extends JavaPlugin {
         mapManager.loadMaps();
         
         discordManager.startLeaderboardScheduler();
+        discordManager.startProgressScheduler();
+        announcementManager.startAnnouncementScheduler();
+        verifyManager.loadVerifiedUsers();
+        
         globalLBCache.startGlobalCacheScheduler();
         mapLBCache.startMapCacheScheduler();
         blockManager.loadBlockData();
@@ -99,6 +112,10 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("show").setExecutor(new ShowCommand(hideManager));
         Bukkit.getPluginCommand("hideall").setExecutor(new HideAllCommand(hideManager));
         Bukkit.getPluginCommand("showall").setExecutor(new ShowAllCommand(hideManager));
+        Bukkit.getPluginCommand("verify").setExecutor(new VerifyCommand(verifyManager));
+        Bukkit.getPluginCommand("tp").setExecutor(new TPCommand());
+        Bukkit.getPluginCommand("cp").setExecutor(new CPCountCommand(blockManager));
+        Bukkit.getPluginCommand("discord").setExecutor(new DiscordCommand());
     }
     
     private void registerEvents() {

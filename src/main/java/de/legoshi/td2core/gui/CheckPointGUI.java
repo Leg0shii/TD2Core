@@ -17,7 +17,7 @@ public class CheckPointGUI extends GUIPane {
     
     private final String[] guiSetup = {
         "ggggggggg",
-        "gaggbggcg",
+        "gagbgcgdg",
         "ggggggggq"
     };
     private BlockManager blockManager;
@@ -38,11 +38,15 @@ public class CheckPointGUI extends GUIPane {
         StaticGuiElement preciseCoordsElement = getPreciseCoordsElement();
         StaticGuiElement nextCPElement = getNextCPElement();
         GuiStateElement activeCheckpoints = getGuiStateElement();
+        GuiStateElement cpIndexElement = getCPIndexStateElement();
         
         if (blockManager.isCheckpoint(selectedCP)) activeCheckpoints.setState("checkpointEnabled");
         else activeCheckpoints.setState("checkpointDisabled");
         
-        this.current.addElements(preciseCoordsElement, nextCPElement, activeCheckpoints);
+        if (blockManager.getClickedCPIndex(selectedCP) == -1) cpIndexElement.setState("cpIndexDisabled");
+        else cpIndexElement.setState("cpIndexEnabled");
+        
+        this.current.addElements(preciseCoordsElement, nextCPElement, activeCheckpoints, cpIndexElement);
     }
     
     private StaticGuiElement getPreciseCoordsElement() {
@@ -130,6 +134,31 @@ public class CheckPointGUI extends GUIPane {
                 CustomHeads.crossMark,
                 ChatColor.RED + "Not Active Checkpoint",
                 "§8By clicking here you will activate the checkpoint again."
+            )
+        );
+    }
+    
+    private GuiStateElement getCPIndexStateElement() {
+        return new GuiStateElement('d',
+            new GuiStateElement.State(
+                change -> {
+                    blockManager.addIsCPIndex((Player) change.getWhoClicked(), selectedCP);
+                    this.holder.closeInventory();
+                    this.holder.sendMessage(Message.ACTIVATE_INDEX_CP.getInfoMessage());
+                },
+                "cpIndexEnabled",
+                CustomHeads.indexEnabled,
+                ChatColor.GREEN + "Checkpoint index active: §6" + blockManager.getClickedCPIndex(selectedCP)
+            ),
+            new GuiStateElement.State(
+                change -> {
+                    blockManager.addIsCPIndex((Player) change.getWhoClicked(), selectedCP);
+                    this.holder.closeInventory();
+                    this.holder.sendMessage(Message.ACTIVATE_INDEX_CP.getSuccessMessage());
+                },
+                "cpIndexDisabled",
+                CustomHeads.indexDisabled,
+                ChatColor.RED + "Checkpoint index not active: §6" + blockManager.getClickedCPIndex(selectedCP)
             )
         );
     }

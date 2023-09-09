@@ -5,6 +5,7 @@ public enum ChannelType {
     COMPLETION,
     STAFF,
     CHECKPOINT,
-    LEADERBOARD
+    LEADERBOARD,
+    VERIFY
     
 }

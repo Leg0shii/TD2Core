@@ -10,6 +10,7 @@ commands:
     unprac:
     kit:
     leave:
+      aliases: [l, hub]
     delete:
     nv:
     reset:
@@ -19,6 +20,10 @@ commands:
     show:
     hideall:
     showall:
+    verify:
+    tp:
+    cp:
+    discord:
 
 permissions:
   td2core:

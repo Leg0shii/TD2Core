@@ -3,6 +3,7 @@ package de.legoshi.td2core.player;
 import com.viaversion.viaversion.api.Via;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.kit.*;
+import de.legoshi.td2core.listener.item.ItemInteractManager;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
@@ -24,7 +25,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -185,11 +185,13 @@ public class ParkourPlayer {
             session.setPracCPLocation(null);
         }
         if (isCP) {
+            if (ItemInteractManager.hasClickedCP(player)) return;
+            ItemInteractManager.addCP(player);
             player.sendMessage(Message.CHECKPOINT_REACHED.getInfoMessage());
         }
     }
     
-    public void checkClickedBlock(Location clickedBlock, boolean isCP) {
+    public void checkClickedBlock(Location clickedBlock, boolean isCP, int cpIndex) {
         if (playerState == PlayerState.STAFF_MODE) return;
         if (playerState != PlayerState.PARKOUR) return;
         if (clickedBlock.add(0, -1, 0).getBlock().getType() == Material.BEDROCK) return;
@@ -217,7 +219,8 @@ public class ParkourPlayer {
                     insertStatement.setString(3, Utils.getStringFromLocation(clickedBlock));
                     insertStatement.executeUpdate();
                     
-                    updatePercentage(currentParkourMap);
+                    updatePercentage(currentParkourMap, cpIndex);
+                    TD2Core.getInstance().getDiscordManager().getRoleManager().cpRoleCheck(currentParkourMap.getMapName(), player.getUniqueId().toString());
                     Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
                         TD2Core.getInstance().getDiscordManager().sendCheckPointMessage(player);
                     });
@@ -234,6 +237,11 @@ public class ParkourPlayer {
     
     public void activateGoal(Location location) {
         if (currentParkourMap.getEndLocation().equals(location)) {
+            
+            // do not execute multiple times!
+            if (ItemInteractManager.hasClickedCP(player)) return;
+            ItemInteractManager.addCP(player);
+            
             ParkourSession session = sessionManager.get(player, currentParkourMap);
             
             Location lastLocation = session.getLastCheckpointLocation();
@@ -252,7 +260,7 @@ public class ParkourPlayer {
             
             mapLeave(true);
             
-            updatePercentage(copyPKMap);
+            updatePercentage(copyPKMap, copyPKMap.getCpCount());
             Bukkit.broadcastMessage(Message.GOAL_REACHED.getInfoMessage(player.getName(), mapName));
             Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
                 TD2Core.getInstance().getDiscordManager().sendCompletionMessage(player);
@@ -260,8 +268,8 @@ public class ParkourPlayer {
         }
     }
     
-    private void updatePercentage(ParkourMap parkourMap) {
-        TD2Core.getInstance().mapLBCache.addCPCount(player.getUniqueId(), currentParkourMap);
+    private void updatePercentage(ParkourMap parkourMap, int cpIndex) {
+        TD2Core.getInstance().mapLBCache.addCPCount(player.getUniqueId(), currentParkourMap, cpIndex);
         playerManager.loadPercentage(player).thenApplyAsync(val -> {
             TD2Core.getInstance().mapLBCache.reloadCache(player.getUniqueId(), parkourMap);
             TD2Core.getInstance().globalLBCache.reloadCache();

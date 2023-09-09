@@ -8,16 +8,17 @@ import java.util.List;
 
 public class ConfigManager {
     
-    private final List<ConfigAccessor> config;
+    public final List<ConfigAccessor> configs;
     
     public ConfigManager(JavaPlugin plugin) {
-        this.config = new ArrayList<>();
+        this.configs = new ArrayList<>();
         addConfig(new DBConfig(plugin));
         addConfig(new ServerConfig(plugin));
         addConfig(new MapConfig(plugin));
         addConfig(new PlayerConfig(plugin));
         addConfig(new DiscordConfig(plugin));
-        config.forEach(ConfigAccessor::reloadConfig);
+        addConfig(new AnnouncementConfig(plugin));
+        configs.forEach(ConfigAccessor::reloadConfig);
     }
     
     public FileConfiguration getConfig(Class<? extends ConfigAccessor> clazz) {
@@ -29,7 +30,7 @@ public class ConfigManager {
     }
     
     public <T extends ConfigAccessor> T getConfigAccessor(Class<T> clazz) {
-        for (ConfigAccessor configAccessor : config) {
+        for (ConfigAccessor configAccessor : configs) {
             if (configAccessor.getClass().equals(clazz)) {
                 return clazz.cast(configAccessor);
             }
@@ -38,11 +39,11 @@ public class ConfigManager {
     }
     
     public void loadConfig() {
-        config.forEach(ConfigAccessor::reloadConfig);
+        configs.forEach(ConfigAccessor::reloadConfig);
     }
     
     private void addConfig(ConfigAccessor config) {
-        this.config.add(config);
+        this.configs.add(config);
     }
     
 }

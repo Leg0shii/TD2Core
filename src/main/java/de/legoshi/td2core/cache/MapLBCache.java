@@ -107,10 +107,22 @@ public class MapLBCache {
         });
     }
     
-    public void addCPCount(UUID userId, ParkourMap parkourMap) {
+    public void addCPCount(UUID userId, ParkourMap parkourMap, int cpIndex) {
         synchronized (cacheLock) {
             if (cache.get(parkourMap) != null && cache.get(parkourMap).get(userId) != null) {
-                cache.get(parkourMap).get(userId).setCurrentCPCount(cache.get(parkourMap).get(userId).getCurrentCPCount() + 1);
+                int newCPCount = cpIndex == -1 ? cache.get(parkourMap).get(userId).getCurrentCPCount() + 1 : cpIndex;
+                cache.get(parkourMap).get(userId).setCurrentCPCount(newCPCount);
+                
+                try {
+                    String query = "UPDATE player_log SET cp_count = ? WHERE userid = ? AND mapname = ?";
+                    PreparedStatement preparedStatement = TD2Core.sql().prepare(query);
+                    preparedStatement.setInt(1, newCPCount);
+                    preparedStatement.setString(2, userId.toString());
+                    preparedStatement.setString(3, parkourMap.getMapName());
+                    preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -124,7 +136,7 @@ public class MapLBCache {
                 "    ps.userid," +
                 "    COALESCE(ps.min_playtime, 0) as playtime," +
                 "    COALESCE(ps.min_fails, 0) as fails," +
-                "    COALESCE(cps.cpCount, 0) as cpCount," +
+                "    COALESCE(cps.cp_count, 0) as cpCount," +
                 "    ps.has_passed " +
                 "FROM (" +
                 "    SELECT" +
@@ -139,10 +151,9 @@ public class MapLBCache {
                 "LEFT JOIN (" +
                 "    SELECT" +
                 "        userid," +
-                "        COUNT(*) as cpCount" +
-                "    FROM collected_cp" +
+                "        cp_count" +
+                "    FROM player_log" +
                 "    WHERE mapname = ? AND userid = ?" +
-                "    GROUP BY userid" +
                 ") AS cps ON ps.userid = cps.userid;";
         
         try {
@@ -179,7 +190,7 @@ public class MapLBCache {
                 "    ps.userid," +
                 "    COALESCE(ps.min_playtime, 0) as playtime," +
                 "    COALESCE(ps.min_fails, 0) as fails," +
-                "    COALESCE(cps.cpCount, 0) as cpCount," +
+                "    COALESCE(cps.cp_count, 0) as cpCount," +
                 "    ps.has_passed " +
                 "FROM (" +
                 "    SELECT" +
@@ -194,10 +205,9 @@ public class MapLBCache {
                 "LEFT JOIN (" +
                 "    SELECT" +
                 "        userid," +
-                "        COUNT(*) as cpCount" +
-                "    FROM collected_cp" +
+                "        cp_count" +
+                "    FROM player_log" +
                 "    WHERE mapname = ?" +
-                "    GROUP BY userid" +
                 ") AS cps ON ps.userid = cps.userid;";
     
         try {

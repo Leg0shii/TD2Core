@@ -21,6 +21,11 @@ public enum Message {
     NIGHT_VISION_ON("§7 Successfully turned on night vision."),
     NIGHT_VISION_OFF("§7 Successfully turned off night vision."),
     NOT_WORTHY("§4§lYOU §7§lare §4§lNOT WORTHY§7§l..."),
+    VERIFY_START("§7You have 5 minutes to verify in discord. Type §6/verify {1} §7in §6#verify"),
+    ALREADY_VERIFIED("You have already been verified."),
+    VERIFY_ERROR("Your code is incorrect or your time ran out..."),
+    VERIFY_SUCCESS("You have been verified!"),
+    ALREADY_CREATED("You have already created a key. You have 5 minutes to verify in discord. Type §6/verify {1} §cin §6#verify"),
     
     ERROR_NO_PERMISSION("You do not have permission to use this command."),
     
@@ -32,6 +37,11 @@ public enum Message {
     BLOCK_DATA_ERROR_SYNTAX("Syntax error!"),
     PLAYER_VERSION_NOT_SUPPORTED("§cWARNING §7recommended versions: §6§l1.12-1.12.2§7.\nSome jumps might not be possible in other versions."),
     PLAYER_NOT_ON_GROUND("You must be on the ground to do that."),
+    TELEPORT("Teleported!"),
+    NOT_A_NUMBER("Please only enter numbers."),
+    PLAYER_NOT_ONLINE("The player is not online."),
+    TP_USAGE("§7Usage: §6/tp <player> <toPlayer> §7|| §6/tp <x> <y> <z> [yaw] [pitch]"),
+    ERROR_ALREADY_VERIFIED("You have already been verified."),
     
     PLAYER_SWITCH_TO_PRACTICE("§7 Switched to practice mode."),
     PLAYER_SWITCH_TO_PARKOUR("§7 Switched to parkour mode."),
@@ -49,6 +59,7 @@ public enum Message {
     PLAYER_STEP_PROGRESS(" §7I'm not a checkpoint. I'm here to track your progress!"),
     ACTIVATED_CP("Activated checkpoint."),
     DEACTIVATED_CP("Deactivated checkpoint."),
+    ACTIVATE_INDEX_CP("§7Set the checkpoint number by typing §6/cp <number> §7or §6/cp -1 §7to deactivate."),
     
     STAFF_MODE_OFF(" §7§lSTAFF MODE §c§lOFF."),
     STAFF_MODE_ON(" §7§lSTAFF MODE §a§lON."),
@@ -67,6 +78,7 @@ public enum Message {
     BLOCK_DATA_SUCCESS("Successfully added blockdata."),
     CANT_DESTROY_BLOCK_DATA("You can't destroy the blockdata."),
     SUCCESS_REMOVE_BLOCK_DATA("Successfully removed the blockdata from block."),
+    DISCORD_MESSAGE(" §7Join the official §6TD2-Discord: §ahttps://discord.gg/WjqfN2qzzT §7to view and compare your progress on this server!"),
     
     HELP_MESSAGE("§7----- §6HELP §7------"),
     HELP_MESSAGE_1("§7/help - §eShow this message"),

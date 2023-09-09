@@ -14,6 +14,7 @@ public class BlockData {
     
     private Location teleportLoc;
     private Location nextCheckpoint;
+    private int cpIndex = -1;
     private int timeTillNextCheckpoint = -1;
     private boolean isCheckpoint = true;
     

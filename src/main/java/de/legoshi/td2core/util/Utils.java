@@ -2,11 +2,10 @@ package de.legoshi.td2core.util;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class Utils {
     
@@ -63,7 +62,7 @@ public class Utils {
     }
     
     public static boolean isOnGround(Player p) {
-        double[] allowedHeights = {0.0, 0.0625, 0.09375, 0.125, 0.25, 0.375, 0.5, 0.5625, 0.625, 0.75, 0.8125, 0.875, 0.9375};
+        double[] allowedHeights = {0.0, 0.0625, 0.09375, 0.125, 0.1875, 0.25, 0.375, 0.5, 0.5625, 0.625, 0.75, 0.8125, 0.875, 0.9375};
         double playerHeight = p.getLocation().getY();
     
         int wholePart = (int) playerHeight;
@@ -84,6 +83,24 @@ public class Utils {
             sb.append(" ");
         }
         return sb.toString();
+    }
+    
+    public static String getPlayerName(String playerID) {
+        OfflinePlayer offPlayer = Bukkit.getOfflinePlayer(playerID);
+        String playerName = playerID;
+        if (offPlayer != null) {
+            playerName = Bukkit.getOfflinePlayer(playerID).getName();
+        }
+        return playerName;
+    }
+    
+    public static String getPlayerNameByUUID(String uuid) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+        String playerName = "null";
+        if (player != null) {
+            playerName = player.getName();
+        }
+        return playerName;
     }
     
 }
