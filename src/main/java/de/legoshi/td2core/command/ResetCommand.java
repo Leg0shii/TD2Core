@@ -41,7 +41,7 @@ public class ResetCommand implements CommandExecutor {
         parkourSession.reset();
         player.teleport(parkourMap.getStartLocation());
     
-        mapManager.deletePlay(player.getUniqueId().toString(), parkourMap.mapName);
+        mapManager.resetPlay(player.getUniqueId().toString(), parkourMap);
         player.sendMessage(Message.SUCCESS_RESET.getSuccessMessage());
         return false;
     }

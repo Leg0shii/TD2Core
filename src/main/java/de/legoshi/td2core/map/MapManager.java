@@ -159,13 +159,21 @@ public class MapManager {
         }, 60L);
     }
     
-    public void deletePlay(String playerID, String mapName) {
+    public void resetPlay(String playerID, ParkourMap parkourMap) {
         Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
-            String sqlString = "DELETE FROM player_log WHERE mapname = ? AND userid = ? AND passed = 0;";
+            String sqlString = "UPDATE player_log SET passed = 0, playtime = 0, fails = 0, finished_date = ?, last_location = ?, " +
+                "last_cp_location = ?, next_cp_location = ?, time_till_next = ? " +
+                "WHERE mapname = ? AND userid = ? AND passed = 0";
+            
             try {
                 PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlString);
-                preparedStatement.setString(1, mapName);
-                preparedStatement.setString(2, playerID);
+                preparedStatement.setDate(1, null);
+                preparedStatement.setString(2, Utils.getStringFromLocation(parkourMap.getStartLocation()));
+                preparedStatement.setString(3, Utils.getStringFromLocation(parkourMap.getStartLocation()));
+                preparedStatement.setString(4, null);
+                preparedStatement.setInt(5, -1);
+                preparedStatement.setString(6, parkourMap.getMapName());
+                preparedStatement.setString(7, playerID);
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();

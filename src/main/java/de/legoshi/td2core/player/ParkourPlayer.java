@@ -261,6 +261,7 @@ public class ParkourPlayer {
             mapLeave(true);
             
             updatePercentage(copyPKMap, copyPKMap.getCpCount());
+            TD2Core.getInstance().getDiscordManager().getRoleManager().cpRoleCheck(currentParkourMap.getMapName(), player.getUniqueId().toString());
             Bukkit.broadcastMessage(Message.GOAL_REACHED.getInfoMessage(player.getName(), mapName));
             Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
                 TD2Core.getInstance().getDiscordManager().sendCompletionMessage(player);

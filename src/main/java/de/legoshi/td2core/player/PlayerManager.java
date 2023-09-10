@@ -116,10 +116,24 @@ public class PlayerManager {
                 if (!resultSet.next()) {
                     String query = "INSERT INTO player_log (mapname, userid, started_date) VALUES (?, ?, ?)";
                     PreparedStatement preparedStatement2 = TD2Core.sql().prepare(query);
+                    Date started = new Date(System.currentTimeMillis());
+                    
                     preparedStatement2.setString(1, mapName);
                     preparedStatement2.setString(2, player.getUniqueId().toString());
-                    preparedStatement2.setDate(3, new Date(System.currentTimeMillis()));
+                    preparedStatement2.setDate(3, started);
                     preparedStatement2.execute();
+    
+                    session.setLastMapLocation(null);
+                    session.setLastCheckpointLocation(null);
+                    session.setStarted(started);
+                    session.setFinished(null);
+                    session.setPlayTime(0);
+                    session.setFails(0);
+                    session.setNextCP(null);
+                    session.setPassed(false);
+                    session.setTotalFails(0);
+                    session.setTotalPlayTime(0);
+                    return null;
                 }
                 
                 resultSet.beforeFirst();

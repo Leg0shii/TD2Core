@@ -24,6 +24,8 @@ commands:
     tp:
     cp:
     discord:
+    leaderboard:
+      aliases: [lb, top]
 
 permissions:
   td2core:
