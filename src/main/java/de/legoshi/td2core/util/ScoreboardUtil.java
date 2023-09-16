@@ -22,8 +22,9 @@ public class ScoreboardUtil {
         scoreboard.registerNewTeam("rank").addEntry(ChatColor.YELLOW + "" + ChatColor.WHITE);
         scoreboard.registerNewTeam("hour").addEntry(ChatColor.GRAY + "" + ChatColor.WHITE);
         scoreboard.registerNewTeam("jump").addEntry(ChatColor.GREEN + "" + ChatColor.WHITE);
+        scoreboard.registerNewTeam("ip").addEntry(ChatColor.GOLD+ "" + ChatColor.WHITE);
         
-        objective.setDisplayName("" + ChatColor.DARK_AQUA + ChatColor.BOLD + "TD2");
+        objective.setDisplayName("" + ChatColor.DARK_AQUA + ChatColor.BOLD + "TD2.mcpro.io");
         
         Team noCollide = scoreboard.getTeam("noCollide");
         noCollide.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
