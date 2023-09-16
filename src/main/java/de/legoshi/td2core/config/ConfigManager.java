@@ -18,6 +18,7 @@ public class ConfigManager {
         addConfig(new PlayerConfig(plugin));
         addConfig(new DiscordConfig(plugin));
         addConfig(new AnnouncementConfig(plugin));
+        addConfig(new PlayerInventoryConfig(plugin));
         configs.forEach(ConfigAccessor::reloadConfig);
     }
     

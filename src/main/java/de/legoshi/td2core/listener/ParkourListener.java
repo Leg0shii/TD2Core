@@ -46,7 +46,7 @@ public class ParkourListener implements Listener {
         ItemStack itemStack = event.getItem();
         
         ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
-        if (parkourPlayer.getPlayerState().equals(PlayerState.STAFF_MODE)) {
+        if (parkourPlayer.getPlayerState().equals(PlayerState.STAFF)) {
             onTrapDoorClick(event);
         }
         
@@ -98,7 +98,7 @@ public class ParkourListener implements Listener {
             return;
         }
         
-        if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
+        if (parkourPlayer.getPlayerState() == PlayerState.STAFF) {
             Location pracLocation = session.getPracCPLocation();
             if (pracLocation == null) {
                 if (location == null) {
@@ -134,7 +134,7 @@ public class ParkourListener implements Listener {
         event.setCancelled(true);
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
+        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.STAFF) {
             player.setAllowFlight(!player.getAllowFlight());
             
             String prefix = "§a";
@@ -180,7 +180,7 @@ public class ParkourListener implements Listener {
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
     
-        if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
+        if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.STAFF) {
     
             ParkourSession session = sessionManager.get(player, parkourPlayer.getCurrentParkourMap());
             Material pressurePlate = event.getClickedBlock().getType();
@@ -202,7 +202,7 @@ public class ParkourListener implements Listener {
                         Location nextCPLocation = blockManager.getNextCPLocation(cpLocation);
                         session.setNextCP(nextCPLocation);
     
-                        if (parkourPlayer.getPlayerState() != PlayerState.STAFF_MODE) parkourPlayer.updateActionBar(session);
+                        if (parkourPlayer.getPlayerState() != PlayerState.STAFF) parkourPlayer.updateActionBar(session);
                     
                         player.getInventory().addItem(new ItemStack(Material.COMPASS));
                         player.setCompassTarget(nextCPLocation.clone().add(0.5, 0, 0.5));
@@ -238,7 +238,7 @@ public class ParkourListener implements Listener {
             }
         
             if (pressurePlate == Material.GOLD_PLATE) {
-                if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) return;
+                if (parkourPlayer.getPlayerState() == PlayerState.STAFF) return;
                 parkourPlayer.activateGoal(cpLocation);
                 Bukkit.getOnlinePlayers().forEach(p -> player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F));
             }

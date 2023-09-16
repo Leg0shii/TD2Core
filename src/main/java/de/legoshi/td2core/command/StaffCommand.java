@@ -31,7 +31,7 @@ public class StaffCommand implements CommandExecutor {
         
         Player player = (Player) commandSender;
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
+        if (parkourPlayer.getPlayerState() == PlayerState.STAFF) {
             if (parkourPlayer.getBukkitTask() != null) {
                 parkourPlayer.getBukkitTask().cancel();
             }
@@ -43,7 +43,7 @@ public class StaffCommand implements CommandExecutor {
             player.setGameMode(GameMode.ADVENTURE);
             player.teleport(TD2Core.getSpawn());
         } else {
-            parkourPlayer.switchPlayerState(PlayerState.STAFF_MODE);
+            parkourPlayer.switchPlayerState(PlayerState.STAFF);
             player.setGameMode(GameMode.CREATIVE);
             player.sendMessage(Message.STAFF_MODE_ON.getInfoMessage());
         }

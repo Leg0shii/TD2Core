@@ -25,7 +25,7 @@ public class PracticeCommand implements CommandExecutor {
         Player player = (Player) commandSender;
         ParkourPlayer parkourPlayer = playerManager.get(player);
         
-        if (parkourPlayer.getPlayerState() == PlayerState.LOBBY || parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
+        if (parkourPlayer.getPlayerState() == PlayerState.LOBBY || parkourPlayer.getPlayerState() == PlayerState.STAFF) {
             player.sendMessage(Message.ERROR_IN_LOBBY.getWarningMessage());
         } else {
             if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE) {

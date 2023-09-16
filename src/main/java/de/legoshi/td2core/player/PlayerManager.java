@@ -2,6 +2,7 @@ package de.legoshi.td2core.player;
 
 import com.viaversion.viaversion.util.Pair;
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.kit.KitManager;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
@@ -21,16 +22,18 @@ public class PlayerManager {
     
     @Getter private final MapManager mapManager;
     private final SessionManager sessionManager;
+    private final KitManager kitManager;
     private final HashMap<Player, ParkourPlayer> playerHashMap;
     
-    public PlayerManager(MapManager mapManager, SessionManager sessionManager) {
+    public PlayerManager(MapManager mapManager, SessionManager sessionManager, KitManager kitManager) {
         this.mapManager = mapManager;
         this.sessionManager = sessionManager;
+        this.kitManager = kitManager;
         this.playerHashMap = new HashMap<>();
     }
     
     public ParkourPlayer create(Player player) {
-        return new ParkourPlayer(this, sessionManager, player);
+        return new ParkourPlayer(this, sessionManager, kitManager, player);
     }
     
     public CompletableFuture<Void> loadPercentage(Player player) {
@@ -47,7 +50,7 @@ public class PlayerManager {
         ParkourSession session = sessionManager.get(player, parkourMap);
         ParkourPlayer parkourPlayer = get(player);
         
-        if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) return;
+        if (parkourPlayer.getPlayerState() == PlayerState.STAFF) return;
         
         // check if player has entry
         String entryCheck = "SELECT * FROM player_log WHERE mapname = ? AND userid = ? AND passed = 0";

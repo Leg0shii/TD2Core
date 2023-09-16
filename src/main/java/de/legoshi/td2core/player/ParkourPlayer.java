@@ -25,6 +25,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,6 +34,7 @@ public class ParkourPlayer {
     private final PlayerManager playerManager;
     private final SessionManager sessionManager;
     private final MapManager mapManager;
+    private final KitManager kitManager;
     
     private final Player player;
     private PlayerTag playerTag;
@@ -42,24 +44,27 @@ public class ParkourPlayer {
     private ParkourMap currentParkourMap;
     
     private Kit playerKit;
+    private List<Kit> playerKits;
     private BukkitTask bukkitTask;
     private BukkitTask cpTask;
     private boolean sendMessage;
     private double percentage;
     private int version;
     
-    public ParkourPlayer(PlayerManager playerManager, SessionManager sessionManager, Player player) {
+    public ParkourPlayer(PlayerManager playerManager, SessionManager sessionManager, KitManager kitManager, Player player) {
         this.playerManager = playerManager;
         this.sessionManager = sessionManager;
         this.mapManager = playerManager.getMapManager();
+        this.kitManager = kitManager;
         
         this.player = player;
         this.version = Via.getAPI().getPlayerVersion(player.getUniqueId());
         this.playerState = PlayerState.LOBBY;
-        this.playerKit = new ParkourKit(version);
+        this.playerKit = kitManager.loadKit(this);
         this.percentage = 0;
         this.rank = 99999;
-        
+
+        // TODO: load player kits from config
         startCPScheduler();
     }
     
@@ -84,7 +89,7 @@ public class ParkourPlayer {
     
     public void serverLeave(boolean shutdown) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
-        if (playerState == PlayerState.STAFF_MODE) {
+        if (playerState == PlayerState.STAFF) {
             if (bukkitTask != null) {
                 bukkitTask.cancel();
             }
@@ -96,6 +101,7 @@ public class ParkourPlayer {
             playerManager.saveIndividualStats(player, currentParkourMap);
         } else {
             Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
+                // TODO: save kits to config
                 playerManager.saveIndividualStats(player, currentParkourMap);
                 if (bukkitTask != null) bukkitTask.cancel();
                 playerManager.remove(this);
@@ -108,7 +114,7 @@ public class ParkourPlayer {
     
     public void mapJoin(ParkourMap map) {
         this.currentParkourMap = map;
-        if (playerState != PlayerState.STAFF_MODE) {
+        if (playerState != PlayerState.STAFF) {
             updateState(PlayerState.PARKOUR);
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(false);
@@ -121,7 +127,7 @@ public class ParkourPlayer {
             Bukkit.getScheduler().runTask(TD2Core.getInstance(), () -> {
                 bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> updateActionBar(session), 0L, 20L);
                 
-                if (playerState == PlayerState.STAFF_MODE) {
+                if (playerState == PlayerState.STAFF) {
                     player.setGameMode(GameMode.CREATIVE);
                 } else {
                     if (session.getLastMapLocation() != null) {
@@ -151,7 +157,7 @@ public class ParkourPlayer {
         Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
             playerManager.saveIndividualStats(player, currentParkourMap);
             currentParkourMap = null;
-            if (playerState != PlayerState.STAFF_MODE) {
+            if (playerState != PlayerState.STAFF) {
                 updateState(PlayerState.LOBBY);
             }
             bukkitTask.cancel();
@@ -160,7 +166,7 @@ public class ParkourPlayer {
         
         player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 1.0F, 1.0F);
         
-        if (playerState != PlayerState.STAFF_MODE) {
+        if (playerState != PlayerState.STAFF) {
             player.teleport(TD2Core.getSpawn());
         }
     }
@@ -181,7 +187,7 @@ public class ParkourPlayer {
         }
         
         session.setLastCheckpointLocation(location);
-        if (playerState == PlayerState.STAFF_MODE) {
+        if (playerState == PlayerState.STAFF) {
             session.setPracCPLocation(null);
         }
         if (isCP) {
@@ -192,7 +198,7 @@ public class ParkourPlayer {
     }
     
     public void checkClickedBlock(Location clickedBlock, boolean isCP, int cpIndex) {
-        if (playerState == PlayerState.STAFF_MODE) return;
+        if (playerState == PlayerState.STAFF) return;
         if (playerState != PlayerState.PARKOUR) return;
         if (clickedBlock.add(0, -1, 0).getBlock().getType() == Material.BEDROCK) return;
         
@@ -281,13 +287,14 @@ public class ParkourPlayer {
     }
     
     public void triggerFail() {
-        if (playerState == PlayerState.PRACTICE || playerState == PlayerState.STAFF_MODE) return;
+        if (playerState == PlayerState.PRACTICE || playerState == PlayerState.STAFF) return;
         ParkourSession session = sessionManager.get(player, currentParkourMap);
         session.setFails(session.getFails() + 1);
         updateActionBar(session);
     }
     
     public void setKit() {
+        // TODO: save current kit configuration
         player.getInventory().clear();
         for (int i = 0; i < 9; i++) {
             ItemStack item = playerKit.getInventory().getItem(i);
@@ -327,7 +334,7 @@ public class ParkourPlayer {
                 player.sendMessage(Message.PLAYER_SWITCH_TO_PARKOUR.getInfoMessage());
                 break;
             }
-            case STAFF_MODE: {
+            case STAFF: {
                 if (playerState == PlayerState.PARKOUR && session != null) {
                     session.setLastMapLocation(player.getLocation());
                 }
@@ -364,7 +371,7 @@ public class ParkourPlayer {
     public void startCPScheduler() {
         this.cpTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> {
             ParkourSession session = sessionManager.get(player, currentParkourMap);
-            if (session != null && session.getNextCP() != null && (playerState == PlayerState.PARKOUR || playerState == PlayerState.STAFF_MODE)) {
+            if (session != null && session.getNextCP() != null && (playerState == PlayerState.PARKOUR || playerState == PlayerState.STAFF)) {
                 player.spawnParticle(Particle.VILLAGER_HAPPY, session.getNextCP().clone().add(0.5, 0, 0.5), 50);
             }
         }, 0L, 20L);
@@ -388,7 +395,7 @@ public class ParkourPlayer {
             case LOBBY:
                 playerKit = new LobbyKit();
                 break;
-            case STAFF_MODE:
+            case STAFF:
                 playerKit = new StaffKit(version);
                 break;
         }
@@ -396,7 +403,7 @@ public class ParkourPlayer {
     }
     
     public void updateActionBar(ParkourSession session) {
-        if (playerState == PlayerState.STAFF_MODE) {
+        if (playerState == PlayerState.STAFF) {
             Utils.sendActionBar(player, "§cSTAFF Mode");
             return;
         }

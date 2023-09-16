@@ -109,7 +109,7 @@ public class MapGUI extends GUIPane {
                             return true;
                         }
                     }
-                    if (player.getPlayerState() == PlayerState.STAFF_MODE) {
+                    if (player.getPlayerState() == PlayerState.STAFF) {
                         player.getPlayer().sendMessage(Message.NOT_STAFF_MODE.getMessage());
                         return true;
                     }

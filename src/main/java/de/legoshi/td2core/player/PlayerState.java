@@ -5,6 +5,6 @@ public enum PlayerState {
     LOBBY,
     PARKOUR,
     PRACTICE,
-    STAFF_MODE;
+    STAFF;
 
 }

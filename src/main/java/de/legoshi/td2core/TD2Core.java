@@ -13,6 +13,8 @@ import de.legoshi.td2core.database.DBManager;
 import de.legoshi.td2core.discord.DiscordManager;
 import de.legoshi.td2core.discord.RoleManager;
 import de.legoshi.td2core.discord.VerifyManager;
+import de.legoshi.td2core.kit.Kit;
+import de.legoshi.td2core.kit.KitManager;
 import de.legoshi.td2core.listener.GeneralListener;
 import de.legoshi.td2core.listener.ParkourListener;
 import de.legoshi.td2core.map.MapManager;
@@ -42,6 +44,7 @@ public final class TD2Core extends JavaPlugin {
     private SessionManager sessionManager;
     private VerifyManager verifyManager;
     private RoleManager roleManager;
+    private KitManager kitManager;
     private AnnouncementManager announcementManager;
     
     private ConfigManager configManager;
@@ -61,7 +64,8 @@ public final class TD2Core extends JavaPlugin {
         dbManager = new DBManager(this, configManager);
         announcementManager = new AnnouncementManager(verifyManager, configManager);
         mapManager = new MapManager(configManager);
-        playerManager = new PlayerManager(mapManager, sessionManager);
+        kitManager = new KitManager(configManager);
+        playerManager = new PlayerManager(mapManager, sessionManager, kitManager);
         discordManager = new DiscordManager(configManager, playerManager, sessionManager, verifyManager);
         blockManager = new BlockManager(playerManager);
         hideManager = new HideManager();

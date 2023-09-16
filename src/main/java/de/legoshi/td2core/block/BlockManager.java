@@ -48,7 +48,7 @@ public class BlockManager implements Listener {
         
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        if (parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE || player.hasPermission("td2core.edit_cp")) {
+        if (parkourPlayer.getPlayerState() == PlayerState.STAFF || player.hasPermission("td2core.edit_cp")) {
             Location clickedBlock = event.getClickedBlock().getLocation();
             new CheckPointGUI().openGui(player, this, clickedBlock);
         }

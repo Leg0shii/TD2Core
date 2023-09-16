@@ -32,7 +32,7 @@ public class SpawnCommand implements CommandExecutor {
             player.teleport(TD2Core.getSpawn());
         }
         
-        if (parkourPlayer.getPlayerState() != PlayerState.STAFF_MODE) {
+        if (parkourPlayer.getPlayerState() != PlayerState.STAFF) {
             player.setAllowFlight(false);
         }
         player.sendMessage(Message.SUCCESS_SPAWN.getSuccessMessage());

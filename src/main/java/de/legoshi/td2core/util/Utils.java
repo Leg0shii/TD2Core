@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -35,6 +36,14 @@ public class Utils {
             return new Location(w, x, y, z);
         }
         return null;
+    }
+
+    public static String getStringFromItemStack(ItemStack itemStack) {
+        return "";
+    }
+
+    public static ItemStack getItemStackFromString(String itemString) {
+        return new ItemStack(Material.AIR);
     }
     
     public static void sendActionBar(Player p, String message) {

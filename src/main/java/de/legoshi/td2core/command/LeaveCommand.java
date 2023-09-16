@@ -34,7 +34,7 @@ public class LeaveCommand implements CommandExecutor {
         
         ParkourMap parkourMap = parkourPlayer.getCurrentParkourMap();
         
-        if (parkourPlayer.getPlayerState() == PlayerState.LOBBY || parkourPlayer.getPlayerState() == PlayerState.STAFF_MODE) {
+        if (parkourPlayer.getPlayerState() == PlayerState.LOBBY || parkourPlayer.getPlayerState() == PlayerState.STAFF) {
             player.sendMessage(Message.PLAYER_NOT_IN_MAP.getWarningMessage());
             return false;
         }
