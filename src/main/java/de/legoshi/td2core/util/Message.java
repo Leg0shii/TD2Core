@@ -92,6 +92,10 @@ public enum Message {
     HELP_MESSAGE_9("§7/reset - §eReset progress in the map you are in."),
     HELP_MESSAGE_10("§7/hideall | /showall - §eHides/shows all players."),
     HELP_MESSAGE_11("§7/hide <player> | /show <player> - §eHides/shows a specific player."),
+    HELP_MESSAGE_12("§7/lb - §eShow the leaderboard"),
+    HELP_MESSAGE_13("§7/staff - §eSwitch to/from staff mode"),
+    HELP_MESSAGE_14("§7/verify - §eVerify yourself in the discord (/discord)"),
+    HELP_MESSAGE_15("§7/discord - §eGet the discord link"),
     ;
     
     private final String message;
