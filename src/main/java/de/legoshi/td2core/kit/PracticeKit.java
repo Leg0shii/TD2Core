@@ -11,7 +11,7 @@ public class PracticeKit extends ParkourKit {
     protected ItemStack goldHelmet = new ItemStack(Material.GOLD_HELMET, 1);
     protected ItemStack setCPTool = new ItemStack(Material.EMERALD, 1);
     
-    public PracticeKit(int version) {
+    public PracticeKit(Integer version) {
         super(version);
     
         unPracticeTool = ItemUtils.setItemText(unPracticeTool, "§eUnpractice");
@@ -22,11 +22,15 @@ public class PracticeKit extends ParkourKit {
         unPracticeTool = ItemUtils.addNbtId(unPracticeTool, "unprac");
         flyTool = ItemUtils.addNbtId(flyTool, "fly");
         setCPTool = ItemUtils.addNbtId(setCPTool, "set");
-        
-        inventory.setItem(1, unPracticeTool);
-        inventory.setItem(2, setCPTool);
-        inventory.setItem(3, flyTool);
-        inventory.setItem(4, goldHelmet);
+    
+        inventoryMap.setItem(1, unPracticeTool);
+        inventoryMap.setItem(2, setCPTool);
+        inventoryMap.setItem(3, flyTool);
+        inventoryMap.setItem(4, goldHelmet);
+    }
+    
+    public PracticeKit(ItemInventoryMap inventoryMap, Integer version) {
+        super(inventoryMap, version);
     }
     
 }

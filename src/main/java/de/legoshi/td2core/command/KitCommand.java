@@ -1,5 +1,6 @@
 package de.legoshi.td2core.command;
 
+import de.legoshi.td2core.kit.KitManager;
 import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.util.Message;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public class KitCommand implements CommandExecutor {
     
+    private final KitManager kitManager;
     private final PlayerManager playerManager;
     
     @Override
@@ -23,7 +25,17 @@ public class KitCommand implements CommandExecutor {
         
         Player player = (Player) commandSender;
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        parkourPlayer.setKit();
+        
+        if (strings.length == 0) {
+            parkourPlayer.setKit();
+            player.sendMessage(Message.KIT_RESET_HELP.getSuccessMessage());
+        } else if (strings.length == 1 && strings[0].equalsIgnoreCase("reset")) {
+            kitManager.resetPlayerKits(parkourPlayer);
+            parkourPlayer.setKit();
+            player.sendMessage(Message.KIT_RESET.getSuccessMessage());
+        } else {
+            player.sendMessage(Message.HELP_MESSAGE_3.getMessage());
+        }
         
         return true;
     }

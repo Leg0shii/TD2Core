@@ -10,7 +10,7 @@ public class StaffKit extends PracticeKit {
     private ItemStack leaderboard = CustomHeads.leaderboardHead;
     private ItemStack diamondHelmet = new ItemStack(Material.DIAMOND_HELMET, 1);
     
-    public StaffKit(int version) {
+    public StaffKit(Integer version) {
         super(version);
     
         diamondHelmet = ItemUtils.setItemText(diamondHelmet, "§3Diamond Helmet");
@@ -18,15 +18,19 @@ public class StaffKit extends PracticeKit {
     
         leaderboard = ItemUtils.addNbtId(leaderboard, "leaderboard");
     
-        inventory.setItem(0, checkPointTool);
-        inventory.setItem(1, setCPTool);
-        inventory.setItem(2, flyTool);
-        inventory.setItem(3, diamondHelmet);
-        inventory.setItem(4, leaderboard);
-        inventory.setItem(6, new ItemStack(Material.AIR));
-        inventory.setItem(8, helpTool);
+        inventoryMap.setItem(0, checkPointTool);
+        inventoryMap.setItem(1, setCPTool);
+        inventoryMap.setItem(2, flyTool);
+        inventoryMap.setItem(3, diamondHelmet);
+        inventoryMap.setItem(4, leaderboard);
+        inventoryMap.setItem(6, new ItemStack(Material.AIR));
+        inventoryMap.setItem(8, helpTool);
         
-        applyPracticeTool(version, 7);
+        applyPracticeTool(7);
+    }
+    
+    public StaffKit(ItemInventoryMap inventoryMap, Integer version) {
+        super(inventoryMap, version);
     }
     
 }

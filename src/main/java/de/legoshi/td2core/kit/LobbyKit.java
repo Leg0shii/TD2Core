@@ -10,8 +10,8 @@ public class LobbyKit extends Kit {
     protected ItemStack mapSelector = new ItemStack(Material.NETHER_STAR, 1);
     protected ItemStack leaderboard = CustomHeads.leaderboardHead;
     
-    public LobbyKit() {
-       super();
+    public LobbyKit(Integer version) {
+       super(version);
     
         mapSelector = ItemUtils.setItemText(mapSelector, "§eSelect Map");
         leaderboard = ItemUtils.setItemText(leaderboard, "§eLeaderboard");
@@ -19,9 +19,13 @@ public class LobbyKit extends Kit {
         mapSelector = ItemUtils.addNbtId(mapSelector, "select");
         leaderboard = ItemUtils.addNbtId(leaderboard, "leaderboard");
     
-        inventory.setItem(0, mapSelector);
-        inventory.setItem(4, leaderboard);
-        inventory.setItem(8, helpTool);
+        inventoryMap.setItem(0, mapSelector);
+        inventoryMap.setItem(4, leaderboard);
+        inventoryMap.setItem(8, helpTool);
+    }
+    
+    public LobbyKit(ItemInventoryMap inventoryMap, Integer version) {
+        super(inventoryMap, version);
     }
     
 }

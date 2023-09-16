@@ -64,19 +64,27 @@ public class GeneralListener implements Listener {
         Inventory bottomInv = event.getView().getBottomInventory();
         Inventory clickedInv = event.getClickedInventory();
         
-        if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY ||
-            (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.RIGHT) &&
-                (clickedInv == topInv && event.getCursor() != null && event.getCursor().getType() != Material.AIR) ||
-            (clickedInv == bottomInv && topInv.contains(event.getCursor()))) {
+        // If moving between inventories, cancel it
+        if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
             event.setCancelled(true);
             return;
         }
         
+        // If they are clicking inside their personal inventory, allow
+        if (clickedInv == bottomInv) {
+            return;
+        }
+    
+        // If they are clicking inside the opened inventory, cancel it (preventing putting things inside)
+        if (clickedInv == topInv && !TD2Core.isServerGUI(topInv.getName())) {
+            event.setCancelled(true);
+            return;
+        }
+        
+        // Restrict SKULL_ITEM or GOLD_HELMET from being placed in the helmet slot (slot 39)
         ItemStack itemStack = event.getCurrentItem();
-        if (itemStack.getType() == Material.SKULL_ITEM || itemStack.getType() == Material.GOLD_HELMET) {
-            if (event.getSlot() == 39 || event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                event.setCancelled(true);
-            }
+        if ((itemStack.getType() == Material.SKULL_ITEM || itemStack.getType() == Material.GOLD_HELMET) && event.getSlot() == 39) {
+            event.setCancelled(true);
         }
     }
     

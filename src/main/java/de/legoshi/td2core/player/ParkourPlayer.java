@@ -44,7 +44,6 @@ public class ParkourPlayer {
     private ParkourMap currentParkourMap;
     
     private Kit playerKit;
-    private List<Kit> playerKits;
     private BukkitTask bukkitTask;
     private BukkitTask cpTask;
     private boolean sendMessage;
@@ -60,11 +59,13 @@ public class ParkourPlayer {
         this.player = player;
         this.version = Via.getAPI().getPlayerVersion(player.getUniqueId());
         this.playerState = PlayerState.LOBBY;
-        this.playerKit = kitManager.loadKit(this);
+        
+        this.playerKit = kitManager.getPlayerKit(this, LobbyKit.class);
+        setKit();
+        
         this.percentage = 0;
         this.rank = 99999;
-
-        // TODO: load player kits from config
+        
         startCPScheduler();
     }
     
@@ -79,8 +80,6 @@ public class ParkourPlayer {
         });
     
         sessionManager.init(player);
-        
-        updateState(PlayerState.LOBBY);
         
         player.teleport(TD2Core.getSpawn());
         player.setAllowFlight(false);
@@ -98,10 +97,11 @@ public class ParkourPlayer {
             session.setLastMapLocation(player.getLocation());
         }
         if (shutdown) {
+            kitManager.savePlayerKit(this);
             playerManager.saveIndividualStats(player, currentParkourMap);
         } else {
             Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
-                // TODO: save kits to config
+                kitManager.savePlayerKit(this);
                 playerManager.saveIndividualStats(player, currentParkourMap);
                 if (bukkitTask != null) bukkitTask.cancel();
                 playerManager.remove(this);
@@ -294,10 +294,9 @@ public class ParkourPlayer {
     }
     
     public void setKit() {
-        // TODO: save current kit configuration
         player.getInventory().clear();
-        for (int i = 0; i < 9; i++) {
-            ItemStack item = playerKit.getInventory().getItem(i);
+        for (int i = 0; i < 40; i++) {
+            ItemStack item = playerKit.getItem(i);
             if (item != null && item.getType() != Material.AIR) {
                 if (item.getType().equals(Material.GOLD_HELMET) || item.getType().equals(Material.DIAMOND_HELMET)) {
                     player.getInventory().setHelmet(item);
@@ -384,19 +383,20 @@ public class ParkourPlayer {
     }
     
     private void updateState(PlayerState state) {
+        kitManager.updatePlayerKitOrder(this);
         this.playerState = state;
         switch (playerState) {
             case PARKOUR:
-                playerKit = new ParkourKit(version);
+                playerKit = kitManager.getPlayerKit(this, ParkourKit.class);
                 break;
             case PRACTICE:
-                playerKit = new PracticeKit(version);
+                playerKit = kitManager.getPlayerKit(this, PracticeKit.class);
                 break;
             case LOBBY:
-                playerKit = new LobbyKit();
+                playerKit = kitManager.getPlayerKit(this, LobbyKit.class);
                 break;
             case STAFF:
-                playerKit = new StaffKit(version);
+                playerKit = kitManager.getPlayerKit(this, StaffKit.class);
                 break;
         }
         setKit();

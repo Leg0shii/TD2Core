@@ -33,9 +33,13 @@ public interface ItemUtils {
     }
     
     static boolean hasNbtId(ItemStack item, String value) {
+        return getNBTId(item).equals(value);
+    }
+    
+    static String getNBTId(ItemStack item) {
         net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
         NBTTagCompound itemCompound = (nmsItem.hasTag()) ? nmsItem.getTag() : new NBTTagCompound();
-        return itemCompound.getString("id").equals(value);
+        return itemCompound.getString("id");
     }
     
     static boolean isFullInventory(Player player) {

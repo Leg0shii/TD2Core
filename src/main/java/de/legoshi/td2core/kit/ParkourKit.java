@@ -12,9 +12,9 @@ public class ParkourKit extends Kit {
     protected ItemStack shield = new ItemStack(Material.SHIELD);
     protected ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
     
-    public ParkourKit(int version) {
-        super();
-    
+    public ParkourKit(Integer version) {
+        super(version);
+        
         checkPointTool = ItemUtils.setItemText(checkPointTool, "§aBack to Checkpoint");
         practiceTool = ItemUtils.setItemText(practiceTool, "§ePractice");
         leaveTool = ItemUtils.setItemText(leaveTool, "§cBack to Lobby");
@@ -27,17 +27,32 @@ public class ParkourKit extends Kit {
         shield = ItemUtils.addNbtId(shield, "align");
         sword = ItemUtils.addNbtId(sword, "align");
     
-        inventory.setItem(0, checkPointTool);
-        inventory.setItem(1, practiceTool);
-        inventory.setItem(7, helpTool);
-        inventory.setItem(8, leaveTool);
+        inventoryMap.setItem(0, checkPointTool);
+        inventoryMap.setItem(1, practiceTool);
+        inventoryMap.setItem(7, helpTool);
+        inventoryMap.setItem(8, leaveTool);
         
-        applyPracticeTool(version, 6);
+        applyPracticeTool(6);
     }
     
-    protected void applyPracticeTool(int version, int count) {
-        inventory.setItem(count, shield);
-        if (!(version >= 335 && version <= 340)) inventory.setItem(count, sword);
+    public ParkourKit(ItemInventoryMap inventoryMap, Integer version) {
+        super(inventoryMap, version);
+        for (int slot : inventoryMap.getInventoryMap().keySet()) {
+            if (inventoryMap.getInventoryMap().get(slot).getType().equals(Material.DIAMOND_SWORD) && is12Version()) {
+                inventoryMap.setItem(slot, shield);
+            } else if (inventoryMap.getInventoryMap().get(slot).getType().equals(Material.SHIELD) && !is12Version()) {
+                inventoryMap.setItem(slot, sword);
+            }
+        }
+    }
+    
+    protected void applyPracticeTool(int count) {
+        inventoryMap.setItem(count, shield);
+        if (!is12Version()) inventoryMap.setItem(count, sword);
+    }
+    
+    private boolean is12Version() {
+        return version >= 335 && version <= 340;
     }
     
 }

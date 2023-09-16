@@ -162,7 +162,6 @@ public class ParkourListener implements Listener {
     private void leaderBoardClick(PlayerInteractEvent event) {
         event.setCancelled(true);
         new GlobalLBGUI(configManager).openGui(event.getPlayer(), null);
-        // event.getPlayer().sendMessage("Currently deactivated");
     }
     
     private void buttonInteract(PlayerInteractEvent event) {

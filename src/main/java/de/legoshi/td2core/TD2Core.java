@@ -104,7 +104,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("help").setExecutor(new HelpCommand());
         Bukkit.getPluginCommand("prac").setExecutor(new PracticeCommand(playerManager));
         Bukkit.getPluginCommand("unprac").setExecutor(new UnPracCommand(playerManager));
-        Bukkit.getPluginCommand("kit").setExecutor(new KitCommand(playerManager));
+        Bukkit.getPluginCommand("kit").setExecutor(new KitCommand(kitManager, playerManager));
         Bukkit.getPluginCommand("leave").setExecutor(new LeaveCommand(playerManager));
         Bukkit.getPluginCommand("delete").setExecutor(new DeletePlayerCommand(mapManager));
         Bukkit.getPluginCommand("spawn").setExecutor(new SpawnCommand(playerManager));
@@ -120,7 +120,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("tp").setExecutor(new TPCommand());
         Bukkit.getPluginCommand("cp").setExecutor(new CPCountCommand(blockManager));
         Bukkit.getPluginCommand("discord").setExecutor(new DiscordCommand());
-        Bukkit.getPluginCommand("leaderboard").setExecutor(new LeaderboardCommand(configManager));
+        Bukkit.getPluginCommand("leaderboard").setExecutor(new LeaderboardCommand(playerManager, configManager));
     }
     
     private void registerEvents() {
@@ -149,6 +149,11 @@ public final class TD2Core extends JavaPlugin {
     
     private void loadSpawnLocation() {
         spawnLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("spawn"));
+    }
+    
+    public static boolean isServerGUI(String name) {
+        return name.equals("Section Selection") || name.contains("Leaderboard") || name.contains("Map Selection")
+            || name.equals("§7§lLeaderboard") || name.equals("Checkpoint Editor");
     }
     
 }

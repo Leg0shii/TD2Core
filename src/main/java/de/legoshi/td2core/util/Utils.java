@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
 
@@ -39,11 +40,51 @@ public class Utils {
     }
 
     public static String getStringFromItemStack(ItemStack itemStack) {
-        return "";
+        String material = itemStack.getType().toString();
+        String name = "";
+        if (itemStack.hasItemMeta()) {
+            name = itemStack.getItemMeta().getDisplayName();
+        }
+        String nbt = ItemUtils.getNBTId(itemStack);
+        String data = "-";
+        if (itemStack.getType().equals(Material.INK_SACK)) {
+            if (name.contains("Checkpoint")) {
+                data = "1";
+            } else if (name.contains("Lobby")) {
+                data = "8";
+            }
+        }
+        return material + ";" + name + ";" + nbt + ";" + data;
     }
-
+    
     public static ItemStack getItemStackFromString(String itemString) {
-        return new ItemStack(Material.AIR);
+        String[] components = itemString.split(";");
+        if(components.length != 4) {
+            return new ItemStack(Material.AIR);
+        }
+        
+        Material material = Material.valueOf(components[0]);
+        String name = components[1];
+        String nbt = components[2];
+        String data = components[3];
+        
+        ItemStack itemStack = new ItemStack(material);
+        if (itemStack.getType().equals(Material.INK_SACK)) {
+            itemStack = new ItemStack(material, 1, (short) Integer.parseInt(data));
+        } else if (itemStack.getType().equals(Material.SKULL_ITEM)) {
+            if (name.contains("help")) {
+                itemStack = CustomHeads.helpHead;
+            } else if (name.contains("Leaderboard")) {
+                itemStack = CustomHeads.leaderboardHead;
+            }
+        }
+        
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName(name);
+        itemStack.setItemMeta(meta);
+        
+        itemStack = ItemUtils.addNbtId(itemStack, nbt);
+        return itemStack;
     }
     
     public static void sendActionBar(Player p, String message) {
