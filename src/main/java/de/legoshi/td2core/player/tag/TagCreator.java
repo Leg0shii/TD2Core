@@ -3,6 +3,7 @@ package de.legoshi.td2core.player.tag;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
+import de.legoshi.td2core.player.PlayerState;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -20,7 +21,7 @@ public class TagCreator {
                 PlayerTag playerTag = getPlayerTag((
                     (int) (parkourPlayer.getPercentage() * 10)) / 10.0,
                     parkourPlayer.getRank(),
-                    all.hasPermission("td2core.staff")
+                    parkourPlayer.getPlayerState().equals(PlayerState.STAFF)
                 );
                 String team = playerTag.getTeam();
                 

@@ -167,7 +167,7 @@ public class ParkourListener implements Listener {
     private void buttonInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || player.hasPermission("td2core.build")) return;
+        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.STAFF) return;
         if (event.getItem() != null && (event.getItem().getType().equals(Material.SHIELD) || event.getItem().getType().equals(Material.DIAMOND_SWORD))) return;
         event.setCancelled(true);
     }

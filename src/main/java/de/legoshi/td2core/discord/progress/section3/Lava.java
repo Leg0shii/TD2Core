@@ -18,7 +18,7 @@ public class Lava extends ProgressMap {
         add(channel.getRoleMentionByName("Section 3 | Lava Chapter 9") + " (CP121-CP135): ");
         add(channel.getRoleMentionByName("Section 3 | Lava Chapter 10") + " (CP136-CP150): ");
         add(channel.getRoleMentionByName("Section 3 | Lava Chapter 11") + " (CP151-CP165): ");
-        add(channel.getRoleMentionByName("Section 3 | Lava Chapter 12") + " (CP166-CP182): ");
+        add(channel.getRoleMentionByName("Section 3 | Lava Chapter 12") + " (CP166-CP193): ");
     }
     
     @Override
@@ -54,6 +54,6 @@ public class Lava extends ProgressMap {
         addRoleMapping(136, "Section 3 | Lava Chapter 10");
         addRoleMapping(151, "Section 3 | Lava Chapter 11");
         addRoleMapping(166, "Section 3 | Lava Chapter 12");
-        addRoleMapping(183, "Section 3 | Lava VICTOR");
+        addRoleMapping(193, "Section 3 | Lava VICTOR");
     }
 }

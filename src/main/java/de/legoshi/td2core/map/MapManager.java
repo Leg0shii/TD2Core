@@ -75,6 +75,11 @@ public class MapManager {
                         parkourMap.setPotionEffects(list);
                     }
                 }
+                
+                if (key.equals("section6")) {
+                    parkourMap.setRedstone(true);
+                }
+                
                 put(parkourMap);
             }
         });
@@ -109,7 +114,7 @@ public class MapManager {
     
     public void loadMapStats(String mapName) {
         ParkourMap parkourMap = get(mapName);
-        String sqlString = "SELECT p.userid, p.passed, p.playtime, p.fails, m.total_cp " +
+        String sqlString = "SELECT p.userid, p.passed, p.playtime, p.fails, m.total_cp, m.redstone " +
             "FROM player_log as p " +
             "JOIN maps as m ON p.mapname = m.mapname " +
             "WHERE p.mapname = ?;";

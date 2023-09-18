@@ -25,6 +25,7 @@ public class ParkourMap {
     private int order;
     private int weight;
     private int estimatedDifficulty;
+    private boolean redstone;
     
     // dynamic fields
     private List<PotionEffect> potionEffects = new ArrayList<>();

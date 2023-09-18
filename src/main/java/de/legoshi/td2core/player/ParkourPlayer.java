@@ -309,6 +309,7 @@ public class ParkourPlayer {
     
     public void switchPlayerState(PlayerState state) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
+        PlayerState prevState = playerState;
         
         switch (state) {
             case PRACTICE: {
@@ -316,13 +317,23 @@ public class ParkourPlayer {
                     player.sendMessage(Message.PLAYER_NOT_ON_GROUND.getWarningMessage());
                     return;
                 }
+                
                 updateState(state);
                 player.setAllowFlight(true);
                 session.setPlayTime(session.getPlayTime());
                 session.setLastMapLocation(player.getLocation());
                 session.setLastPracLocation(player.getLocation());
+                
+                if (currentParkourMap.isRedstone()) {
+                    player.teleport(player.getLocation().add(100000, 0, 100000));
+                }
+                
                 session.setPracCPLocation(player.getLocation());
                 player.sendMessage(Message.PLAYER_SWITCH_TO_PRACTICE.getInfoMessage());
+    
+                if (prevState == PlayerState.STAFF) {
+                    Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
+                }
                 break;
             }
             case PARKOUR: {
@@ -331,6 +342,10 @@ public class ParkourPlayer {
                 player.setAllowFlight(false);
                 player.teleport(session.getLastPracLocation());
                 player.sendMessage(Message.PLAYER_SWITCH_TO_PARKOUR.getInfoMessage());
+    
+                if (prevState == PlayerState.STAFF) {
+                    Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
+                }
                 break;
             }
             case STAFF: {
@@ -345,6 +360,8 @@ public class ParkourPlayer {
     
                     clearPotionEffects();
                     updateState(state);
+    
+                    Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
                     ParkourMap parkourMap = mapManager.get("Initial TD2");
                     currentParkourMap = parkourMap;
                     
@@ -363,6 +380,10 @@ public class ParkourPlayer {
             }
             case LOBBY: {
                 updateState(state);
+    
+                if (prevState == PlayerState.STAFF) {
+                    Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
+                }
             }
         }
     }

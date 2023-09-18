@@ -1,0 +1,13 @@
+08521f46-8bb8-43a8-9eb3-d3842c34473d:
+  LobbyKit:
+    '0': NETHER_STAR;§eSelect Map;select;-
+    '4': SKULL_ITEM;§eLeaderboard;leaderboard;-
+    '8': SKULL_ITEM;§dClick me for help;help;-
+  StaffKit:
+    '0': INK_SACK;§aBack to Checkpoint;cp;1
+    '1': EMERALD;§eSet Checkpoint;set;-
+    '2': FEATHER;§eFly;fly;-
+    '4': SKULL_ITEM;§eLeaderboard;leaderboard;-
+    '7': SHIELD;§eAlign Yourself;align;-
+    '39': DIAMOND_HELMET;§3Diamond Helmet;;-
+    '8': SKULL_ITEM;§dClick me for help;help;-
