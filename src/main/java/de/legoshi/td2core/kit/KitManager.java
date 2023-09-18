@@ -76,7 +76,7 @@ public class KitManager {
             updatePlayerKitOrder(parkourPlayer);
             for (int slot : kit.getSlots()) {
                 ItemStack item = kit.getItem(slot);
-                if (item != null && !item.getType().equals(Material.COMPASS)) {
+                if (item == null || item.getType().equals(Material.COMPASS)) {
                     continue;
                 }
                 configuration.set(
