@@ -72,6 +72,7 @@ public class VerifyManager {
         Bukkit.getScheduler().runTaskLaterAsynchronously(TD2Core.getInstance(), () -> {
             roleManager.firstUserVerify(mcUUID);
             roleManager.addVerifyRole(user);
+            roleManager.checkPercentageRole(mcUUID);
             verifiedUsers.put(mcUUID, user.getId());
         }, 20L);
         return Message.VERIFY_SUCCESS.getMessage();

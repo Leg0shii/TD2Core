@@ -14,10 +14,11 @@ import java.util.*;
 public class ProgressChannel {
     
     @Getter private final String channelID;
-    private final String topHeader = "**=================================**";
-    private final String bottomHeader = "**=================================**";
+    @Getter private final String topHeader = "**=================================**";
+    @Getter private final String bottomHeader = "**=================================**";
     @Getter private final List<ProgressMap> progressMaps = new ArrayList<>();
     private final Guild guild;
+    private String query;
     
     public ProgressChannel(String channelID, Guild guild) {
         this.channelID = channelID;
@@ -37,12 +38,12 @@ public class ProgressChannel {
         return progressStringList;
     }
     
-    private String getTitleString(ProgressMap progressMap) {
+    protected String getTitleString(ProgressMap progressMap) {
         if (progressMap.getProgressLines().isEmpty()) return "";
         return topHeader + "\n**" + progressMap.getMapName() + "**\n" + bottomHeader + "\n";
     }
     
-    private String getProgressString(ProgressMap progressMap) {
+    protected String getProgressString(ProgressMap progressMap) {
         String mapName = progressMap.getMapName();
         StringBuilder progressString = new StringBuilder();
         if (progressMap.getProgressLines().isEmpty()) return "";
@@ -91,10 +92,9 @@ public class ProgressChannel {
         return progressString.toString();
     }
     
-    private String getCompletionString(ProgressMap progressMap) {
+    protected String getCompletionString(ProgressMap progressMap) {
         String mapName = progressMap.getMapName();
         StringBuilder completionString = new StringBuilder();
-        // System.out.println("Started: "+ mapName);
         
         completionString
             .append(topHeader)
@@ -111,32 +111,17 @@ public class ProgressChannel {
             ResultSet resultSet = preparedStatement.executeQuery();
             int index = 1;
             while (resultSet.next()) {
-                if (index == 1) completionString.append("> :first_place: ");
-                else if (index == 2) completionString.append("> :second_place: ");
-                else if (index == 3) completionString.append("> :third_place: ");
-                else completionString.append("> **").append(index).append(".** ");
-    
-                String playerName = Utils.getPlayerNameByUUID(resultSet.getString("userid"));
-                if (playerName == null) playerName = "null";
-                playerName = playerName + Utils.repeatSpace((16 - playerName.length())*1.5);
-                
+                String playerName = retrievePlayerName(resultSet.getString("userid"));
                 String completionDate = "(" + resultSet.getString("finished_date") + ") ";
                 String playTime = "in " + Utils.secondsToTime(resultSet.getInt("playtime")/1000) + " ";
                 String failCount = "with " + resultSet.getString("fails") + " fails.";
+    
+                completionString = indexLB(completionString, index);
                 completionString.append("**").append(playerName).append("** ").append(completionDate).append(playTime).append(failCount).append("\n");
         
                 index++;
             }
-    
-            if (index == 1) {
-                completionString.append("> :first_place: **Be the first!**\n");
-                completionString.append("> :second_place: \n");
-            } else {
-                if (index == 2) completionString.append("> :second_place: \n");
-                else if (index == 3) completionString.append("> :third_place: \n");
-                else completionString.append("> **").append(index).append(".** \n");
-            }
-            
+            completionString = rankString(completionString, index);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -158,6 +143,33 @@ public class ProgressChannel {
             return input.substring(0, input.length() - 1).trim();
         }
         return input;
+    }
+    
+    protected String retrievePlayerName(String uuid) {
+        String playerName = Utils.getPlayerNameByUUID(uuid);
+        if (playerName == null) playerName = "null";
+        playerName = playerName + Utils.repeatSpace((16 - playerName.length())*1.5);
+        return playerName;
+    }
+    
+    protected StringBuilder indexLB(StringBuilder builder, int index) {
+        if (index == 1) builder.append("> :first_place: ");
+        else if (index == 2) builder.append("> :second_place: ");
+        else if (index == 3) builder.append("> :third_place: ");
+        else builder.append("> **").append(index).append(".** ");
+        return builder;
+    }
+    
+    protected StringBuilder rankString(StringBuilder builder, int index) {
+        if (index == 1) {
+            builder.append("> :first_place: **Be the first!**\n");
+            builder.append("> :second_place: \n");
+        } else {
+            if (index == 2) builder.append("> :second_place: \n");
+            else if (index == 3) builder.append("> :third_place: \n");
+            else builder.append("> **").append(index).append(".** \n");
+        }
+        return builder;
     }
     
 }

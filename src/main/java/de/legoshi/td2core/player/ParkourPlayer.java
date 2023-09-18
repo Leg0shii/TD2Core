@@ -226,7 +226,9 @@ public class ParkourPlayer {
                     insertStatement.executeUpdate();
                     
                     updatePercentage(currentParkourMap, cpIndex);
-                    TD2Core.getInstance().getDiscordManager().getRoleManager().cpRoleCheck(currentParkourMap.getMapName(), player.getUniqueId().toString());
+                    Bukkit.getScheduler().runTaskLaterAsynchronously(TD2Core.getInstance(), () -> {
+                        TD2Core.getInstance().getDiscordManager().getRoleManager().cpRoleCheck(currentParkourMap.getMapName(), player.getUniqueId().toString());
+                    }, 20L*5);
                     Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
                         TD2Core.getInstance().getDiscordManager().sendCheckPointMessage(player);
                     });
@@ -267,7 +269,9 @@ public class ParkourPlayer {
             mapLeave(true);
             
             updatePercentage(copyPKMap, copyPKMap.getCpCount());
-            TD2Core.getInstance().getDiscordManager().getRoleManager().cpRoleCheck(currentParkourMap.getMapName(), player.getUniqueId().toString());
+            Bukkit.getScheduler().runTaskLaterAsynchronously(TD2Core.getInstance(), () -> {
+                TD2Core.getInstance().getDiscordManager().getRoleManager().cpRoleCheck(copyPKMap.getMapName(), player.getUniqueId().toString());
+            }, 20L*5);
             Bukkit.broadcastMessage(Message.GOAL_REACHED.getInfoMessage(player.getName(), mapName));
             Bukkit.getScheduler().runTaskAsynchronously(TD2Core.getInstance(), () -> {
                 TD2Core.getInstance().getDiscordManager().sendCompletionMessage(player);

@@ -49,7 +49,6 @@ public abstract class ProgressMap {
         if (cpToRole.containsKey(cpCount)) {
             return cpToRole.get(cpCount);
         }
-    
         int closestLowerKey = Integer.MIN_VALUE;
         for (int key : cpToRole.keySet()) {
             if (key < cpCount && key > closestLowerKey) {

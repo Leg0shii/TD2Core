@@ -6,6 +6,7 @@ import de.legoshi.td2core.config.PlayerInventoryConfig;
 import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerState;
 import de.legoshi.td2core.util.Utils;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -60,7 +61,7 @@ public class KitManager {
         ItemInventoryMap inventoryMap = new ItemInventoryMap();
         for (int slot = 0; slot < contents.length; slot++) {
             ItemStack item = contents[slot];
-            if (item != null) {
+            if (item != null && !item.getType().equals(Material.COMPASS)) {
                 inventoryMap.setItem(slot, item);
             }
         }
@@ -75,6 +76,9 @@ public class KitManager {
             updatePlayerKitOrder(parkourPlayer);
             for (int slot : kit.getSlots()) {
                 ItemStack item = kit.getItem(slot);
+                if (item != null && !item.getType().equals(Material.COMPASS)) {
+                    continue;
+                }
                 configuration.set(
                         playerUUID + "." + kit.getClass().getSimpleName() + "." + slot,
                         Utils.getStringFromItemStack(item)

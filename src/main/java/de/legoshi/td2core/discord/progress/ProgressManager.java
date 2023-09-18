@@ -1,6 +1,8 @@
 package de.legoshi.td2core.discord.progress;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.discord.progress.overall.OverallChannel;
+import de.legoshi.td2core.discord.progress.overall.OverallProgress;
 import de.legoshi.td2core.discord.progress.section1.BlackStretch;
 import de.legoshi.td2core.discord.progress.section1.GreenStretch;
 import de.legoshi.td2core.discord.progress.section1.InitialTD2;
@@ -23,7 +25,6 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProgressManager {
     
@@ -35,6 +36,9 @@ public class ProgressManager {
     }
     
     public void loadProgressChannels(Guild guild) {
+        OverallChannel section0 = new OverallChannel("1143261060573450280", guild);
+        section0.getProgressMaps().add(new OverallProgress(section0));
+        
         ProgressChannel section1 = new ProgressChannel("1144566390167179325", guild);
         section1.getProgressMaps().add(new InitialTD2());
         section1.getProgressMaps().add(new GreenStretch());
@@ -75,7 +79,7 @@ public class ProgressManager {
         ProgressChannel section10 = new ProgressChannel("1144566997108134018", guild);
         section10.getProgressMaps().add(new Slime(section10));
         
-        progressChannels.addAll(Arrays.asList(section1, section2, section3, section5, section6, section7, section9, section10));
+        progressChannels.addAll(Arrays.asList(section0, section1, section2, section3, section5, section6, section7, section9, section10));
     }
     
     public void startProgressScheduler() {
