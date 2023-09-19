@@ -7,6 +7,7 @@ import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
+import de.legoshi.td2core.permission.PermissionManager;
 import de.legoshi.td2core.util.Utils;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -19,13 +20,15 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerManager {
-    
+
+    private final PermissionManager permissionManager;
     @Getter private final MapManager mapManager;
     private final SessionManager sessionManager;
     private final KitManager kitManager;
     private final HashMap<Player, ParkourPlayer> playerHashMap;
     
-    public PlayerManager(MapManager mapManager, SessionManager sessionManager, KitManager kitManager) {
+    public PlayerManager(PermissionManager permissionManager, MapManager mapManager, SessionManager sessionManager, KitManager kitManager) {
+        this.permissionManager = permissionManager;
         this.mapManager = mapManager;
         this.sessionManager = sessionManager;
         this.kitManager = kitManager;
@@ -33,7 +36,7 @@ public class PlayerManager {
     }
     
     public ParkourPlayer create(Player player) {
-        return new ParkourPlayer(this, sessionManager, kitManager, player);
+        return new ParkourPlayer(permissionManager, this, sessionManager, kitManager, player);
     }
     
     public CompletableFuture<Void> loadPercentage(Player player) {

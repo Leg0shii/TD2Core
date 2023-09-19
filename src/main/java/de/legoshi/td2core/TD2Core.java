@@ -19,6 +19,7 @@ import de.legoshi.td2core.listener.GeneralListener;
 import de.legoshi.td2core.listener.ParkourListener;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.session.SessionManager;
+import de.legoshi.td2core.permission.PermissionManager;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.cache.GlobalLBCache;
 import de.legoshi.td2core.player.hide.HideManager;
@@ -42,6 +43,7 @@ public final class TD2Core extends JavaPlugin {
     private Location tutSpawnLocation;
     private Location tutEndLocation;
     
+    private PermissionManager permissionManager;
     private MapManager mapManager;
     private SessionManager sessionManager;
     private VerifyManager verifyManager;
@@ -67,7 +69,8 @@ public final class TD2Core extends JavaPlugin {
         announcementManager = new AnnouncementManager(verifyManager, configManager);
         mapManager = new MapManager(configManager);
         kitManager = new KitManager(configManager);
-        playerManager = new PlayerManager(mapManager, sessionManager, kitManager);
+        permissionManager = new PermissionManager();
+        playerManager = new PlayerManager(permissionManager, mapManager, sessionManager, kitManager);
         discordManager = new DiscordManager(configManager, playerManager, sessionManager, verifyManager);
         blockManager = new BlockManager(playerManager);
         hideManager = new HideManager();
@@ -99,7 +102,10 @@ public final class TD2Core extends JavaPlugin {
     @Override
     public void onDisable() {
         isShuttingDown = true;
-        Bukkit.getOnlinePlayers().forEach(all -> playerManager.get(all).serverLeave(true));
+        Bukkit.getOnlinePlayers().forEach(all -> {
+            playerManager.get(all).serverLeave(true);
+            permissionManager.removePlayer(all);
+        });
     }
     
     private void registerCommands() {
