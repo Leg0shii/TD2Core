@@ -25,7 +25,7 @@ public class PermissionManager {
     }
 
     public void disallowFly(Player player) {
-        permissions.get(player.getUniqueId()).setPermission("replay.ignore", false);
+        permissions.get(player.getUniqueId()).unsetPermission("replay.ignore");
     }
 
 }

@@ -13,7 +13,6 @@ import de.legoshi.td2core.database.DBManager;
 import de.legoshi.td2core.discord.DiscordManager;
 import de.legoshi.td2core.discord.RoleManager;
 import de.legoshi.td2core.discord.VerifyManager;
-import de.legoshi.td2core.kit.Kit;
 import de.legoshi.td2core.kit.KitManager;
 import de.legoshi.td2core.listener.GeneralListener;
 import de.legoshi.td2core.listener.ParkourListener;
@@ -171,7 +170,7 @@ public final class TD2Core extends JavaPlugin {
     
     public static boolean isServerGUI(String name) {
         return name.equals("Section Selection") || name.contains("Leaderboard") || name.contains("Map Selection")
-            || name.equals("§7§lLeaderboard") || name.equals("Checkpoint Editor");
+            || name.equals("§7§lLeaderboard") || name.equals("Checkpoint Editor") || name.contains("Replay");
     }
     
 }

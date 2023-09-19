@@ -3,3 +3,8 @@
     '0': NETHER_STAR;§eSelect Map;select;-
     '1': SKULL_ITEM;§eLeaderboard;leaderboard;-
     '17': SKULL_ITEM;§dClick me for help;help;-
+72679223-8173-4693-8b5a-5574ce16a795:
+  LobbyKit:
+    '0': NETHER_STAR;§eSelect Map;select;-
+    '4': SKULL_ITEM;§eLeaderboard;leaderboard;-
+    '8': SKULL_ITEM;§dClick me for help;help;-

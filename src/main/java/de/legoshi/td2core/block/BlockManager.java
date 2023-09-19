@@ -48,7 +48,7 @@ public class BlockManager implements Listener {
         
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        if (parkourPlayer.getPlayerState() == PlayerState.STAFF || player.hasPermission("td2core.edit_cp")) {
+        if (parkourPlayer.getPlayerState() == PlayerState.STAFF) {
             Location clickedBlock = event.getClickedBlock().getLocation();
             new CheckPointGUI().openGui(player, this, clickedBlock);
         }
@@ -58,8 +58,9 @@ public class BlockManager implements Listener {
     public void blockInteract(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Location clickedLoc = event.getBlock().getLocation();
+        ParkourPlayer parkourPlayer = playerManager.get(player);
         
-        if (blockInformation.containsKey(clickedLoc) && !player.hasPermission("td2core.edit_cp")) {
+        if (parkourPlayer.getPlayerState() != PlayerState.STAFF) {
             player.sendMessage(Message.CANT_DESTROY_BLOCK_DATA.getWarningMessage());
             event.setCancelled(true);
             return;
