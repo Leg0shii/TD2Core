@@ -8,6 +8,7 @@ import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
 import de.legoshi.td2core.map.session.ParkourSession;
 import de.legoshi.td2core.map.session.SessionManager;
+import de.legoshi.td2core.permission.PermissionManager;
 import de.legoshi.td2core.player.tag.PlayerTag;
 import de.legoshi.td2core.player.tag.TagCreator;
 import de.legoshi.td2core.util.Message;
@@ -25,12 +26,12 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 @Getter
 @Setter
 public class ParkourPlayer {
-    
+
+    private final PermissionManager permissionManager;
     private final PlayerManager playerManager;
     private final SessionManager sessionManager;
     private final MapManager mapManager;
@@ -50,7 +51,8 @@ public class ParkourPlayer {
     private double percentage;
     private int version;
     
-    public ParkourPlayer(PlayerManager playerManager, SessionManager sessionManager, KitManager kitManager, Player player) {
+    public ParkourPlayer(PermissionManager permissionManager, PlayerManager playerManager, SessionManager sessionManager, KitManager kitManager, Player player) {
+        this.permissionManager = permissionManager;
         this.playerManager = playerManager;
         this.sessionManager = sessionManager;
         this.mapManager = playerManager.getMapManager();
@@ -71,6 +73,7 @@ public class ParkourPlayer {
     
     public void serverJoin() {
         playerManager.put(this);
+        permissionManager.addPlayer(player);
         ScoreboardUtil.initializeScoreboard(player);
     
         playerManager.loadPercentage(player).thenApply(val -> {
@@ -314,6 +317,7 @@ public class ParkourPlayer {
     public void switchPlayerState(PlayerState state) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
         PlayerState prevState = playerState;
+        permissionManager.disallowFly(player);
         
         switch (state) {
             case PRACTICE: {
@@ -338,6 +342,8 @@ public class ParkourPlayer {
                 if (prevState == PlayerState.STAFF) {
                     Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
                 }
+
+                permissionManager.allowFly(player);
                 break;
             }
             case PARKOUR: {
