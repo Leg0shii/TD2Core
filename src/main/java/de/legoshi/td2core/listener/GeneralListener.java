@@ -94,7 +94,7 @@ public class GeneralListener implements Listener {
         event.setJoinMessage("");
     
         playerConfig.savePlayer(player);
-        playerManager.create(player).serverJoin(); // creates new ParkourPlayer
+        playerManager.create(player).serverJoin(playerConfig); // creates new ParkourPlayer
     }
     
     @EventHandler

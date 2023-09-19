@@ -25,6 +25,11 @@ public class SpawnCommand implements CommandExecutor {
         
         Player player = (Player) commandSender;
         ParkourPlayer parkourPlayer = playerManager.get(player);
+    
+        if (parkourPlayer.isTutorial()) {
+            player.teleport(TD2Core.getTutSpawn());
+            return true;
+        }
         
         if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.PRACTICE) {
             parkourPlayer.mapLeave(false);

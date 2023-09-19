@@ -39,6 +39,8 @@ public final class TD2Core extends JavaPlugin {
     
     private static TD2Core instance;
     private Location spawnLocation;
+    private Location tutSpawnLocation;
+    private Location tutEndLocation;
     
     private MapManager mapManager;
     private SessionManager sessionManager;
@@ -88,8 +90,8 @@ public final class TD2Core extends JavaPlugin {
         globalLBCache.startGlobalCacheScheduler();
         mapLBCache.startMapCacheScheduler();
         blockManager.loadBlockData();
-        
-        loadSpawnLocation();
+    
+        loadLocation();
         registerEvents();
         registerCommands();
     }
@@ -139,6 +141,14 @@ public final class TD2Core extends JavaPlugin {
         return instance.spawnLocation;
     }
     
+    public static Location getTutSpawn() {
+        return instance.tutSpawnLocation;
+    }
+    
+    public static Location getEndTut() {
+        return instance.tutEndLocation;
+    }
+    
     public static AsyncMySQL sql() {
         return instance.dbManager.mySQL;
     }
@@ -147,8 +157,10 @@ public final class TD2Core extends JavaPlugin {
         return discordManager;
     }
     
-    private void loadSpawnLocation() {
+    private void loadLocation() {
         spawnLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("spawn"));
+        tutSpawnLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("tutspawn"));
+        tutEndLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("tutend"));
     }
     
     public static boolean isServerGUI(String name) {

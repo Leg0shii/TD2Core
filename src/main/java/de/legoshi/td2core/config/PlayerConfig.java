@@ -34,10 +34,6 @@ public class PlayerConfig extends ConfigAccessor {
         saveConfig();
     }
     
-    public void loadPlayersFromConfig() {
-    
-    }
-    
     public void saveSkin(UUID uuid, String skin) {
         getConfig().set(uuid.toString() + ".skin", skin);
         saveConfig();
@@ -53,6 +49,15 @@ public class PlayerConfig extends ConfigAccessor {
     
     public String getSkin(UUID uuid) {
         return getConfig().getString(uuid.toString() + ".skin");
+    }
+    
+    public void completeTutorial(UUID uuid) {
+        getConfig().set(uuid.toString() + ".tutorial", true);
+        saveConfig();
+    }
+    
+    public boolean getTutorial(UUID uuid) {
+        return !getConfig().getBoolean(uuid.toString() + ".tutorial");
     }
     
 }

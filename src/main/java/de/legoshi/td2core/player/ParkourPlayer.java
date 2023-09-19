@@ -2,6 +2,7 @@ package de.legoshi.td2core.player;
 
 import com.viaversion.viaversion.api.Via;
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.kit.*;
 import de.legoshi.td2core.listener.item.ItemInteractManager;
 import de.legoshi.td2core.map.MapManager;
@@ -47,6 +48,7 @@ public class ParkourPlayer {
     private BukkitTask bukkitTask;
     private BukkitTask cpTask;
     private boolean sendMessage;
+    private boolean tutorial;
     private double percentage;
     private int version;
     
@@ -69,9 +71,10 @@ public class ParkourPlayer {
         startCPScheduler();
     }
     
-    public void serverJoin() {
+    public void serverJoin(PlayerConfig playerConfig) {
         playerManager.put(this);
         ScoreboardUtil.initializeScoreboard(player);
+        tutorial = playerConfig.getTutorial(player.getUniqueId());
     
         playerManager.loadPercentage(player).thenApply(val -> {
             ScoreboardUtil.setSpawnScoreboardValue(player);
@@ -81,7 +84,11 @@ public class ParkourPlayer {
     
         sessionManager.init(player);
         
-        player.teleport(TD2Core.getSpawn());
+        if (tutorial) {
+            player.teleport(TD2Core.getTutSpawn());
+        } else {
+            player.teleport(TD2Core.getSpawn());
+        }
         player.setAllowFlight(false);
         Bukkit.broadcastMessage(Message.PLAYER_JOIN.getInfoMessage(player.getName()));
     }

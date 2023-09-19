@@ -3,6 +3,7 @@ package de.legoshi.td2core.listener;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.block.BlockManager;
 import de.legoshi.td2core.config.ConfigManager;
+import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.gui.GlobalLBGUI;
 import de.legoshi.td2core.gui.SectionGUI;
 import de.legoshi.td2core.listener.item.ItemInteractManager;
@@ -156,6 +157,14 @@ public class ParkourListener implements Listener {
     
     private void selectClick(PlayerInteractEvent event) {
         event.setCancelled(true);
+    
+        Player player = event.getPlayer();
+        ParkourPlayer parkourPlayer = playerManager.get(player);
+        if (parkourPlayer.isTutorial()) {
+            player.sendMessage(Message.ERROR_IN_TUTORIAL.getWarningMessage());
+            return;
+        }
+        
         new SectionGUI(mapManager, playerManager, sessionManager, configManager).openGui(event.getPlayer(), null);
     }
     
@@ -179,11 +188,15 @@ public class ParkourListener implements Listener {
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
     
+        Location cpLocation = event.getClickedBlock().getLocation();
+        if (parkourPlayer.isTutorial()) {
+            tutorialPlateInteract(parkourPlayer, cpLocation);
+        }
+    
         if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.STAFF) {
     
             ParkourSession session = sessionManager.get(player, parkourPlayer.getCurrentParkourMap());
             Material pressurePlate = event.getClickedBlock().getType();
-            Location cpLocation = event.getClickedBlock().getLocation();
             Location nextCP = session.getNextCP();
         
             if (!parkourPlayer.isNextCP(cpLocation)) {
@@ -241,6 +254,17 @@ public class ParkourListener implements Listener {
                 parkourPlayer.activateGoal(cpLocation);
                 Bukkit.getOnlinePlayers().forEach(p -> player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F));
             }
+        }
+    }
+    
+    private void tutorialPlateInteract(ParkourPlayer parkourPlayer, Location clickedPlate) {
+        if (TD2Core.getEndTut().equals(clickedPlate) && parkourPlayer.isTutorial()) {
+            Player player = parkourPlayer.getPlayer();
+            parkourPlayer.setTutorial(false);
+            configManager.getConfigAccessor(PlayerConfig.class).completeTutorial(player.getUniqueId());
+            player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F);
+            player.sendMessage(Message.TUTORIAL_COMPLETED.getSuccessMessage());
+            player.teleport(TD2Core.getSpawn());
         }
     }
     

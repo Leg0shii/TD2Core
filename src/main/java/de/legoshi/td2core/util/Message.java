@@ -82,6 +82,8 @@ public enum Message {
     CANT_DESTROY_BLOCK_DATA("You can't destroy the blockdata."),
     SUCCESS_REMOVE_BLOCK_DATA("Successfully removed the blockdata from block."),
     DISCORD_MESSAGE(" §7Join the official §6TD2-Discord: §ahttps://discord.gg/WjqfN2qzzT §7to view and compare your progress on this server!"),
+    ERROR_IN_TUTORIAL("Please finish the tutorial before doing this."),
+    TUTORIAL_COMPLETED("You have finished the tutorial!"),
     
     HELP_MESSAGE("§7----- §6HELP §7------"),
     HELP_MESSAGE_1("§7/help - §eShow this message"),
