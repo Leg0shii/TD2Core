@@ -93,6 +93,7 @@ public class ParkourPlayer {
             player.teleport(TD2Core.getSpawn());
         }
         player.setAllowFlight(false);
+        clearPotionEffects();
         Bukkit.broadcastMessage(Message.PLAYER_JOIN.getInfoMessage(player.getName()));
     }
     
