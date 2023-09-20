@@ -26,7 +26,7 @@ public class TD1Buffed extends ProgressMap {
         add("------------------------------------------");
         add("Section 9 | TD1 Buffed CP 36+");
         add("------------------------------------------");
-        add("**CP36-CP39**: ");
+        add("**CP36-CP38**: ");
         add("------------------------------------------");
         add("Section 9 | TD1 Buffed SKY");
         add("------------------------------------------");
@@ -50,7 +50,7 @@ public class TD1Buffed extends ProgressMap {
         addRoleMapping(16, "Section 9 | TD1 Buffed CP 16+");
         addRoleMapping(26, "Section 9 | TD1 Buffed CP 26+");
         addRoleMapping(36, "Section 9 | TD1 Buffed CP 36+");
-        addRoleMapping(40, "Section 9 | TD1 Buffed SKY");
-        addRoleMapping(41, "Section 9 | TD1 Buffed VICTOR");
+        addRoleMapping(39, "Section 9 | TD1 Buffed SKY");
+        addRoleMapping(40, "Section 9 | TD1 Buffed VICTOR");
     }
 }

@@ -23,9 +23,6 @@ public class Castle extends ProgressMap {
         add("Section 6 | Castle R6+");
         add("------------------------------------------");
         add("**R6**: ");
-        add("------------------------------------------");
-        add("Section 6 | Castle R7+");
-        add("------------------------------------------");
         add("**R7**: ");
         add("**R8**: ");
         add("------------------------------------------");
@@ -47,18 +44,17 @@ public class Castle extends ProgressMap {
         addProgressMapping(4, 7);
         addProgressMapping(5, 8);
         addProgressMapping(6, 12);
-        addProgressMapping(7, 16);
-        addProgressMapping(8, 17);
-        addProgressMapping(9, 21);
-        addProgressMapping(10, 22);
-        addProgressMapping(11, 16);
+        addProgressMapping(7, 13);
+        addProgressMapping(8, 14);
+        addProgressMapping(9, 18);
+        addProgressMapping(10, 19);
+        addProgressMapping(11, 23);
     }
     
     @Override
     public void addRoleMapping() {
         addRoleMapping(3, "Section 6 | Castle R3+");
         addRoleMapping(6, "Section 6 | Castle R6+");
-        addRoleMapping(7, "Section 6 | Castle R7+");
         addRoleMapping(9, "Section 6 | Castle R9+");
         addRoleMapping(11, "Section 6 | Castle SKY");
         addRoleMapping(12, "Section 6 | Castle VICTOR");
