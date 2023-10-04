@@ -5,7 +5,7 @@ import de.legoshi.td2core.discord.progress.ProgressMap;
 public class TD1Buffed extends ProgressMap {
     
     public TD1Buffed() {
-        super("TD1 Buffed");
+        super("Buffed TD1");
     }
     
     @Override
@@ -35,14 +35,14 @@ public class TD1Buffed extends ProgressMap {
     
     @Override
     public void addProgressMapping() {
-        addProgressMapping(1, 1);
-        addProgressMapping(6, 2);
-        addProgressMapping(11, 6);
-        addProgressMapping(16, 7);
-        addProgressMapping(21, 11);
-        addProgressMapping(26, 12);
-        addProgressMapping(31, 16);
-        addProgressMapping(36, 20);
+        addProgressMapping(6, 1);
+        addProgressMapping(11, 2);
+        addProgressMapping(16, 6);
+        addProgressMapping(21, 7);
+        addProgressMapping(26, 11);
+        addProgressMapping(31, 12);
+        addProgressMapping(36, 16);
+        addProgressMapping(39, 20);
     }
     
     @Override

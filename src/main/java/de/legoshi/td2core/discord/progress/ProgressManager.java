@@ -17,6 +17,7 @@ import de.legoshi.td2core.discord.progress.section5.OneJump;
 import de.legoshi.td2core.discord.progress.section6.*;
 import de.legoshi.td2core.discord.progress.section7.*;
 import de.legoshi.td2core.discord.progress.section9.TD1Buffed;
+import de.legoshi.td2core.discord.progress.section9.TD1XXL;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -75,6 +76,7 @@ public class ProgressManager {
         
         ProgressChannel section9 = new ProgressChannel("1144566938543071232", guild);
         section9.getProgressMaps().add(new TD1Buffed());
+        section9.getProgressMaps().add(new TD1XXL(section9));
         
         ProgressChannel section10 = new ProgressChannel("1144566997108134018", guild);
         section10.getProgressMaps().add(new Slime(section10));
