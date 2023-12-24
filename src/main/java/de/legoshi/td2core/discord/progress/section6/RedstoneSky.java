@@ -21,9 +21,9 @@ public class RedstoneSky extends ProgressMap {
     
     @Override
     public void addProgressMapping() {
-        addProgressMapping(1, 5);
-        addProgressMapping(5, 9);
-        addProgressMapping(6, 13);
+        addProgressMapping(5, 1);
+        addProgressMapping(9, 5);
+        addProgressMapping(13, 6);
     }
     
     @Override

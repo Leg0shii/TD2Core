@@ -55,6 +55,11 @@ public class ParkourListener implements Listener {
         if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
         if (ItemInteractManager.hasClickedItem(event.getPlayer())) return;
         
+        if (isBook(itemStack)) {
+            event.setCancelled(true);
+            return;
+        }
+        
         ItemInteractManager.addItem(event.getPlayer());
         
         if (ItemUtils.hasNbtId(itemStack, "cp")) checkPointClick(event);
@@ -283,6 +288,14 @@ public class ParkourListener implements Listener {
             door.setOpen(!door.isOpen());
             state.update();
         }
+    }
+    
+    private boolean isBook(ItemStack item) {
+        return item != null && (item.getType().equals(Material.BOOK) ||
+                item.getType().equals(Material.BOOK_AND_QUILL) ||
+                item.getType().equals(Material.WRITTEN_BOOK) ||
+                item.getType().equals(Material.ENCHANTED_BOOK) ||
+                item.getType().equals(Material.KNOWLEDGE_BOOK));
     }
 
 }
