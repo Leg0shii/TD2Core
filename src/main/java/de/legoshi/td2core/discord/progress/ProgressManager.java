@@ -16,6 +16,7 @@ import de.legoshi.td2core.discord.progress.section3.Overworld;
 import de.legoshi.td2core.discord.progress.section5.OneJump;
 import de.legoshi.td2core.discord.progress.section6.*;
 import de.legoshi.td2core.discord.progress.section7.*;
+import de.legoshi.td2core.discord.progress.section8.*;
 import de.legoshi.td2core.discord.progress.section9.TD1Buffed;
 import de.legoshi.td2core.discord.progress.section9.TD1XXL;
 import net.dv8tion.jda.api.JDA;
@@ -73,6 +74,13 @@ public class ProgressManager {
         section7.getProgressMaps().add(new Speed2());
         section7.getProgressMaps().add(new Speed3());
         section7.getProgressMaps().add(new Speed4());
+
+        ProgressChannel section8 = new ProgressChannel("1202167568425824279", guild);
+        section8.getProgressMaps().add(new Jump1());
+        section8.getProgressMaps().add(new Jump2());
+        section8.getProgressMaps().add(new Jump3());
+        section8.getProgressMaps().add(new Jump4());
+        section8.getProgressMaps().add(new Jump5());
         
         ProgressChannel section9 = new ProgressChannel("1144566938543071232", guild);
         section9.getProgressMaps().add(new TD1Buffed());
@@ -81,7 +89,7 @@ public class ProgressManager {
         ProgressChannel section10 = new ProgressChannel("1144566997108134018", guild);
         section10.getProgressMaps().add(new Slime(section10));
         
-        progressChannels.addAll(Arrays.asList(section0, section1, section2, section3, section5, section6, section7, section9, section10));
+        progressChannels.addAll(Arrays.asList(section0, section1, section2, section3, section5, section6, section7, section8, section9, section10));
     }
     
     public void startProgressScheduler() {

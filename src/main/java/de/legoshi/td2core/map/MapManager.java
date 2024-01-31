@@ -75,6 +75,12 @@ public class MapManager {
                         parkourMap.setPotionEffects(list);
                     }
                 }
+
+                if (key.equals("section8")) {
+                    List<PotionEffect> list = new ArrayList<>();
+                    list.add(new PotionEffect(PotionEffectType.JUMP, 10000000, i-1));
+                    parkourMap.setPotionEffects(list);
+                }
                 
                 if (key.equals("section6")) {
                     parkourMap.setRedstone(true);

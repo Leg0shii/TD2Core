@@ -17,7 +17,8 @@ public class SectionGUI extends GUIPane {
     private final SessionManager sessionManager;
     private final ConfigManager configManager;
     private final String[] guiSetup = {
-        "abcdefghi"
+        "abcdefghi",
+        "zzzzjzzzz",
     };
     
     public SectionGUI(MapManager mapManager, PlayerManager playerManager, SessionManager sessionManager, ConfigManager configManager) {
@@ -43,10 +44,11 @@ public class SectionGUI extends GUIPane {
         StaticGuiElement section5 = new StaticGuiElement('d', CustomHeads.section5,  click -> openMap(5), "§7§lSection 5 §8§l- §d§lOne§5§ljump");
         StaticGuiElement section6 = new StaticGuiElement('e', CustomHeads.section6, click -> openMap(6), "§7§lSection 6 §8§l- §c§lRed§4§lstone");
         StaticGuiElement section7 = new StaticGuiElement('f', CustomHeads.section7, click -> openMap(7), "§7§lSection 7 §8§l- §b§lSpe§3§led");
-        StaticGuiElement section9 = new StaticGuiElement('g', CustomHeads.section9, click -> openMap(9), "§7§lSection 9 §8§l- §7§lXXL");
-        StaticGuiElement section10 = new StaticGuiElement('h', CustomHeads.section10, click -> openMap(10), "§7§lSection 10 §8§l- §a§lSli§2§lme");
-        StaticGuiElement lastJump = new StaticGuiElement('i', CustomHeads.section11, click -> openMap(11), "§7§lFinal §8§lJump");
-        this.current.addElements(this.returnToParent, section1, section2, section3, section5, section6, section7, section9, section10, lastJump);
+        StaticGuiElement section8 = new StaticGuiElement('g', CustomHeads.section8, click -> openMap(8), "§7§lSection 8 §8§l- §e§lJump§6§lboost");
+        StaticGuiElement section9 = new StaticGuiElement('h', CustomHeads.section9, click -> openMap(9), "§7§lSection 9 §8§l- §7§lXXL");
+        StaticGuiElement section10 = new StaticGuiElement('i', CustomHeads.section10, click -> openMap(10), "§7§lSection 10 §8§l- §a§lSli§2§lme");
+        StaticGuiElement lastJump = new StaticGuiElement('j', CustomHeads.section11, click -> openMap(11), "§7§lFinal §8§lJump");
+        this.current.addElements(this.returnToParent, section1, section2, section3, section5, section6, section7, section8, section9, section10, lastJump);
     }
     
     protected boolean openMap(int id) {

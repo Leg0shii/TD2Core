@@ -457,6 +457,7 @@ public class ParkourPlayer {
     
     public void clearPotionEffects() {
         player.removePotionEffect(PotionEffectType.SPEED);
+        player.removePotionEffect(PotionEffectType.JUMP);
     }
     
 }
