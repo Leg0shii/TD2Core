@@ -70,7 +70,11 @@ public class Utils {
         
         ItemStack itemStack = new ItemStack(material);
         if (itemStack.getType().equals(Material.INK_SACK)) {
-            itemStack = new ItemStack(material, 1, (short) Integer.parseInt(data));
+            try {
+                itemStack = new ItemStack(material, 1, (short) Integer.parseInt(data));
+            } catch (Exception e) {
+                itemStack = new ItemStack(material);
+            }
         } else if (itemStack.getType().equals(Material.SKULL_ITEM)) {
             if (name.contains("help")) {
                 itemStack = CustomHeads.helpHead;

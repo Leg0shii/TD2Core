@@ -63,7 +63,7 @@ public class PlayerManager {
             preparedStatement.setString(2, player.getUniqueId().toString());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                String sqlString = "UPDATE player_log SET passed = ?, playtime = ?, fails = ?, finished_date = ?, last_location = ?, last_cp_location = ?, next_cp_location = ?, time_till_next = ? WHERE mapname = ? AND userid = ? AND passed = 0";
+                String sqlString = "UPDATE player_log SET passed = ?, playtime = ?, fails = ?, finished_date = ?, last_location = ?, last_cp_location = ?, next_cp_location = ?, time_till_next = ?, is_nosprint = ? WHERE mapname = ? AND userid = ? AND passed = 0";
                 long playTime = parkourPlayer.getPlayerState() == PlayerState.PRACTICE ? session.getPausedTime() : session.getPlayTime();
                 PreparedStatement preparedStatement2 = TD2Core.sql().prepare(sqlString);
                 preparedStatement2.setBoolean(1, session.justFinished());
@@ -73,12 +73,13 @@ public class PlayerManager {
                 preparedStatement2.setString(5, Utils.getStringFromLocation(session.getLastMapLocation()));
                 preparedStatement2.setString(6, Utils.getStringFromLocation(session.getLastCheckpointLocation()));
                 preparedStatement2.setString(7, Utils.getStringFromLocation(session.getNextCP()));
-                preparedStatement2.setInt(8, -1);
-                preparedStatement2.setString(9, mapName);
-                preparedStatement2.setString(10, player.getUniqueId().toString());
+                preparedStatement2.setInt(8, session.getTimeTillNextTicks());
+                preparedStatement2.setBoolean(9, session.isNoSprint());
+                preparedStatement2.setString(10, mapName);
+                preparedStatement2.setString(11, player.getUniqueId().toString());
                 preparedStatement2.execute();
             } else {
-                String sqlString = "INSERT INTO player_log (mapname, userid, passed, playtime, fails, started_date, finished_date, last_location, last_cp_location, next_cp_location, time_till_next) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                String sqlString = "INSERT INTO player_log (mapname, userid, passed, playtime, fails, started_date, finished_date, last_location, last_cp_location, next_cp_location, time_till_next, is_nosprint) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement preparedStatement2 = TD2Core.sql().prepare(sqlString);
                 preparedStatement2.setString(1, mapName);
                 preparedStatement2.setString(2, player.getUniqueId().toString());
@@ -90,7 +91,8 @@ public class PlayerManager {
                 preparedStatement2.setString(8, Utils.getStringFromLocation(session.getLastMapLocation()));
                 preparedStatement2.setString(9, Utils.getStringFromLocation(session.getLastCheckpointLocation()));
                 preparedStatement2.setString(10, Utils.getStringFromLocation(session.getNextCP()));
-                preparedStatement2.setInt(11, -1);
+                preparedStatement2.setInt(11, session.getTimeTillNextTicks());
+                preparedStatement.setBoolean(12, session.isNoSprint());
                 preparedStatement2.execute();
             }
         } catch (SQLException e) {
@@ -139,6 +141,7 @@ public class PlayerManager {
                     session.setPassed(false);
                     session.setTotalFails(0);
                     session.setTotalPlayTime(0);
+                    session.setTimeTillNextTicks(-1);
                     return null;
                 }
                 
@@ -157,7 +160,12 @@ public class PlayerManager {
                         session.setPlayTime(playTime);
                         session.setFails(fails);
                         session.setNextCP(Utils.getLocationFromString(resultSet.getString("next_cp_location")));
-                        // load time till next
+
+                        int timeTillNext = resultSet.getInt("time_till_next");
+                        timeTillNext = timeTillNext == 0 ? -1 : timeTillNext;
+                        session.setTimeTillNextTicks(timeTillNext);
+
+                        session.setNoSprint(resultSet.getBoolean("is_nosprint"));
                     } else {
                         session.setPassed(true);
                     }

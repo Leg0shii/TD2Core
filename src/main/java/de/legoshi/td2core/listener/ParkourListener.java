@@ -121,7 +121,8 @@ public class ParkourListener implements Listener {
         if (location == null) {
             location = parkourMap.getStartLocation();
         }
-    
+
+        session.setCurrTimeTillNext(System.currentTimeMillis());
         session.setNextCP(null);
         player.teleport(location);
     }
@@ -240,6 +241,17 @@ public class ParkourListener implements Listener {
                     }
                 }
             }
+
+            int time = blockManager.getTimeTillNext(cpLocation);
+            if (time != -1) {
+                session.setTimeTillNextTicks(time);
+                session.setCurrTimeTillNext(System.currentTimeMillis());
+            } else {
+                session.setTimeTillNextTicks(-1);
+            }
+
+            session.setNoSprint(blockManager.isNoSprint(cpLocation));
+            parkourPlayer.updateNoSprint(session.isNoSprint());
         
             if (pressurePlate == Material.IRON_PLATE) {
                 event.setUseInteractedBlock(Event.Result.DENY);

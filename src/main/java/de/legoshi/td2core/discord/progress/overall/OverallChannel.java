@@ -29,8 +29,7 @@ public class OverallChannel extends ProgressChannel {
                 List<String> progressLines = new ArrayList<>(progressMap.getProgressLines());
                 
                 for (UUID uuid : leaderboard.keySet()) {
-                    String playerName = Utils.getPlayerNameByUUID(uuid.toString());
-                    if (playerName == null) playerName = "null";
+                    String playerName = Utils.getPlayerNameByUUID(uuid.toString()).replace("_", "\\_");
                     
                     int percentage = (int) leaderboard.get(uuid).getPercentage();
                     int lineIndex = progressMap.getProgressPosition(percentage);

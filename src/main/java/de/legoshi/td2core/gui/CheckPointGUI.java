@@ -17,7 +17,7 @@ public class CheckPointGUI extends GUIPane {
     
     private final String[] guiSetup = {
         "ggggggggg",
-        "gagbgcgdg",
+        "gabecdfgg",
         "ggggggggq"
     };
     private BlockManager blockManager;
@@ -39,14 +39,19 @@ public class CheckPointGUI extends GUIPane {
         StaticGuiElement nextCPElement = getNextCPElement();
         GuiStateElement activeCheckpoints = getGuiStateElement();
         GuiStateElement cpIndexElement = getCPIndexStateElement();
+        StaticGuiElement timeElement = getTimeElement();
+        GuiStateElement noSprintElement = getNoSprintStateElement();
         
         if (blockManager.isCheckpoint(selectedCP)) activeCheckpoints.setState("checkpointEnabled");
         else activeCheckpoints.setState("checkpointDisabled");
+
+        if (!blockManager.isNoSprint(selectedCP)) noSprintElement.setState("sprintEnabled");
+        else noSprintElement.setState("sprintDisabled");
         
         if (blockManager.getClickedCPIndex(selectedCP) == -1) cpIndexElement.setState("cpIndexDisabled");
         else cpIndexElement.setState("cpIndexEnabled");
         
-        this.current.addElements(preciseCoordsElement, nextCPElement, activeCheckpoints, cpIndexElement);
+        this.current.addElements(preciseCoordsElement, nextCPElement, activeCheckpoints, cpIndexElement, timeElement, noSprintElement);
     }
     
     private StaticGuiElement getPreciseCoordsElement() {
@@ -148,7 +153,10 @@ public class CheckPointGUI extends GUIPane {
                 },
                 "cpIndexEnabled",
                 CustomHeads.indexEnabled,
-                ChatColor.GREEN + "Checkpoint index active: §6" + blockManager.getClickedCPIndex(selectedCP)
+                ChatColor.GREEN + "Checkpoint index active: §6" + blockManager.getClickedCPIndex(selectedCP),
+                "§8By clicking here you can set the index-th checkpoint to be activated." +
+                        "\nThis is relevant for cases where players might skip checkpoints," +
+                        "\nto maintain the correct checkpoint count."
             ),
             new GuiStateElement.State(
                 change -> {
@@ -158,8 +166,52 @@ public class CheckPointGUI extends GUIPane {
                 },
                 "cpIndexDisabled",
                 CustomHeads.indexDisabled,
-                ChatColor.RED + "Checkpoint index not active: §6" + blockManager.getClickedCPIndex(selectedCP)
+                ChatColor.RED + "Checkpoint index not active",
+                    "§8By clicking here you can reset the index-th checkpoint."
             )
+        );
+    }
+
+    private GuiStateElement getNoSprintStateElement() {
+        return new GuiStateElement('f',
+                new GuiStateElement.State(
+                        change -> {
+                            blockManager.addIsNoSprint(selectedCP, false);
+                            this.holder.closeInventory();
+                            this.holder.sendMessage(Message.ACTIVATED_NO_SPRINT.getSuccessMessage());
+                        },
+                        "sprintEnabled",
+                        new ItemStack(Material.DIAMOND_BOOTS),
+                        ChatColor.RED + "Sprint active.",
+                        "§8By clicking here you can disable sprinting for the checkpoint."
+                ),
+                new GuiStateElement.State(
+                        change -> {
+                            blockManager.addIsNoSprint(selectedCP, true);
+                            this.holder.closeInventory();
+                            this.holder.sendMessage(Message.DEACTIVATED_NO_SPRINT.getSuccessMessage());
+                        },
+                        "sprintDisabled",
+                        new ItemStack(Material.LEATHER_BOOTS),
+                        ChatColor.GREEN + "No Sprint active.",
+                        "§8By clicking here you can enable sprinting for the checkpoint."
+                )
+        );
+    }
+
+    private StaticGuiElement getTimeElement() {
+        return new StaticGuiElement(
+                'e',
+                new ItemStack(Material.WATCH, 1, (short) 0),
+                click -> {
+                    blockManager.addTimeTillNext(this.holder, selectedCP);
+                    this.holder.closeInventory();
+                    this.holder.sendMessage(Message.TIME_USAGE.getInfoMessage());
+                    return true;
+                },
+                "§7Set time to reach next cp",
+                "§7Current Time (in ticks): §6" + blockManager.getTimeTillNext(selectedCP),
+                "§8Click to set time for next cp (in ticks)"
         );
     }
     

@@ -28,7 +28,9 @@ public class BlockManager implements Listener {
     
     private final HashMap<Player, Location> playerPreciseData;
     private final HashMap<Player, Location> playerNextData;
+    private final HashMap<Player, Location> playerTimeTillNextData;
     private final HashMap<Player, Location> playerCPData;
+    private final HashMap<Player, Location> playerNoSprintData;
     
     public BlockManager(PlayerManager playerManager) {
         this.playerManager = playerManager;
@@ -36,6 +38,8 @@ public class BlockManager implements Listener {
         this.playerPreciseData = new HashMap<>();
         this.playerNextData = new HashMap<>();
         this.playerCPData = new HashMap<>();
+        this.playerTimeTillNextData = new HashMap<>();
+        this.playerNoSprintData = new HashMap<>();
     }
     
     @EventHandler
@@ -112,6 +116,15 @@ public class BlockManager implements Listener {
         playerCPData.remove(player);
         saveBlockInformation(checkpoint, blockData);
     }
+
+    public void saveTimeTillNext(Player player, int time) {
+        Location checkpoint = playerTimeTillNextData.get(player);
+        BlockData blockData = blockInformation.getOrDefault(checkpoint, new BlockData());
+        blockData.setTimeTillNextCheckpoint(time);
+
+        playerTimeTillNextData.remove(player);
+        saveBlockInformation(checkpoint, blockData);
+    }
     
     public Location getNextCPLocation(Location location) {
         if (hasEntry(location)) {
@@ -123,6 +136,13 @@ public class BlockManager implements Listener {
     public int getClickedCPIndex(Location location) {
         if (hasEntry(location)) {
             return blockInformation.get(location).getCpIndex();
+        }
+        return -1;
+    }
+
+    public int getTimeTillNext(Location location) {
+        if (hasEntry(location)) {
+            return blockInformation.get(location).getTimeTillNextCheckpoint();
         }
         return -1;
     }
@@ -142,6 +162,10 @@ public class BlockManager implements Listener {
     public boolean isCheckpoint(Location location) {
         return blockInformation.getOrDefault(location, new BlockData()).isCheckpoint();
     }
+
+    public boolean isNoSprint(Location location) {
+        return blockInformation.getOrDefault(location, new BlockData()).isNoSprint();
+    }
     
     public void addTempPreciseData(Player player, Location location) {
         playerPreciseData.put(player, location);
@@ -156,11 +180,25 @@ public class BlockManager implements Listener {
         blockData.setCheckpoint(value);
         saveBlockInformation(location, blockData);
     }
+
+    public void addIsNoSprint(Location location, boolean value) {
+        BlockData blockData = blockInformation.getOrDefault(location, new BlockData());
+        blockData.setNoSprint(value);
+        saveBlockInformation(location, blockData);
+    }
     
     public void addIsCPIndex(Player player, Location location) {
         playerCPData.put(player, location);
     }
-    
+
+    public void addTimeTillNext(Player player, Location location) {
+        playerTimeTillNextData.put(player, location);
+    }
+
+    public boolean hasTime(Player player) {
+        return playerTimeTillNextData.containsKey(player);
+    }
+
     public boolean hasSPCTemp(Player player) {
         return playerPreciseData.containsKey(player);
     }
@@ -181,7 +219,8 @@ public class BlockManager implements Listener {
                 int cpIndex = resultSet.getInt("cp_index");
                 int timeTillNextCheckpoint = resultSet.getInt("time_till_next");
                 boolean isCheckpoint = resultSet.getBoolean("is_checkpoint");
-                blockInformation.put(location, new BlockData(teleportLocation, nextCheckpoint, cpIndex, timeTillNextCheckpoint, isCheckpoint));
+                boolean isNoSprint = resultSet.getBoolean("is_nosprint");
+                blockInformation.put(location, new BlockData(teleportLocation, nextCheckpoint, cpIndex, timeTillNextCheckpoint, isCheckpoint, isNoSprint));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -191,7 +230,7 @@ public class BlockManager implements Listener {
     
     private void saveBlockInformation(Location clickedLoc, BlockData blockData) {
         if (blockInformation.containsKey(clickedLoc)) {
-            String sqlQuery = "UPDATE block_data SET teleport_location = ?, next_checkpoint = ?, time_till_next = ?, is_checkpoint = ?, cp_index = ? WHERE block_location = ?";
+            String sqlQuery = "UPDATE block_data SET teleport_location = ?, next_checkpoint = ?, time_till_next = ?, is_checkpoint = ?, cp_index = ?, is_nosprint = ? WHERE block_location = ?";
             blockInformation.put(clickedLoc, blockData);
         
             try {
@@ -201,13 +240,14 @@ public class BlockManager implements Listener {
                 preparedStatement.setInt(3, blockData.getTimeTillNextCheckpoint());
                 preparedStatement.setBoolean(4, blockData.isCheckpoint());
                 preparedStatement.setInt(5, blockData.getCpIndex());
-                preparedStatement.setString(6, Utils.getStringFromLocation(clickedLoc));
+                preparedStatement.setBoolean(6, blockData.isNoSprint());
+                preparedStatement.setString(7, Utils.getStringFromLocation(clickedLoc));
                 preparedStatement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
-            String sqlQuery = "INSERT INTO block_data (block_location, teleport_location, next_checkpoint, time_till_next, is_checkpoint, cp_index) VALUES (?, ?, ?, ?, ?, ?)";
+            String sqlQuery = "INSERT INTO block_data (block_location, teleport_location, next_checkpoint, time_till_next, is_checkpoint, cp_index, is_nosprint) VALUES (?, ?, ?, ?, ?, ?, ?)";
             blockInformation.put(clickedLoc, blockData);
             
             try {
@@ -218,6 +258,7 @@ public class BlockManager implements Listener {
                 preparedStatement.setInt(4, blockData.getTimeTillNextCheckpoint());
                 preparedStatement.setBoolean(5, blockData.isCheckpoint());
                 preparedStatement.setInt(6, blockData.getCpIndex());
+                preparedStatement.setBoolean(7, blockData.isNoSprint());
                 preparedStatement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();

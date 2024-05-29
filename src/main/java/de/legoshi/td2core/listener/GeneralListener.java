@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
@@ -116,6 +117,14 @@ public class GeneralListener implements Listener {
             ScoreboardUtil.updateJumpAndTime(event.getPlayer());
         }
         
+    }
+
+    @EventHandler
+    public void onDamage(FoodLevelChangeEvent event) {
+        Player player = (Player) event.getEntity();
+        if (player.getFoodLevel() + 1 == event.getFoodLevel()) {
+            event.setCancelled(true);
+        }
     }
     
     @EventHandler

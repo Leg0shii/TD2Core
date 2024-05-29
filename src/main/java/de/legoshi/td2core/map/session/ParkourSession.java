@@ -30,6 +30,11 @@ public class ParkourSession {
     private boolean passed;
     private int currentCPCount;
     private long playTime;
+
+    private boolean isNoSprint = false;
+    private int timeTillNextTicks = - 1;
+    private long currTimeTillNext;
+
     private int fails;
     
     public boolean justFinished() {
@@ -42,6 +47,10 @@ public class ParkourSession {
     
     public long getPausedTime() {
         return playTime;
+    }
+
+    public int getTimeTillNextTicks() {
+        return timeTillNextTicks;
     }
     
     public void reset() {
@@ -56,6 +65,8 @@ public class ParkourSession {
         finished = null;
         playTime = 0;
         fails = 0;
+        timeTillNextTicks = -1;
+        isNoSprint = false;
     }
     
     public ParkourSession copy() {
@@ -71,6 +82,9 @@ public class ParkourSession {
         session.finished = finished;
         session.playTime = playTime;
         session.fails = fails;
+        session.timeTillNextTicks = timeTillNextTicks;
+        session.currTimeTillNext = currTimeTillNext;
+        session.isNoSprint = isNoSprint;
         return session;
     }
     

@@ -118,6 +118,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("nv").setExecutor(new NightVisionCommand());
         Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand(mapManager, playerManager, sessionManager));
         Bukkit.getPluginCommand("spc").setExecutor(new SPCCommand(blockManager));
+        Bukkit.getPluginCommand("duration").setExecutor(new CPTimeCommand(blockManager));
         Bukkit.getPluginCommand("staff").setExecutor(new StaffCommand(playerManager));
         Bukkit.getPluginCommand("hide").setExecutor(new HideCommand(hideManager));
         Bukkit.getPluginCommand("show").setExecutor(new ShowCommand(hideManager));

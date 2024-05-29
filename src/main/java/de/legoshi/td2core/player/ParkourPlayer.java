@@ -47,12 +47,13 @@ public class ParkourPlayer {
     
     private Kit playerKit;
     private BukkitTask bukkitTask;
+    private BukkitTask timeTask;
     private BukkitTask cpTask;
     private boolean sendMessage;
     private boolean tutorial;
     private double percentage;
     private int version;
-    
+
     public ParkourPlayer(PermissionManager permissionManager, PlayerManager playerManager, SessionManager sessionManager, KitManager kitManager, Player player) {
         this.permissionManager = permissionManager;
         this.playerManager = playerManager;
@@ -71,6 +72,7 @@ public class ParkourPlayer {
         this.rank = 99999;
         
         startCPScheduler();
+        startTimeScheduler();
     }
     
     public void serverJoin(PlayerConfig playerConfig) {
@@ -92,6 +94,7 @@ public class ParkourPlayer {
         } else {
             player.teleport(TD2Core.getSpawn());
         }
+
         player.setAllowFlight(false);
         clearPotionEffects();
         Bukkit.broadcastMessage(Message.PLAYER_JOIN.getInfoMessage(player.getName()));
@@ -121,6 +124,7 @@ public class ParkourPlayer {
             });
         }
         cpTask.cancel();
+        timeTask.cancel();
     }
     
     public void mapJoin(ParkourMap map) {
@@ -149,7 +153,8 @@ public class ParkourPlayer {
                         player.teleport(map.getStartLocation());
                     }
                 }
-                
+
+                updateNoSprint(session.isNoSprint());
                 player.addPotionEffects(map.getPotionEffects());
                 player.sendMessage(Message.PLAYER_MAP_JOIN.getInfoMessage(map.getMapName()));
             });
@@ -174,7 +179,8 @@ public class ParkourPlayer {
             bukkitTask.cancel();
             clearPotionEffects();
         });
-        
+
+        updateNoSprint(false);
         player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 1.0F, 1.0F);
         
         if (playerState != PlayerState.STAFF) {
@@ -414,6 +420,22 @@ public class ParkourPlayer {
             }
         }, 0L, 20L);
     }
+
+    public void startTimeScheduler() {
+        this.timeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> {
+            ParkourSession session = sessionManager.get(player, currentParkourMap);
+            if (session == null || session.getTimeTillNextTicks() == -1 || playerState != PlayerState.PARKOUR) return;
+            if (session.getTimeTillNextTicks() * 50L + session.getCurrTimeTillNext() < System.currentTimeMillis()) {
+                player.sendMessage(Message.PLAYER_TOO_SLOW.getMessage());
+                player.teleport(session.getLastCheckpointLocation());
+            }
+        }, 0L, 1L);
+    }
+
+    public void updateNoSprint(boolean value) {
+        if (value) player.setFoodLevel(6);
+        else player.setFoodLevel(20);
+    }
     
     public boolean isNextCP(Location location) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
@@ -450,9 +472,14 @@ public class ParkourPlayer {
         if (playerState == PlayerState.PRACTICE) playTime = session.getPausedTime() / 1000;
         String nextCPString = "";
         String infoString = "§6Time: §7" + Utils.secondsToTime((int) playTime) + " - §cFails: §7" + session.getFails();
+        String timeTillNext = "";
+
         if (session.getNextCP() != null)
             nextCPString = "§7 - " + Message.NEXT_CP.getMessage((int) session.getNextCP().getX() + "", (int) session.getNextCP().getY() + "", (int) session.getNextCP().getZ() + "");
-        Utils.sendActionBar(player, infoString + nextCPString);
+        if (session.getTimeTillNextTicks() != -1 && playerState == PlayerState.PARKOUR)
+            timeTillNext = "§7 - §aTime left: §7" + Utils.secondsToTime((int)(((session.getTimeTillNextTicks() / 20) + (session.getCurrTimeTillNext() / 1000)) - (System.currentTimeMillis() / 1000)));
+
+        Utils.sendActionBar(player, infoString + nextCPString + timeTillNext);
     }
     
     public void clearPotionEffects() {

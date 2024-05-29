@@ -68,8 +68,9 @@ public class ProgressChannel {
             List<String> progressLines = new ArrayList<>(progressMap.getProgressLines());
             
             while (resultSet.next()) {
+                // don't replace with retrievePlayerName - it adds additional white spaces
                 String playerName = Utils.getPlayerNameByUUID(resultSet.getString("userid"));
-                if (playerName == null) playerName = "null";
+                playerName= playerName.replace("_", "\\_");
                 
                 int playerCPCount = resultSet.getInt("cpCount");
                 int lineIndex = progressMap.getProgressPosition(playerCPCount);
@@ -147,9 +148,8 @@ public class ProgressChannel {
     
     protected String retrievePlayerName(String uuid) {
         String playerName = Utils.getPlayerNameByUUID(uuid);
-        if (playerName == null) playerName = "null";
         playerName = playerName + Utils.repeatSpace((16 - playerName.length())*1.5);
-        return playerName;
+        return playerName.replace("_", "\\_");
     }
     
     protected StringBuilder indexLB(StringBuilder builder, int index) {

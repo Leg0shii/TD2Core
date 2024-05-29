@@ -15,6 +15,7 @@ commands:
     nv:
     reset:
     spc:
+    duration:
     staff:
     hide:
     show:

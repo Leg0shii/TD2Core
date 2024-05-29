@@ -55,14 +55,29 @@ public class ScoreboardUtil {
         Scoreboard scoreboard = player.getScoreboard();
         if (scoreboard == null) return;
         double percentage = TD2Core.getInstance().playerManager.get(player).getPercentage();
-        scoreboard.getTeam("rank").setPrefix("" + ChatColor.WHITE + ((int) (percentage*100))/100.0 + " %");
+
+        Team team = scoreboard.getTeam("rank");
+        updateTeamPrefix(team, "" + ChatColor.WHITE + ((int) (percentage*100))/100.0 + " %");
     }
     
     public static void updateJumpAndTime(Player player) {
         Scoreboard scoreboard = player.getScoreboard();
         if (scoreboard == null) return;
-        scoreboard.getTeam("hour").setPrefix("" + ChatColor.WHITE + player.getStatistic(Statistic.PLAY_ONE_TICK)/(20*60*60)+ " h");
-        scoreboard.getTeam("jump").setPrefix("" + ChatColor.WHITE + player.getStatistic(Statistic.JUMP));
+
+        Team hourTeam = scoreboard.getTeam("hour");
+        updateTeamPrefix(hourTeam, "" + ChatColor.WHITE + player.getStatistic(Statistic.PLAY_ONE_TICK)/(20*60*60)+ " h");
+
+        Team jumpTeam = scoreboard.getTeam("jump");
+        updateTeamPrefix(jumpTeam, "" + ChatColor.WHITE + player.getStatistic(Statistic.JUMP));
+    }
+
+    public static void updateTeamPrefix(Team team, String string) {
+        if (team != null) {
+            team.setPrefix(string);
+        } else {
+            // Optionally reinitialize the scoreboard or handle the error
+            System.out.println("Team not found");
+        }
     }
     
 }
