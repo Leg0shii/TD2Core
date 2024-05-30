@@ -12,12 +12,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 public class CheckPointGUI extends GUIPane {
     
     private final String[] guiSetup = {
         "ggggggggg",
-        "gabecdfgg",
+        "gabecdfhg",
         "ggggggggq"
     };
     private BlockManager blockManager;
@@ -41,6 +42,7 @@ public class CheckPointGUI extends GUIPane {
         GuiStateElement cpIndexElement = getCPIndexStateElement();
         StaticGuiElement timeElement = getTimeElement();
         GuiStateElement noSprintElement = getNoSprintStateElement();
+        StaticGuiElement effectElement = getEffectElement();
         
         if (blockManager.isCheckpoint(selectedCP)) activeCheckpoints.setState("checkpointEnabled");
         else activeCheckpoints.setState("checkpointDisabled");
@@ -51,9 +53,32 @@ public class CheckPointGUI extends GUIPane {
         if (blockManager.getClickedCPIndex(selectedCP) == -1) cpIndexElement.setState("cpIndexDisabled");
         else cpIndexElement.setState("cpIndexEnabled");
         
-        this.current.addElements(preciseCoordsElement, nextCPElement, activeCheckpoints, cpIndexElement, timeElement, noSprintElement);
+        this.current.addElements(preciseCoordsElement, nextCPElement, activeCheckpoints, cpIndexElement, timeElement,
+                noSprintElement, effectElement);
     }
-    
+
+    private StaticGuiElement getEffectElement() {
+        String potions = "";
+        for (PotionEffect p : blockManager.getPotionEffects(selectedCP)) {
+            potions = potions + " §6- §8" + p.getType().getName() + " " + (p.getAmplifier() + 1) + "\n";
+        }
+
+        return new StaticGuiElement(
+                'h',
+                new ItemStack(Material.POTION),
+                click -> {
+                    blockManager.addPotionData(this.holder, selectedCP);
+                    this.holder.closeInventory();
+                    this.holder.sendMessage(Message.POTION_USAGE.getInfoMessage());
+                    return true;
+                },
+                "§7Set potion effects",
+                "§7Currently active:",
+                potions,
+                "§8Click to set potion effects."
+        );
+    }
+
     private StaticGuiElement getPreciseCoordsElement() {
         Location preciseCoords = blockManager.getTeleportPos(selectedCP);
         String usedCoords = getPrecisionString(preciseCoords);

@@ -11,12 +11,15 @@ import de.legoshi.td2core.permission.PermissionManager;
 import de.legoshi.td2core.util.Utils;
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerManager {
@@ -63,7 +66,7 @@ public class PlayerManager {
             preparedStatement.setString(2, player.getUniqueId().toString());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                String sqlString = "UPDATE player_log SET passed = ?, playtime = ?, fails = ?, finished_date = ?, last_location = ?, last_cp_location = ?, next_cp_location = ?, time_till_next = ?, is_nosprint = ? WHERE mapname = ? AND userid = ? AND passed = 0";
+                String sqlString = "UPDATE player_log SET passed = ?, playtime = ?, fails = ?, finished_date = ?, last_location = ?, last_cp_location = ?, next_cp_location = ?, time_till_next = ?, is_nosprint = ?, cp_effect = ? WHERE mapname = ? AND userid = ? AND passed = 0";
                 long playTime = parkourPlayer.getPlayerState() == PlayerState.PRACTICE ? session.getPausedTime() : session.getPlayTime();
                 PreparedStatement preparedStatement2 = TD2Core.sql().prepare(sqlString);
                 preparedStatement2.setBoolean(1, session.justFinished());
@@ -75,11 +78,12 @@ public class PlayerManager {
                 preparedStatement2.setString(7, Utils.getStringFromLocation(session.getNextCP()));
                 preparedStatement2.setInt(8, session.getTimeTillNextTicks());
                 preparedStatement2.setBoolean(9, session.isNoSprint());
-                preparedStatement2.setString(10, mapName);
-                preparedStatement2.setString(11, player.getUniqueId().toString());
+                preparedStatement2.setString(10, Utils.parseStringPotion(session.getCurrentEffects()));
+                preparedStatement2.setString(11, mapName);
+                preparedStatement2.setString(12, player.getUniqueId().toString());
                 preparedStatement2.execute();
             } else {
-                String sqlString = "INSERT INTO player_log (mapname, userid, passed, playtime, fails, started_date, finished_date, last_location, last_cp_location, next_cp_location, time_till_next, is_nosprint) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                String sqlString = "INSERT INTO player_log (mapname, userid, passed, playtime, fails, started_date, finished_date, last_location, last_cp_location, next_cp_location, time_till_next, is_nosprint, cp_effect) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement preparedStatement2 = TD2Core.sql().prepare(sqlString);
                 preparedStatement2.setString(1, mapName);
                 preparedStatement2.setString(2, player.getUniqueId().toString());
@@ -93,6 +97,7 @@ public class PlayerManager {
                 preparedStatement2.setString(10, Utils.getStringFromLocation(session.getNextCP()));
                 preparedStatement2.setInt(11, session.getTimeTillNextTicks());
                 preparedStatement.setBoolean(12, session.isNoSprint());
+                preparedStatement2.setString(13, Utils.parseStringPotion(session.getCurrentEffects()));
                 preparedStatement2.execute();
             }
         } catch (SQLException e) {
@@ -142,6 +147,7 @@ public class PlayerManager {
                     session.setTotalFails(0);
                     session.setTotalPlayTime(0);
                     session.setTimeTillNextTicks(-1);
+                    session.setCurrentEffects(new ArrayList<>());
                     return null;
                 }
                 
@@ -166,6 +172,9 @@ public class PlayerManager {
                         session.setTimeTillNextTicks(timeTillNext);
 
                         session.setNoSprint(resultSet.getBoolean("is_nosprint"));
+
+                        List<PotionEffect> potionEffects = Utils.parsePotions(resultSet.getString("cp_effect"));
+                        session.setCurrentEffects(potionEffects);
                     } else {
                         session.setPassed(true);
                     }

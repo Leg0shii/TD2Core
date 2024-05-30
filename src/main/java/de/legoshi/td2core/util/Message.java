@@ -56,6 +56,8 @@ public enum Message {
     LEADERBOARD_ENTRY("{1} {2}   - {3} completion.\n"),
     NOT_STAFF_MODE("§7You can't join a course while in staff mode. Use /staff to deactivate."),
     SPC_USAGE(" §7Use: §6/spc <x> <y> <z> [yaw] [pitch] §7or §6/spc §7to set precise coordinates."),
+    POTION_USAGE(" §7Use: §6/cpeffect <speed/slowness/jumpboost> <strength> §7to set an effect. Use strength §60 §7to remove the effect."),
+    SUCC_APPLIED_POTION("Successfully applied new potion effect."),
     PRECISE_COORDS_USAGE(" §7Hit a §6checkpoint §7to connect this one with."),
     TIME_USAGE(" §7Type §6/duration <ticks> §7to set a maximum time for this checkpoint."),
     PLAYER_TOO_SLOW(" §7You were too slow :(!"),

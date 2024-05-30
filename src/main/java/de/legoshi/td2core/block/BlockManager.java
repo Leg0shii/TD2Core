@@ -15,11 +15,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class BlockManager implements Listener {
     
@@ -30,8 +35,8 @@ public class BlockManager implements Listener {
     private final HashMap<Player, Location> playerNextData;
     private final HashMap<Player, Location> playerTimeTillNextData;
     private final HashMap<Player, Location> playerCPData;
-    private final HashMap<Player, Location> playerNoSprintData;
-    
+    private final HashMap<Player, Location> playerPotionData;
+
     public BlockManager(PlayerManager playerManager) {
         this.playerManager = playerManager;
         this.blockInformation = new HashMap<>();
@@ -39,7 +44,7 @@ public class BlockManager implements Listener {
         this.playerNextData = new HashMap<>();
         this.playerCPData = new HashMap<>();
         this.playerTimeTillNextData = new HashMap<>();
-        this.playerNoSprintData = new HashMap<>();
+        this.playerPotionData = new HashMap<>();
     }
     
     @EventHandler
@@ -98,6 +103,13 @@ public class BlockManager implements Listener {
         }
         return null;
     }
+
+    public Collection<PotionEffect> getPotionEffects(Location location) {
+        if (hasEntry(location)) {
+            return blockInformation.get(location).getPotionEffects();
+        }
+        return new ArrayList<>();
+    }
     
     public void saveSPC(Player player, Location teleportLocation) {
         Location checkpoint = playerPreciseData.get(player);
@@ -114,6 +126,24 @@ public class BlockManager implements Listener {
         blockData.setCpIndex(cpIndex);
         
         playerCPData.remove(player);
+        saveBlockInformation(checkpoint, blockData);
+    }
+
+    public void savePotion(Player player, PotionEffect potionEffect) {
+        Location checkpoint = playerPotionData.get(player);
+        BlockData blockData = blockInformation.getOrDefault(checkpoint, new BlockData());
+        blockData.getPotionEffects().add(potionEffect);
+
+        playerPotionData.remove(player);
+        saveBlockInformation(checkpoint, blockData);
+    }
+
+    public void removePotion(Player player, PotionEffectType potionEffectType) {
+        Location checkpoint = playerPotionData.get(player);
+        BlockData blockData = blockInformation.getOrDefault(checkpoint, new BlockData());
+        blockData.getPotionEffects().removeIf(p -> p.getType().equals(potionEffectType));
+
+        playerPotionData.remove(player);
         saveBlockInformation(checkpoint, blockData);
     }
 
@@ -166,6 +196,10 @@ public class BlockManager implements Listener {
     public boolean isNoSprint(Location location) {
         return blockInformation.getOrDefault(location, new BlockData()).isNoSprint();
     }
+
+    public void addPotionData(Player player, Location location) {
+        playerPotionData.put(player, location);
+    }
     
     public void addTempPreciseData(Player player, Location location) {
         playerPreciseData.put(player, location);
@@ -206,6 +240,10 @@ public class BlockManager implements Listener {
     public boolean hasCPTemp(Player player) {
         return playerCPData.containsKey(player);
     }
+
+    public boolean hasPotionTemp(Player player) {
+        return playerPotionData.containsKey(player);
+    }
     
     public void loadBlockData() {
         String sqlQuery = "SELECT * FROM block_data";
@@ -220,7 +258,11 @@ public class BlockManager implements Listener {
                 int timeTillNextCheckpoint = resultSet.getInt("time_till_next");
                 boolean isCheckpoint = resultSet.getBoolean("is_checkpoint");
                 boolean isNoSprint = resultSet.getBoolean("is_nosprint");
-                blockInformation.put(location, new BlockData(teleportLocation, nextCheckpoint, cpIndex, timeTillNextCheckpoint, isCheckpoint, isNoSprint));
+
+                String potionString = resultSet.getString("cp_effect");
+                List<PotionEffect> potionEffects = Utils.parsePotions(potionString);
+                blockInformation.put(location, new BlockData(teleportLocation, nextCheckpoint, cpIndex,
+                        timeTillNextCheckpoint, isCheckpoint, isNoSprint, potionEffects));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -230,7 +272,7 @@ public class BlockManager implements Listener {
     
     private void saveBlockInformation(Location clickedLoc, BlockData blockData) {
         if (blockInformation.containsKey(clickedLoc)) {
-            String sqlQuery = "UPDATE block_data SET teleport_location = ?, next_checkpoint = ?, time_till_next = ?, is_checkpoint = ?, cp_index = ?, is_nosprint = ? WHERE block_location = ?";
+            String sqlQuery = "UPDATE block_data SET teleport_location = ?, next_checkpoint = ?, time_till_next = ?, is_checkpoint = ?, cp_index = ?, is_nosprint = ?, cp_effect = ? WHERE block_location = ?";
             blockInformation.put(clickedLoc, blockData);
         
             try {
@@ -241,13 +283,16 @@ public class BlockManager implements Listener {
                 preparedStatement.setBoolean(4, blockData.isCheckpoint());
                 preparedStatement.setInt(5, blockData.getCpIndex());
                 preparedStatement.setBoolean(6, blockData.isNoSprint());
-                preparedStatement.setString(7, Utils.getStringFromLocation(clickedLoc));
+
+                String potionEffects = Utils.parseStringPotion(blockData.getPotionEffects());
+                preparedStatement.setString(7, potionEffects);
+                preparedStatement.setString(8, Utils.getStringFromLocation(clickedLoc));
                 preparedStatement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
-            String sqlQuery = "INSERT INTO block_data (block_location, teleport_location, next_checkpoint, time_till_next, is_checkpoint, cp_index, is_nosprint) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sqlQuery = "INSERT INTO block_data (block_location, teleport_location, next_checkpoint, time_till_next, is_checkpoint, cp_index, is_nosprint, cp_effect) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             blockInformation.put(clickedLoc, blockData);
             
             try {
@@ -259,6 +304,8 @@ public class BlockManager implements Listener {
                 preparedStatement.setBoolean(5, blockData.isCheckpoint());
                 preparedStatement.setInt(6, blockData.getCpIndex());
                 preparedStatement.setBoolean(7, blockData.isNoSprint());
+                String potionEffects = Utils.parseStringPotion(blockData.getPotionEffects());
+                preparedStatement.setString(8, potionEffects);
                 preparedStatement.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -278,4 +325,5 @@ public class BlockManager implements Listener {
             e.printStackTrace();
         }
     }
+
 }

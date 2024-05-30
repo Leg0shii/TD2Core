@@ -25,6 +25,7 @@ commands:
     tp:
     cp:
     discord:
+    cpeffect:
     leaderboard:
       aliases: [lb, top]
 

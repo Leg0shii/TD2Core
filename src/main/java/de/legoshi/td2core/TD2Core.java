@@ -127,6 +127,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("verify").setExecutor(new VerifyCommand(verifyManager));
         Bukkit.getPluginCommand("tp").setExecutor(new TPCommand());
         Bukkit.getPluginCommand("cp").setExecutor(new CPCountCommand(blockManager));
+        Bukkit.getPluginCommand("cpeffect").setExecutor(new CPEffectCommand(blockManager));
         Bukkit.getPluginCommand("discord").setExecutor(new DiscordCommand());
         Bukkit.getPluginCommand("leaderboard").setExecutor(new LeaderboardCommand(playerManager, configManager));
     }

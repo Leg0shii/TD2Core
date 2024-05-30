@@ -156,6 +156,7 @@ public class ParkourPlayer {
 
                 updateNoSprint(session.isNoSprint());
                 player.addPotionEffects(map.getPotionEffects());
+                player.addPotionEffects(session.getCurrentEffects());
                 player.sendMessage(Message.PLAYER_MAP_JOIN.getInfoMessage(map.getMapName()));
             });
             return null;
@@ -485,6 +486,7 @@ public class ParkourPlayer {
     public void clearPotionEffects() {
         player.removePotionEffect(PotionEffectType.SPEED);
         player.removePotionEffect(PotionEffectType.JUMP);
+        player.removePotionEffect(PotionEffectType.SLOW);
     }
     
 }

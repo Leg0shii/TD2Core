@@ -6,7 +6,11 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Utils {
@@ -155,6 +159,51 @@ public class Utils {
             playerName = player.getName();
         }
         return playerName;
+    }
+
+    public static String parseStringPotion(List<PotionEffect> potionEffects) {
+        String s = "";
+        for (PotionEffect potionEffect : potionEffects) {
+            if (potionEffect.getType().equals(PotionEffectType.SPEED)) {
+                s = s + "speed." + potionEffect.getAmplifier() + ";";
+            } else if (potionEffect.getType().equals(PotionEffectType.SLOW)) {
+                s = s + "speed." + potionEffect.getAmplifier() + ";";
+            } else if (potionEffect.getType().equals(PotionEffectType.JUMP)) {
+                s = s + "speed." + potionEffect.getAmplifier() + ";";
+            }
+        }
+        return s;
+    }
+
+    // speed.1;jumpboost.2
+    public static List<PotionEffect> parsePotions(String s) {
+        if (s == null || s.equals("") || s.equals(" ")) return new ArrayList<>();
+
+        List<PotionEffect> potionEffects = new ArrayList<>();
+        String[] potions = s.split(";");
+        for (String potion : potions) {
+            String[] potionData = potion.split("\\.");
+            int strength;
+            try {
+                strength = Integer.parseInt(potionData[1]);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            if (strength <= 0) continue;
+
+            switch (potionData[0]) {
+                case "speed":
+                    potionEffects.add(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, strength));
+                    break;
+                case "slowness":
+                    potionEffects.add(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, strength));
+                    break;
+                case "jumpboost":
+                    potionEffects.add(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, strength));
+                    break;
+            }
+        }
+        return potionEffects;
     }
     
 }

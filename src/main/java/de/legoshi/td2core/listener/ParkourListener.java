@@ -32,6 +32,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Door;
 import org.bukkit.material.TrapDoor;
+import org.bukkit.potion.PotionEffect;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class ParkourListener implements Listener {
@@ -252,6 +255,10 @@ public class ParkourListener implements Listener {
 
             session.setNoSprint(blockManager.isNoSprint(cpLocation));
             parkourPlayer.updateNoSprint(session.isNoSprint());
+
+            parkourPlayer.clearPotionEffects();
+            session.setCurrentEffects((List<PotionEffect>) blockManager.getPotionEffects(cpLocation));
+            player.addPotionEffects(blockManager.getPotionEffects(cpLocation));
         
             if (pressurePlate == Material.IRON_PLATE) {
                 event.setUseInteractedBlock(Event.Result.DENY);

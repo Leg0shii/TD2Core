@@ -2,8 +2,11 @@ package de.legoshi.td2core.map.session;
 
 import lombok.*;
 import org.bukkit.Location;
+import org.bukkit.potion.PotionEffect;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,6 +35,7 @@ public class ParkourSession {
     private long playTime;
 
     private boolean isNoSprint = false;
+    private List<PotionEffect> currentEffects = new ArrayList<>();
     private int timeTillNextTicks = - 1;
     private long currTimeTillNext;
 
@@ -67,6 +71,7 @@ public class ParkourSession {
         fails = 0;
         timeTillNextTicks = -1;
         isNoSprint = false;
+        currentEffects = new ArrayList<>();
     }
     
     public ParkourSession copy() {
@@ -85,6 +90,7 @@ public class ParkourSession {
         session.timeTillNextTicks = timeTillNextTicks;
         session.currTimeTillNext = currTimeTillNext;
         session.isNoSprint = isNoSprint;
+        session.currentEffects = new ArrayList<>(currentEffects);
         return session;
     }
     
