@@ -5,8 +5,8 @@ TD2Core is a Minecraft plugin I built for a massive parkour map. It’s designed
 ### Map & Section Selection 
 You can pick specific sections or complete maps to tackle. It shows your progress, leaderboards, and overall stats right there in-game.
 
-<img src="https://github.com/user-attachments/assets/d883d35d-3e03-4c1b-9a28-59e92c6510ef" width="400" height="350"/>
-<img src="https://github.com/user-attachments/assets/b76a7157-b831-4be2-b938-2e7b0364d7fa" width="500" height="350"/>
+<img src="https://github.com/user-attachments/assets/d883d35d-3e03-4c1b-9a28-59e92c6510ef" width="300" height="225"/>
+<img src="https://github.com/user-attachments/assets/b76a7157-b831-4be2-b938-2e7b0364d7fa" width="300" height="230"/>
 
 ### Discord Integration
 As you progress, a Discord bot updates your role in the server, so everyone knows how you’re doing. It also tracks everyone’s progress on the server. Join [here](https://discord.gg/W3EUnbG6gp).
@@ -18,7 +18,6 @@ As you progress, a Discord bot updates your role in the server, so everyone know
 Every jump, every fail, and your time are tracked. You can see how you stack up against others on a global leaderboard.
 
 <img src="https://github.com/user-attachments/assets/c8c376a5-b290-4185-89d1-aca73a1346f2" width="400" height="400"/>
-<img src="https://github.com/user-attachments/assets/a5b15aed-fdca-4e72-979f-5dbefe92515f" width="500" height="220"/>
 
 ### Further Features
 - **Cool Pressure Plates**: There are custom pressure plates that can be timed, teleport you, or give potion effects. Some are linked, so only specific ones activate in sequence.
