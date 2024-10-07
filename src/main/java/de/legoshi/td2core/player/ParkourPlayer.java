@@ -140,7 +140,7 @@ public class ParkourPlayer {
             session.setSessionStarted(new Date(System.currentTimeMillis()));
             
             Bukkit.getScheduler().runTask(TD2Core.getInstance(), () -> {
-                bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> updateActionBar(session), 0L, 20L);
+                bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> updateActionBar(session), 0L, 1L);
                 
                 if (playerState == PlayerState.STAFF) {
                     player.setGameMode(GameMode.CREATIVE);
@@ -478,7 +478,7 @@ public class ParkourPlayer {
         if (session.getNextCP() != null)
             nextCPString = "§7 - " + Message.NEXT_CP.getMessage((int) session.getNextCP().getX() + "", (int) session.getNextCP().getY() + "", (int) session.getNextCP().getZ() + "");
         if (session.getTimeTillNextTicks() != -1 && playerState == PlayerState.PARKOUR)
-            timeTillNext = "§7 - §aTime left: §7" + Utils.secondsToTime((int)(((session.getTimeTillNextTicks() / 20) + (session.getCurrTimeTillNext() / 1000)) - (System.currentTimeMillis() / 1000)));
+            timeTillNext = "§7 - §aTime left: §7" + Utils.millisecondsToTime((int)(((session.getTimeTillNextTicks() * 50) + session.getCurrTimeTillNext() - System.currentTimeMillis())));
 
         Utils.sendActionBar(player, infoString + nextCPString + timeTillNext);
     }
