@@ -112,6 +112,14 @@ public class Utils {
         
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
+
+    public static String millisecondsToTime(long totalMilliseconds) {
+        int minutes = (int) ((totalMilliseconds % 3600000) / 60000);
+        int seconds = (int) ((totalMilliseconds % 60000) / 1000);
+        int milliseconds = (int) (totalMilliseconds % 1000);
+
+        return String.format("%02d:%02d.%03d", minutes, seconds, milliseconds);
+    }
     
     public static String difficultyString(double difficulty) {
         String diffString = "★★★★★★★★★★";
@@ -167,9 +175,9 @@ public class Utils {
             if (potionEffect.getType().equals(PotionEffectType.SPEED)) {
                 s = s + "speed." + potionEffect.getAmplifier() + ";";
             } else if (potionEffect.getType().equals(PotionEffectType.SLOW)) {
-                s = s + "speed." + potionEffect.getAmplifier() + ";";
+                s = s + "slowness." + potionEffect.getAmplifier() + ";";
             } else if (potionEffect.getType().equals(PotionEffectType.JUMP)) {
-                s = s + "speed." + potionEffect.getAmplifier() + ";";
+                s = s + "jumpboost." + potionEffect.getAmplifier() + ";";
             }
         }
         return s;
@@ -189,7 +197,7 @@ public class Utils {
             } catch (NumberFormatException e) {
                 continue;
             }
-            if (strength <= 0) continue;
+            if (strength < 0) continue;
 
             switch (potionData[0]) {
                 case "speed":

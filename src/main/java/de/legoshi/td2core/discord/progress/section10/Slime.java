@@ -6,7 +6,7 @@ import de.legoshi.td2core.discord.progress.ProgressMap;
 public class Slime extends ProgressMap {
     
     public Slime(ProgressChannel channel) {
-        super("Slime");
+        super("Slime Drop");
     
         add(channel.getRoleMentionByName("Section 10 | Second Drop") + ": ");
         add(channel.getRoleMentionByName("Section 10 | Third Drop") + ": ");
