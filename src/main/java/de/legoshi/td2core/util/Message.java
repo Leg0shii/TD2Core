@@ -26,6 +26,7 @@ public enum Message {
     VERIFY_ERROR("Your code is incorrect or your time ran out..."),
     VERIFY_SUCCESS("You have been verified!"),
     ALREADY_CREATED("You have already created a key. You have 5 minutes to verify in discord. Type §6/verify {1} §cin §6#verify"),
+    COMING_SOON("§cComing Soon..."),
     
     ERROR_NO_PERMISSION("You do not have permission to use this command."),
     
@@ -106,8 +107,7 @@ public enum Message {
     HELP_MESSAGE_12("§7/lb [global] - §eShow the leaderboard of your current map (or the global lb)"),
     HELP_MESSAGE_13("§7/staff - §eSwitch to/from staff mode"),
     HELP_MESSAGE_14("§7/verify - §eVerify yourself in the discord (/discord)"),
-    HELP_MESSAGE_15("§7/discord - §eGet the discord link"),
-    ;
+    HELP_MESSAGE_15("§7/discord - §eGet the discord link");
     
     private final String message;
     
