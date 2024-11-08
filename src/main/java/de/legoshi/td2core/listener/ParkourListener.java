@@ -34,6 +34,7 @@ import org.bukkit.material.Door;
 import org.bukkit.material.TrapDoor;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -52,6 +53,16 @@ public class ParkourListener implements Listener {
         ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
         if (parkourPlayer.getPlayerState().equals(PlayerState.STAFF)) {
             onTrapDoorClick(event);
+        } else {
+            // this disables trapdoors for staff players (ONLY for certain maps) when they are not in staff
+            // currently, staff players can always flip trapdoors (which are disabled with world guard for normal players)
+            // another solution is to give a perm whenever /staff is run, that allows to flip trapdoors and remove the perm
+            // when player is not in /staff
+            String[] mapNames = new String[]{"Initial TD2", "InitialTD2 Rework", "Buffed TD1", "LD TD1"};
+            if (parkourPlayer.getCurrentParkourMap() != null
+                    && Arrays.stream(mapNames).anyMatch(name -> name.equals(parkourPlayer.getCurrentParkourMap().mapName))) {
+                onWoodTrapdoorClick(event);
+            }
         }
         
         if (event.getHand() != null && event.getHand().equals(EquipmentSlot.OFF_HAND)) return;
@@ -306,6 +317,15 @@ public class ParkourListener implements Listener {
             Door door = (Door) state.getData();
             door.setOpen(!door.isOpen());
             state.update();
+        }
+    }
+
+    private void onWoodTrapdoorClick(PlayerInteractEvent event) {
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
+        if (event.getHand().equals(EquipmentSlot.OFF_HAND)) return;
+        if (!(event.getItem() == null || event.getItem().getType().equals(Material.AIR))) return;
+        if (event.getClickedBlock().getType().equals(Material.TRAP_DOOR)) {
+            event.setCancelled(true);
         }
     }
     
