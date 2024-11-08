@@ -22,6 +22,7 @@ import de.legoshi.td2core.discord.progress.section6.*;
 import de.legoshi.td2core.discord.progress.section7.*;
 import de.legoshi.td2core.discord.progress.section8.*;
 import de.legoshi.td2core.discord.progress.section9.TD1Buffed;
+import de.legoshi.td2core.discord.progress.section9.TD1LD;
 import de.legoshi.td2core.discord.progress.section9.TD1XXL;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -94,6 +95,7 @@ public class ProgressManager {
         
         ProgressChannel section9 = new ProgressChannel("1144566938543071232", guild);
         section9.getProgressMaps().add(new TD1Buffed());
+        section9.getProgressMaps().add(new TD1LD());
         section9.getProgressMaps().add(new TD1XXL(section9));
         
         ProgressChannel section10 = new ProgressChannel("1144566997108134018", guild);
@@ -126,13 +128,17 @@ public class ProgressManager {
         for (int i = 0; i < volume; i++) {
             int finalI = i;
             Bukkit.getScheduler().runTaskLaterAsynchronously(TD2Core.getInstance(), () -> {
-                if (messages.size() > finalI) {
-                    net.dv8tion.jda.api.entities.Message m = messages.get(finalI);
-                    if (!m.getContentRaw().equals(messageList.get(finalI))) {
-                        m.editMessage(messageList.get(finalI)).queue();
+                try {
+                    if (messages.size() > finalI) {
+                        net.dv8tion.jda.api.entities.Message m = messages.get(finalI);
+                        if (!m.getContentRaw().equals(messageList.get(finalI))) {
+                            m.editMessage(messageList.get(finalI)).queue();
+                        }
+                    } else {
+                        textChannel.sendMessage(messageList.get(finalI)).queue();
                     }
-                } else {
-                    textChannel.sendMessage(messageList.get(finalI)).queue();
+                } catch (Exception e) {
+                    Bukkit.getLogger().info("Couldn't update discord progress data");
                 }
             }, 120L * finalI);
         }

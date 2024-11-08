@@ -12,6 +12,9 @@ public class TD1XXL extends ProgressMap {
         add(channel.getRoleMentionByName("Section 9 | TD1 XXL CP16+") + ": ");
         add(channel.getRoleMentionByName("Section 9 | TD1 XXL CP21+") + ": ");
         add(channel.getRoleMentionByName("Section 9 | TD1 XXL CP26+") + ": ");
+        add(channel.getRoleMentionByName("Section 9 | TD1 XXL CP31+") + ": ");
+        add(channel.getRoleMentionByName("Section 9 | TD1 XXL CP36+") + ": ");
+        add(channel.getRoleMentionByName("Section 9 | TD1 XXL CP41+") + ": ");
     }
     
     @Override
@@ -26,6 +29,9 @@ public class TD1XXL extends ProgressMap {
         addProgressMapping(16, 3);
         addProgressMapping(21, 4);
         addProgressMapping(26, 5);
+        addProgressMapping(31, 6);
+        addProgressMapping(36, 7);
+        addProgressMapping(41, 8);
     }
     
     @Override
@@ -35,7 +41,10 @@ public class TD1XXL extends ProgressMap {
         addRoleMapping(16, "Section 9 | TD1 XXL CP16+");
         addRoleMapping(21, "Section 9 | TD1 XXL CP21+");
         addRoleMapping(26, "Section 9 | TD1 XXL CP26+");
-        addRoleMapping(31, "Section 9 | TD1 XXL VICTORY");
+        addRoleMapping(31, "Section 9 | TD1 XXL CP31+");
+        addRoleMapping(36, "Section 9 | TD1 XXL CP36+");
+        addRoleMapping(41, "Section 9 | TD1 XXL CP41+");
+        addRoleMapping(43, "Section 9 | TD1 XXL VICTORY");
     }
     
 }

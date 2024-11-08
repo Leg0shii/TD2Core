@@ -5,7 +5,7 @@ import de.legoshi.td2core.discord.progress.ProgressMap;
 public class TD1LD extends ProgressMap {
 
     public TD1LD() {
-        super("TD1 LD");
+        super("LD TD1");
     }
 
     @Override
@@ -20,7 +20,7 @@ public class TD1LD extends ProgressMap {
 
     @Override
     public void addRoleMapping() {
-        addRoleMapping(1, "Section 9 | TD1 LD");
+        addRoleMapping(1, "Section 9 | LD TD1 VICTOR");
     }
 
 }
