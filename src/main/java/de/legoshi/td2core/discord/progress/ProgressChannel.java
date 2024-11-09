@@ -24,18 +24,45 @@ public class ProgressChannel {
         this.channelID = channelID;
         this.guild = guild;
     }
-    
+
     public List<String> getFullProgress() {
         List<String> progressStringList = new ArrayList<>();
         for (ProgressMap progressMap : progressMaps) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder
-                .append(getTitleString(progressMap))
-                .append(getProgressString(progressMap))
-                .append(getCompletionString(progressMap));
-            progressStringList.add(stringBuilder.toString());
+                    .append(getTitleString(progressMap))
+                    .append(getProgressString(progressMap))
+                    .append(getCompletionString(progressMap));
+
+            String fullMessage = stringBuilder.toString();
+
+            if (fullMessage.length() > 2000) {
+                List<String> splitMessages = splitStringBySize(fullMessage, 2000);
+                progressStringList.addAll(splitMessages);
+            } else {
+                progressStringList.add(fullMessage);
+            }
         }
         return progressStringList;
+    }
+
+    public static List<String> splitStringBySize(String input, int maxLength) {
+        List<String> result = new ArrayList<>();
+        int index = 0;
+        while (index < input.length()) {
+            int nextBreak = index + maxLength;
+            if (nextBreak < input.length()) {
+                int lastSpace = input.lastIndexOf('\n', nextBreak);
+                if (lastSpace > index) {
+                    nextBreak = lastSpace + 1;
+                }
+            } else {
+                nextBreak = input.length();
+            }
+            result.add(input.substring(index, nextBreak));
+            index = nextBreak;
+        }
+        return result;
     }
     
     protected String getTitleString(ProgressMap progressMap) {

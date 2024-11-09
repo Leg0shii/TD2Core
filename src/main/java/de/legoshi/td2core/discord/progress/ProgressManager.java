@@ -29,9 +29,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProgressManager {
     
@@ -118,13 +118,15 @@ public class ProgressManager {
             }
         }, 20L * 15L, 20L * 60L * 10L);
     }
-    
+
     public void updateMessage(List<String> messageList, String channelID) {
         TextChannel textChannel = jda.getTextChannelById(channelID);
         if (textChannel == null) return;
-        
+
         int volume = messageList.size();
         List<net.dv8tion.jda.api.entities.Message> messages = textChannel.getHistory().retrievePast(volume).complete();
+        Collections.reverse(messages);
+
         for (int i = 0; i < volume; i++) {
             int finalI = i;
             Bukkit.getScheduler().runTaskLaterAsynchronously(TD2Core.getInstance(), () -> {
