@@ -109,10 +109,6 @@ public class MapGUI extends GUIPane {
                             return true;
                         }
                     }
-                    if (map.mapName.equals("LD TD1")) {
-                        player.getPlayer().sendMessage(Message.COMING_SOON.getMessage());
-                        return true;
-                    }
                     if (player.getPlayerState() == PlayerState.STAFF) {
                         player.getPlayer().sendMessage(Message.NOT_STAFF_MODE.getMessage());
                         return true;
