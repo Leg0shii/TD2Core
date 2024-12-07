@@ -41,7 +41,6 @@ public class SpawnCommand implements CommandExecutor {
             player.setAllowFlight(false);
         }
 
-        parkourPlayer.switchPlayerState(PlayerState.LOBBY);
         player.sendMessage(Message.SUCCESS_SPAWN.getSuccessMessage());
         return false;
     }
