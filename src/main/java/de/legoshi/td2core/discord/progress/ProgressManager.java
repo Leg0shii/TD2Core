@@ -30,8 +30,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.bukkit.Bukkit;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ProgressManager {
     
@@ -85,6 +83,7 @@ public class ProgressManager {
         section7.getProgressMaps().add(new Speed2());
         section7.getProgressMaps().add(new Speed3());
         section7.getProgressMaps().add(new Speed4());
+        section7.getProgressMaps().add(new Speed5());
 
         ProgressChannel section8 = new ProgressChannel("1202167568425824279", guild);
         section8.getProgressMaps().add(new Jump1());

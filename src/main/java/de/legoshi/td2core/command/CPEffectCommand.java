@@ -1,6 +1,9 @@
 package de.legoshi.td2core.command;
 
 import de.legoshi.td2core.block.BlockManager;
+import de.legoshi.td2core.player.ParkourPlayer;
+import de.legoshi.td2core.player.PlayerManager;
+import de.legoshi.td2core.player.PlayerState;
 import de.legoshi.td2core.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.Command;
@@ -14,20 +17,22 @@ import org.bukkit.potion.PotionEffectType;
 public class CPEffectCommand implements CommandExecutor {
 
     private final BlockManager blockManager;
+    private final PlayerManager playerManager;
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (!commandSender.hasPermission("td2core.edit_cp")) {
-            commandSender.sendMessage(Message.ERROR_NO_PERMISSION.getWarningMessage());
-            return false;
-        }
-
         if (!(commandSender instanceof Player)) {
             commandSender.sendMessage(Message.ERROR_NOT_A_PLAYER.getWarningMessage());
             return false;
         }
 
         Player player = (Player) commandSender;
+        ParkourPlayer parkourPlayer = playerManager.get(player);
+        if (!(parkourPlayer.getPlayerState() == PlayerState.STAFF || parkourPlayer.getPlayerState() == PlayerState.PLOT)) {
+            commandSender.sendMessage(Message.ERROR_NO_PERMISSION.getWarningMessage());
+            return false;
+        }
+
         if (!blockManager.hasPotionTemp(player)) {
             commandSender.sendMessage(Message.ERROR_NO_SPC.getWarningMessage());
             return false;

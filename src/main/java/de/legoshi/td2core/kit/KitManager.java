@@ -57,7 +57,8 @@ public class KitManager {
         Player player = parkourPlayer.getPlayer();
         PlayerInventory inventory = player.getInventory();
         ItemStack[] contents = inventory.getContents();
-    
+
+
         ItemInventoryMap inventoryMap = new ItemInventoryMap();
         for (int slot = 0; slot < contents.length; slot++) {
             ItemStack item = contents[slot];
@@ -71,7 +72,7 @@ public class KitManager {
     public void savePlayerKit(ParkourPlayer parkourPlayer) {
         String playerUUID = parkourPlayer.getPlayer().getUniqueId().toString();
         configuration.set(playerUUID, null);
-        
+
         for (Kit kit : playerListHashMap.get(parkourPlayer.getPlayer())) {
             updatePlayerKitOrder(parkourPlayer);
             for (int slot : kit.getSlots()) {

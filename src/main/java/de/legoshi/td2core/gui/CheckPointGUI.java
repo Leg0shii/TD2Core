@@ -97,7 +97,7 @@ public class CheckPointGUI extends GUIPane {
             "§8Click to set precise coords"
             );
     }
-    
+
     private String getPrecisionString(Location location) {
         String usedCoords = "";
         if (location != null) {

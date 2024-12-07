@@ -2,6 +2,7 @@ package de.legoshi.td2core.block;
 
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.gui.CheckPointGUI;
+import de.legoshi.td2core.gui.PlotCheckPointGUI;
 import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
 import de.legoshi.td2core.player.PlayerState;
@@ -53,13 +54,14 @@ public class BlockManager implements Listener {
         
         Material blockType = event.getClickedBlock().getType();
         if (blockType != Material.IRON_PLATE & blockType != Material.WOOD_PLATE && blockType != Material.STONE_PLATE) return;
-        
-        
+
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
+        Location clickedBlock = event.getClickedBlock().getLocation();
         if (parkourPlayer.getPlayerState() == PlayerState.STAFF) {
-            Location clickedBlock = event.getClickedBlock().getLocation();
             new CheckPointGUI().openGui(player, this, clickedBlock);
+        } else if (parkourPlayer.getPlayerState() == PlayerState.PLOT) {
+            new PlotCheckPointGUI().openGui(player, this, clickedBlock);
         }
     }
     
@@ -69,7 +71,7 @@ public class BlockManager implements Listener {
         Location clickedLoc = event.getBlock().getLocation();
         ParkourPlayer parkourPlayer = playerManager.get(player);
         
-        if (parkourPlayer.getPlayerState() != PlayerState.STAFF) {
+        if (!(parkourPlayer.getPlayerState() == PlayerState.STAFF || parkourPlayer.getPlayerState() == PlayerState.PLOT)) {
             player.sendMessage(Message.CANT_DESTROY_BLOCK_DATA.getWarningMessage());
             event.setCancelled(true);
             return;

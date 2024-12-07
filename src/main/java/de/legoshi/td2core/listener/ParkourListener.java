@@ -49,9 +49,9 @@ public class ParkourListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         ItemStack itemStack = event.getItem();
-        
         ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
-        if (parkourPlayer.getPlayerState().equals(PlayerState.STAFF)) {
+
+        if (parkourPlayer.getPlayerState().equals(PlayerState.STAFF) || parkourPlayer.getPlayerState().equals(PlayerState.PLOT)) {
             onTrapDoorClick(event);
         } else {
             // this disables trapdoors for staff players (ONLY for certain maps) when they are not in staff
@@ -67,15 +67,16 @@ public class ParkourListener implements Listener {
         
         if (event.getHand() != null && event.getHand().equals(EquipmentSlot.OFF_HAND)) return;
         if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
+
         if (ItemInteractManager.hasClickedItem(event.getPlayer())) return;
-        
-        if (isBook(itemStack)) {
-            event.setCancelled(true);
-            return;
-        }
-        
         ItemInteractManager.addItem(event.getPlayer());
         
+        itemInteract(itemStack, event);
+        pressurePlateInteract(event);
+        buttonInteract(event);
+    }
+
+    private void itemInteract(ItemStack itemStack, PlayerInteractEvent event) {
         if (ItemUtils.hasNbtId(itemStack, "cp")) checkPointClick(event);
         if (ItemUtils.hasNbtId(itemStack, "prac")) practiceClick(event);
         if (ItemUtils.hasNbtId(itemStack, "unprac")) unPracticeClick(event);
@@ -85,9 +86,6 @@ public class ParkourListener implements Listener {
         if (ItemUtils.hasNbtId(itemStack, "select")) selectClick(event);
         if (ItemUtils.hasNbtId(itemStack, "leaderboard")) leaderBoardClick(event);
         if (ItemUtils.hasNbtId(itemStack, "set")) setCPClick(event);
-    
-        pressurePlateInteract(event);
-        buttonInteract(event);
     }
     
     private void setCPClick(PlayerInteractEvent event) {
@@ -118,11 +116,15 @@ public class ParkourListener implements Listener {
             return;
         }
         
-        if (parkourPlayer.getPlayerState() == PlayerState.STAFF) {
+        if (parkourPlayer.getPlayerState() == PlayerState.STAFF || parkourPlayer.getPlayerState() == PlayerState.PLOT) {
             Location pracLocation = session.getPracCPLocation();
             if (pracLocation == null) {
                 if (location == null) {
-                    player.teleport(TD2Core.getSpawn());
+                    if (parkourPlayer.getPlayerState() == PlayerState.STAFF) {
+                        player.teleport(TD2Core.getSpawn());
+                    } else {
+                        player.teleport(TD2Core.getPlotSpawn());
+                    }
                 } else {
                     player.teleport(location);
                 }
@@ -155,7 +157,8 @@ public class ParkourListener implements Listener {
         event.setCancelled(true);
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.STAFF) {
+        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.STAFF
+            || parkourPlayer.getPlayerState() == PlayerState.PLOT) {
             player.setAllowFlight(!player.getAllowFlight());
             
             String prefix = "§a";
@@ -196,7 +199,8 @@ public class ParkourListener implements Listener {
     private void buttonInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ParkourPlayer parkourPlayer = playerManager.get(player);
-        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.STAFF) return;
+        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.PARKOUR
+                || parkourPlayer.getPlayerState() == PlayerState.STAFF || parkourPlayer.getPlayerState() == PlayerState.PLOT) return;
         if (event.getItem() != null && (event.getItem().getType().equals(Material.SHIELD) || event.getItem().getType().equals(Material.DIAMOND_SWORD))) return;
         event.setCancelled(true);
     }
@@ -234,7 +238,8 @@ public class ParkourListener implements Listener {
                         Location nextCPLocation = blockManager.getNextCPLocation(cpLocation);
                         session.setNextCP(nextCPLocation);
     
-                        if (parkourPlayer.getPlayerState() != PlayerState.STAFF) parkourPlayer.updateActionBar(session);
+                        if (parkourPlayer.getPlayerState() != PlayerState.STAFF
+                        && parkourPlayer.getPlayerState() != PlayerState.PLOT) parkourPlayer.updateActionBar(session);
                     
                         player.getInventory().addItem(new ItemStack(Material.COMPASS));
                         player.setCompassTarget(nextCPLocation.clone().add(0.5, 0, 0.5));
@@ -270,7 +275,8 @@ public class ParkourListener implements Listener {
             parkourPlayer.clearPotionEffects();
             session.setCurrentEffects((List<PotionEffect>) blockManager.getPotionEffects(cpLocation));
             player.addPotionEffects(blockManager.getPotionEffects(cpLocation));
-        
+
+            if (parkourPlayer.getPlayerState() == PlayerState.PLOT) return;
             if (pressurePlate == Material.IRON_PLATE) {
                 event.setUseInteractedBlock(Event.Result.DENY);
                 
@@ -285,11 +291,23 @@ public class ParkourListener implements Listener {
             }
         
             if (pressurePlate == Material.GOLD_PLATE) {
-                if (parkourPlayer.getPlayerState() == PlayerState.STAFF) return;
+                if (parkourPlayer.getPlayerState() != PlayerState.PARKOUR) return;
                 parkourPlayer.activateGoal(cpLocation);
                 Bukkit.getOnlinePlayers().forEach(p -> player.playSound(player.getLocation(), Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 1.0F));
             }
         }
+
+        if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE || parkourPlayer.getPlayerState() == PlayerState.PLOT) {
+            event.setUseInteractedBlock(Event.Result.DENY);
+
+            player.addPotionEffects(blockManager.getPotionEffects(cpLocation));
+            if (blockManager.hasTP(cpLocation)) {
+                cpLocation = blockManager.getTeleportPos(cpLocation).clone();
+                player.teleport(cpLocation);
+                player.playSound(player.getPlayer().getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1.0F, 1.0F);
+            }
+        }
+
     }
     
     private void tutorialPlateInteract(ParkourPlayer parkourPlayer, Location clickedPlate) {
@@ -327,14 +345,6 @@ public class ParkourListener implements Listener {
         if (event.getClickedBlock().getType().equals(Material.TRAP_DOOR)) {
             event.setCancelled(true);
         }
-    }
-    
-    private boolean isBook(ItemStack item) {
-        return item != null && (item.getType().equals(Material.BOOK) ||
-                item.getType().equals(Material.BOOK_AND_QUILL) ||
-                item.getType().equals(Material.WRITTEN_BOOK) ||
-                item.getType().equals(Material.ENCHANTED_BOOK) ||
-                item.getType().equals(Material.KNOWLEDGE_BOOK));
     }
 
 }

@@ -39,6 +39,7 @@ public final class TD2Core extends JavaPlugin {
     
     private static TD2Core instance;
     private Location spawnLocation;
+    private Location plotSpawnLocation;
     private Location tutSpawnLocation;
     private Location tutEndLocation;
     
@@ -91,7 +92,9 @@ public final class TD2Core extends JavaPlugin {
         
         globalLBCache.startGlobalCacheScheduler();
         mapLBCache.startMapCacheScheduler();
-        blockManager.loadBlockData();
+
+        // delayed loading required due to plotworld not loaded yet
+        Bukkit.getScheduler().runTaskLater(TD2Core.getInstance(), () -> blockManager.loadBlockData(), 200L);
     
         loadLocation();
         registerEvents();
@@ -117,7 +120,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("spawn").setExecutor(new SpawnCommand(playerManager));
         Bukkit.getPluginCommand("nv").setExecutor(new NightVisionCommand());
         Bukkit.getPluginCommand("reset").setExecutor(new ResetCommand(mapManager, playerManager, sessionManager));
-        Bukkit.getPluginCommand("spc").setExecutor(new SPCCommand(blockManager));
+        Bukkit.getPluginCommand("spc").setExecutor(new SPCCommand(blockManager, playerManager));
         Bukkit.getPluginCommand("duration").setExecutor(new CPTimeCommand(blockManager));
         Bukkit.getPluginCommand("staff").setExecutor(new StaffCommand(playerManager));
         Bukkit.getPluginCommand("hide").setExecutor(new HideCommand(hideManager));
@@ -127,9 +130,10 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("verify").setExecutor(new VerifyCommand(verifyManager));
         Bukkit.getPluginCommand("tp").setExecutor(new TPCommand());
         Bukkit.getPluginCommand("cp").setExecutor(new CPCountCommand(blockManager));
-        Bukkit.getPluginCommand("cpeffect").setExecutor(new CPEffectCommand(blockManager));
+        Bukkit.getPluginCommand("cpeffect").setExecutor(new CPEffectCommand(blockManager, playerManager));
         Bukkit.getPluginCommand("discord").setExecutor(new DiscordCommand());
         Bukkit.getPluginCommand("leaderboard").setExecutor(new LeaderboardCommand(playerManager, configManager));
+        Bukkit.getPluginCommand("colortest").setExecutor(new ColorTest());
     }
     
     private void registerEvents() {
@@ -146,6 +150,10 @@ public final class TD2Core extends JavaPlugin {
     
     public static Location getSpawn() {
         return instance.spawnLocation;
+    }
+
+    public static Location getPlotSpawn() {
+        return instance.plotSpawnLocation;
     }
     
     public static Location getTutSpawn() {
@@ -168,11 +176,17 @@ public final class TD2Core extends JavaPlugin {
         spawnLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("spawn"));
         tutSpawnLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("tutspawn"));
         tutEndLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("tutend"));
+
+        Bukkit.getScheduler().runTaskLater(TD2Core.getInstance(), () -> {
+            plotSpawnLocation = Utils.getLocationFromString(configManager.getConfig(ServerConfig.class).getString("plotspawn"));
+            Bukkit.getConsoleSender().sendMessage(plotSpawnLocation.toString());
+        }, 200L);
     }
     
     public static boolean isServerGUI(String name) {
         return name.equals("Section Selection") || name.contains("Leaderboard") || name.contains("Map Selection")
-            || name.equals("§7§lLeaderboard") || name.equals("Checkpoint Editor") || name.contains("Replay");
+            || name.equals("§7§lLeaderboard") || name.equals("Checkpoint Editor") || name.contains("Replay")
+                || name.equals("Plate Editor");
     }
     
 }

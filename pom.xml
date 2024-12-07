@@ -114,12 +114,6 @@
             <version>8.0.33</version> <!-- Use the version you need -->
         </dependency>
         <dependency>
-            <groupId>com.onarandombox</groupId>
-            <artifactId>Multiverse-Core</artifactId>
-            <version>4.3.9</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>4.8.0</version>

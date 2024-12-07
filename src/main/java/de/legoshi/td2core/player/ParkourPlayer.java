@@ -64,7 +64,7 @@ public class ParkourPlayer {
         this.player = player;
         this.version = Via.getAPI().getPlayerVersion(player.getUniqueId());
         this.playerState = PlayerState.LOBBY;
-        
+
         this.playerKit = kitManager.getPlayerKit(this, LobbyKit.class);
         setKit();
         
@@ -78,6 +78,8 @@ public class ParkourPlayer {
     public void serverJoin(PlayerConfig playerConfig) {
         playerManager.put(this);
         permissionManager.addPlayer(player);
+
+        permissionManager.allowPlotCommands(player);
         ScoreboardUtil.initializeScoreboard(player);
         tutorial = playerConfig.getTutorial(player.getUniqueId());
     
@@ -97,6 +99,7 @@ public class ParkourPlayer {
 
         player.setAllowFlight(false);
         clearPotionEffects();
+
         Bukkit.broadcastMessage(Message.PLAYER_JOIN.getInfoMessage(player.getName()));
     }
     
@@ -205,7 +208,7 @@ public class ParkourPlayer {
         }
         
         session.setLastCheckpointLocation(location);
-        if (playerState == PlayerState.STAFF) {
+        if (playerState == PlayerState.STAFF || playerState == PlayerState.PLOT) {
             session.setPracCPLocation(null);
         }
         if (isCP) {
@@ -310,7 +313,7 @@ public class ParkourPlayer {
     }
     
     public void triggerFail() {
-        if (playerState == PlayerState.PRACTICE || playerState == PlayerState.STAFF) return;
+        if (playerState == PlayerState.PRACTICE || playerState == PlayerState.STAFF || playerState == PlayerState.PLOT) return;
         ParkourSession session = sessionManager.get(player, currentParkourMap);
         session.setFails(session.getFails() + 1);
         updateActionBar(session);
@@ -332,8 +335,16 @@ public class ParkourPlayer {
     
     public void switchPlayerState(PlayerState state) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
+        if (state == PlayerState.STAFF && playerState == PlayerState.PLOT) {
+            currentParkourMap = null;
+        }
+
+        if (playerState == PlayerState.PLOT) {
+            clearPotionEffects();
+        }
+
         PlayerState prevState = playerState;
-        permissionManager.disallowFly(player);
+        Bukkit.getConsoleSender().sendMessage("New State: " + state.toString());
         
         switch (state) {
             case PRACTICE: {
@@ -343,6 +354,8 @@ public class ParkourPlayer {
                 }
                 
                 updateState(state);
+                permissionManager.disallowPlotCommands(player);
+
                 player.setAllowFlight(true);
                 session.setPlayTime(session.getPlayTime());
                 session.setLastMapLocation(player.getLocation());
@@ -364,6 +377,8 @@ public class ParkourPlayer {
             }
             case PARKOUR: {
                 updateState(state);
+                permissionManager.disallowPlotCommands(player);
+
                 session.setSessionStarted(new Date(System.currentTimeMillis()));
                 player.setAllowFlight(false);
                 player.teleport(session.getLastPracLocation());
@@ -388,19 +403,16 @@ public class ParkourPlayer {
                     updateState(state);
     
                     Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
-                    ParkourMap parkourMap = mapManager.get("Initial TD2");
-                    currentParkourMap = parkourMap;
-                    
-                    ParkourSession parkourSession = new ParkourSession();
-                    parkourSession.setLastCheckpointLocation(player.getLocation());
-    
-                    sessionManager.put(player, parkourMap, parkourSession);
+                    createDummySession();
+
                     updateActionBar(session);
                     if (this.bukkitTask == null || this.bukkitTask.isCancelled()) {
                         bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> updateActionBar(session), 0L, 20L);
                     }
                 });
-                
+
+                permissionManager.disallowPlotCommands(player);
+                permissionManager.allowFly(player);
                 player.setAllowFlight(true);
                 break;
             }
@@ -410,8 +422,26 @@ public class ParkourPlayer {
                 if (prevState == PlayerState.STAFF) {
                     Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
                 }
+
+                break;
+            }
+            case PLOT: {
+                updateState(state);
+                createDummySession();
+
+                permissionManager.allowPlotCommands(player);
+                permissionManager.allowFly(player);
+                break;
             }
         }
+    }
+
+    private void createDummySession() {
+        ParkourMap parkourMap = mapManager.get("Initial TD2");
+        currentParkourMap = parkourMap;
+
+        ParkourSession parkourSession = new ParkourSession();
+        sessionManager.put(player, parkourMap, parkourSession);
     }
     
     public void startCPScheduler() {
@@ -461,6 +491,9 @@ public class ParkourPlayer {
             case STAFF:
                 playerKit = kitManager.getPlayerKit(this, StaffKit.class);
                 break;
+            case PLOT:
+                playerKit = kitManager.getPlayerKit(this, PlotKit.class);
+                break;
         }
         setKit();
     }
@@ -470,7 +503,19 @@ public class ParkourPlayer {
             Utils.sendActionBar(player, "§cSTAFF Mode");
             return;
         }
-        long playTime = (session.getPlayTime() / 1000);
+        if (playerState == PlayerState.PLOT) {
+            Utils.sendActionBar(player, "§ePlot Mode");
+            return;
+        }
+
+        long playTime;
+        try {
+            playTime = (session.getPlayTime() / 1000);
+        } catch (Exception e) {
+            bukkitTask.cancel();
+            return;
+        }
+
         if (playerState == PlayerState.PRACTICE) playTime = session.getPausedTime() / 1000;
         String nextCPString = "";
         String infoString = "§6Time: §7" + Utils.secondsToTime((int) playTime) + " - §cFails: §7" + session.getFails();

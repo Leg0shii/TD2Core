@@ -4,8 +4,10 @@ import com.viaversion.viaversion.api.Via;
 import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
+import de.legoshi.td2core.kit.LobbyKit;
 import de.legoshi.td2core.player.ParkourPlayer;
 import de.legoshi.td2core.player.PlayerManager;
+import de.legoshi.td2core.player.PlayerState;
 import de.legoshi.td2core.player.tag.PlayerTag;
 import de.legoshi.td2core.util.Message;
 import de.legoshi.td2core.util.ScoreboardUtil;
@@ -101,6 +103,8 @@ public class GeneralListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        player.getInventory().clear();
+
         event.setQuitMessage("");
         playerLeave(player);
     }
@@ -141,6 +145,15 @@ public class GeneralListener implements Listener {
     public void onLogin(PlayerLoginEvent event) {
         if (Bukkit.getServer().hasWhitelist()) {
             event.setKickMessage(Bukkit.getServer().getMotd());
+        }
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        if(!event.getFrom().getWorld().getName().equalsIgnoreCase("plotworld") &&
+                event.getTo().getWorld().getName().equalsIgnoreCase("plotworld")) {
+            ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
+            parkourPlayer.switchPlayerState(PlayerState.PLOT);
         }
     }
     
