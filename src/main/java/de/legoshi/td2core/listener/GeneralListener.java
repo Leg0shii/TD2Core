@@ -93,6 +93,7 @@ public class GeneralListener implements Listener {
     
     private void initPlayer(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        player.getInventory().clear();
         player.teleport(TD2Core.getSpawn());
         event.setJoinMessage("");
     
@@ -103,8 +104,6 @@ public class GeneralListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        player.getInventory().clear();
-
         event.setQuitMessage("");
         playerLeave(player);
     }
@@ -154,6 +153,12 @@ public class GeneralListener implements Listener {
                 event.getTo().getWorld().getName().equalsIgnoreCase("plotworld")) {
             ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
             parkourPlayer.switchPlayerState(PlayerState.PLOT);
+        }
+
+        if(event.getFrom().getWorld().getName().equalsIgnoreCase("plotworld") &&
+                !event.getTo().getWorld().getName().equalsIgnoreCase("plotworld")) {
+            ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
+            parkourPlayer.switchPlayerState(PlayerState.LOBBY);
         }
     }
     
