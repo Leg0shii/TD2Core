@@ -73,7 +73,7 @@ public class DiscordManager {
         builder.setActivity(Activity.playing("TD2.mcpro.io"));
         jda = builder.build();
         
-        this.progressManager = new ProgressManager(jda);
+        this.progressManager = new ProgressManager(configAccessor, jda);
         this.roleManager = new RoleManager(progressManager);
         this.verifyManager.setRoleManager(roleManager);
         
