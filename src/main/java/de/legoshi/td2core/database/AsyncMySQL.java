@@ -136,6 +136,19 @@ public class AsyncMySQL {
         return null;
     }
 
+    public PreparedStatement prepare(String query , int resultSetType, int resultSetConcurrency) {
+
+        try {
+
+            return sql.getConnection().prepareStatement(query, resultSetType, resultSetConcurrency);
+
+        } catch (SQLException ignored) {
+            ignored.printStackTrace();
+        }
+
+        return null;
+    }
+
     public PreparedStatement prepare(String query, int val) {
 
         try {
