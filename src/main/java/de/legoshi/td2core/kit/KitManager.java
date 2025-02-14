@@ -4,7 +4,6 @@ import de.legoshi.td2core.config.ConfigAccessor;
 import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerInventoryConfig;
 import de.legoshi.td2core.player.ParkourPlayer;
-import de.legoshi.td2core.player.PlayerState;
 import de.legoshi.td2core.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import javax.swing.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class KitManager {
@@ -35,6 +32,7 @@ public class KitManager {
     private void loadTypes() {
         kitTypes.add(LobbyKit.class);
         kitTypes.add(ParkourKit.class);
+        kitTypes.add(PlotKit.class);
         kitTypes.add(PracticeKit.class);
         kitTypes.add(StaffKit.class);
     }
@@ -57,7 +55,6 @@ public class KitManager {
         Player player = parkourPlayer.getPlayer();
         PlayerInventory inventory = player.getInventory();
         ItemStack[] contents = inventory.getContents();
-
 
         ItemInventoryMap inventoryMap = new ItemInventoryMap();
         for (int slot = 0; slot < contents.length; slot++) {

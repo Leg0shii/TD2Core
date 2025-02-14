@@ -105,11 +105,6 @@ public class ParkourPlayer {
     
     public void serverLeave(boolean shutdown) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
-        if (playerState == PlayerState.STAFF) {
-            if (bukkitTask != null) {
-                bukkitTask.cancel();
-            }
-        }
         if (playerState == PlayerState.PARKOUR && session != null) {
             session.setLastMapLocation(player.getLocation());
         }
@@ -178,7 +173,7 @@ public class ParkourPlayer {
             playerManager.saveIndividualStats(player, currentParkourMap);
             currentParkourMap = null;
             if (playerState != PlayerState.STAFF) {
-                updateState(PlayerState.LOBBY);
+                switchPlayerState(PlayerState.LOBBY);
             }
             bukkitTask.cancel();
             clearPotionEffects();
@@ -344,7 +339,6 @@ public class ParkourPlayer {
         }
 
         PlayerState prevState = playerState;
-        Bukkit.getConsoleSender().sendMessage("New State: " + state.toString());
         
         switch (state) {
             case PRACTICE: {
@@ -356,7 +350,9 @@ public class ParkourPlayer {
                 updateState(state);
                 permissionManager.disallowPlotCommands(player);
 
-                player.setAllowFlight(true);
+                PlayerConfig config = playerManager.getConfigManager().getConfigAccessor(PlayerConfig.class);
+                player.setAllowFlight(config.isPracticeAlwaysActive(player.getUniqueId()));
+
                 session.setPlayTime(session.getPlayTime());
                 session.setLastMapLocation(player.getLocation());
                 session.setLastPracLocation(player.getLocation());
@@ -423,6 +419,7 @@ public class ParkourPlayer {
                     Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
                 }
 
+                permissionManager.allowPlotCommands(player);
                 break;
             }
             case PLOT: {

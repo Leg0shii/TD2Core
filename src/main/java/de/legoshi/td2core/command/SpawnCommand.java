@@ -30,8 +30,9 @@ public class SpawnCommand implements CommandExecutor {
             player.teleport(TD2Core.getTutSpawn());
             return true;
         }
-        
-        if (parkourPlayer.getPlayerState() == PlayerState.PARKOUR || parkourPlayer.getPlayerState() == PlayerState.PRACTICE) {
+
+        PlayerState state =  parkourPlayer.getPlayerState();
+        if (state == PlayerState.PARKOUR || state == PlayerState.PRACTICE) {
             parkourPlayer.mapLeave(false);
         } else {
             player.teleport(TD2Core.getSpawn());

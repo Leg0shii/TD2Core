@@ -28,8 +28,9 @@ public class PracticeCommand implements CommandExecutor {
             player.sendMessage(Message.ERROR_IN_TUTORIAL.getWarningMessage());
             return true;
         }
-        
-        if (parkourPlayer.getPlayerState() == PlayerState.LOBBY || parkourPlayer.getPlayerState() == PlayerState.STAFF) {
+
+        PlayerState state =  parkourPlayer.getPlayerState();
+        if (state == PlayerState.LOBBY || state == PlayerState.STAFF || state == PlayerState.PLOT) {
             player.sendMessage(Message.ERROR_IN_LOBBY.getWarningMessage());
         } else {
             if (parkourPlayer.getPlayerState() == PlayerState.PRACTICE) {
