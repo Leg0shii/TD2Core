@@ -28,20 +28,14 @@ public class ProgressChannel {
     public List<String> getFullProgress() {
         List<String> progressStringList = new ArrayList<>();
         for (ProgressMap progressMap : progressMaps) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder
-                    .append(getTitleString(progressMap))
-                    .append(getProgressString(progressMap))
-                    .append(getCompletionString(progressMap));
 
-            String fullMessage = stringBuilder.toString();
+            String fullMessage =
+                    getTitleString(progressMap) +
+                    getProgressString(progressMap) +
+                    getCompletionString(progressMap);
 
-            if (fullMessage.length() > 2000) {
-                List<String> splitMessages = splitStringBySize(fullMessage, 2000);
-                progressStringList.addAll(splitMessages);
-            } else {
-                progressStringList.add(fullMessage);
-            }
+            List<String> splitMessages = splitStringBySize(fullMessage, 1990);
+            progressStringList.addAll(splitMessages);
         }
         return progressStringList;
     }
