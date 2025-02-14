@@ -1,6 +1,7 @@
 package de.legoshi.td2core.discord.progress;
 
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigAccessor;
 import de.legoshi.td2core.discord.progress.overall.OverallChannel;
 import de.legoshi.td2core.discord.progress.overall.OverallProgress;
 import de.legoshi.td2core.discord.progress.section1.BlackStretch;
@@ -28,47 +29,50 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.*;
 
 public class ProgressManager {
-    
+
+    private final FileConfiguration config;
     private final JDA jda;
     private final List<ProgressChannel> progressChannels = new ArrayList<>();
     
-    public ProgressManager(JDA jda) {
+    public ProgressManager(ConfigAccessor configAccessor, JDA jda) {
+        this.config = configAccessor.getConfig();
         this.jda = jda;
     }
     
     public void loadProgressChannels(Guild guild) {
-        OverallChannel section0 = new OverallChannel("1143261060573450280", guild);
+        OverallChannel section0 = new OverallChannel(config.getString("section0"), guild);
         section0.getProgressMaps().add(new OverallProgress(section0));
         
-        ProgressChannel section1 = new ProgressChannel("1144566390167179325", guild);
+        ProgressChannel section1 = new ProgressChannel(config.getString("section1"), guild);
         section1.getProgressMaps().add(new InitialTD2());
         section1.getProgressMaps().add(new GreenStretch());
         section1.getProgressMaps().add(new BlackStretch());
         section1.getProgressMaps().add(new InitialTD2Rework());
         
-        ProgressChannel section2 = new ProgressChannel("1144566436300337282", guild);
+        ProgressChannel section2 = new ProgressChannel(config.getString("section2"), guild);
         section2.getProgressMaps().add(new Cubes());
         
-        ProgressChannel section3 = new ProgressChannel("1144566557830287440", guild);
+        ProgressChannel section3 = new ProgressChannel(config.getString("section3"), guild);
         section3.getProgressMaps().add(new Overworld(section3));
         section3.getProgressMaps().add(new Cave(section3));
         section3.getProgressMaps().add(new Lava(section3));
         section3.getProgressMaps().add(new FinalStretch());
 
-        ProgressChannel section4 = new ProgressChannel("1242936082514055178", guild);
+        ProgressChannel section4 = new ProgressChannel(config.getString("section4"), guild);
         section4.getProgressMaps().add(new SRStandard());
         section4.getProgressMaps().add(new SRPolish());
         section4.getProgressMaps().add(new SRSpeed());
         section4.getProgressMaps().add(new SRNoSprint());
         
-        ProgressChannel section5 = new ProgressChannel("1144566601614626918", guild);
+        ProgressChannel section5 = new ProgressChannel(config.getString("section5"), guild);
         section5.getProgressMaps().add(new OneJump(section5));
         
-        ProgressChannel section6 = new ProgressChannel("1144566807164895342", guild);
+        ProgressChannel section6 = new ProgressChannel(config.getString("section6"), guild);
         section6.getProgressMaps().add(new Library());
         section6.getProgressMaps().add(new City());
         section6.getProgressMaps().add(new Arcade());
@@ -77,7 +81,7 @@ public class ProgressManager {
         section6.getProgressMaps().add(new RedstoneHallway());
         section6.getProgressMaps().add(new RedstoneSky());
         
-        ProgressChannel section7 = new ProgressChannel("1144566870926692503", guild);
+        ProgressChannel section7 = new ProgressChannel(config.getString("section7"), guild);
         section7.getProgressMaps().add(new Speed0());
         section7.getProgressMaps().add(new Speed1());
         section7.getProgressMaps().add(new Speed2());
@@ -85,19 +89,19 @@ public class ProgressManager {
         section7.getProgressMaps().add(new Speed4());
         section7.getProgressMaps().add(new Speed5());
 
-        ProgressChannel section8 = new ProgressChannel("1202167568425824279", guild);
+        ProgressChannel section8 = new ProgressChannel(config.getString("section8"), guild);
         section8.getProgressMaps().add(new Jump1());
         section8.getProgressMaps().add(new Jump2());
         section8.getProgressMaps().add(new Jump3());
         section8.getProgressMaps().add(new Jump4());
         section8.getProgressMaps().add(new Jump5());
         
-        ProgressChannel section9 = new ProgressChannel("1144566938543071232", guild);
+        ProgressChannel section9 = new ProgressChannel(config.getString("section9"), guild);
         section9.getProgressMaps().add(new TD1Buffed());
         section9.getProgressMaps().add(new TD1LD());
         section9.getProgressMaps().add(new TD1XXL(section9));
         
-        ProgressChannel section10 = new ProgressChannel("1144566997108134018", guild);
+        ProgressChannel section10 = new ProgressChannel(config.getString("section10"), guild);
         section10.getProgressMaps().add(new Slime(section10));
         
         progressChannels.addAll(Arrays.asList(section0, section1, section2, section3, section4, section5, section6,
@@ -140,6 +144,7 @@ public class ProgressManager {
                     }
                 } catch (Exception e) {
                     Bukkit.getLogger().info("Couldn't update discord progress data");
+                    e.printStackTrace();
                 }
             }, 120L * finalI);
         }

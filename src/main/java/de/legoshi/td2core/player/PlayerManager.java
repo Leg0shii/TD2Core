@@ -2,6 +2,7 @@ package de.legoshi.td2core.player;
 
 import com.viaversion.viaversion.util.Pair;
 import de.legoshi.td2core.TD2Core;
+import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.kit.KitManager;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
@@ -28,13 +29,16 @@ public class PlayerManager {
     @Getter private final MapManager mapManager;
     private final SessionManager sessionManager;
     private final KitManager kitManager;
+    @Getter private final ConfigManager configManager;
     private final HashMap<Player, ParkourPlayer> playerHashMap;
     
-    public PlayerManager(PermissionManager permissionManager, MapManager mapManager, SessionManager sessionManager, KitManager kitManager) {
+    public PlayerManager(PermissionManager permissionManager, MapManager mapManager, SessionManager sessionManager,
+                         KitManager kitManager, ConfigManager configManager) {
         this.permissionManager = permissionManager;
         this.mapManager = mapManager;
         this.sessionManager = sessionManager;
         this.kitManager = kitManager;
+        this.configManager = configManager;
         this.playerHashMap = new HashMap<>();
     }
     
@@ -119,8 +123,8 @@ public class PlayerManager {
             try {
                 sessionManager.put(player, parkourMap);
                 ParkourSession session = sessionManager.get(player, parkourMap);
-                
-                PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlString);
+
+                PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                 preparedStatement.setString(1, mapName);
                 preparedStatement.setString(2, player.getUniqueId().toString());
                 
