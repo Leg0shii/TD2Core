@@ -28,6 +28,7 @@ commands:
     cpeffect:
     leaderboard:
       aliases: [lb, top]
+    settings:
     colortest:
 
 permissions:

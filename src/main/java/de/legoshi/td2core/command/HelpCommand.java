@@ -22,6 +22,7 @@ public class HelpCommand implements CommandExecutor {
         commandSender.sendMessage(Message.HELP_MESSAGE_12.getMessage());
         commandSender.sendMessage(Message.HELP_MESSAGE_14.getMessage());
         commandSender.sendMessage(Message.HELP_MESSAGE_15.getMessage());
+        commandSender.sendMessage(Message.HELP_MESSAGE_16.getMessage());
         
         if (commandSender.hasPermission("td2core.deleteplayer")) {
             commandSender.sendMessage(Message.HELP_MESSAGE_5.getMessage());

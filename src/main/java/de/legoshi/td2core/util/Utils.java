@@ -84,6 +84,8 @@ public class Utils {
                 itemStack = CustomHeads.helpHead;
             } else if (name.contains("Leaderboard")) {
                 itemStack = CustomHeads.leaderboardHead;
+            } else if (name.contains("Settings")) {
+                itemStack = CustomHeads.settingsHead;
             }
         }
         

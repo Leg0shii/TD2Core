@@ -70,7 +70,7 @@ public final class TD2Core extends JavaPlugin {
         mapManager = new MapManager(configManager);
         kitManager = new KitManager(configManager);
         permissionManager = new PermissionManager();
-        playerManager = new PlayerManager(permissionManager, mapManager, sessionManager, kitManager);
+        playerManager = new PlayerManager(permissionManager, mapManager, sessionManager, kitManager, configManager);
         discordManager = new DiscordManager(configManager, playerManager, sessionManager, verifyManager);
         blockManager = new BlockManager(playerManager);
         hideManager = new HideManager();
@@ -133,6 +133,8 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("cpeffect").setExecutor(new CPEffectCommand(blockManager, playerManager));
         Bukkit.getPluginCommand("discord").setExecutor(new DiscordCommand());
         Bukkit.getPluginCommand("leaderboard").setExecutor(new LeaderboardCommand(playerManager, configManager));
+        Bukkit.getPluginCommand("settings").setExecutor(new SettingsCommand(configManager));
+
         Bukkit.getPluginCommand("colortest").setExecutor(new ColorTest());
     }
     
@@ -186,7 +188,7 @@ public final class TD2Core extends JavaPlugin {
     public static boolean isServerGUI(String name) {
         return name.equals("Section Selection") || name.contains("Leaderboard") || name.contains("Map Selection")
             || name.equals("§7§lLeaderboard") || name.equals("Checkpoint Editor") || name.contains("Replay")
-                || name.equals("Plate Editor");
+                || name.equals("Plate Editor") || name.equals("Settings");
     }
     
 }

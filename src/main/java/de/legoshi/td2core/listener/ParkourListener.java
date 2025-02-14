@@ -6,6 +6,7 @@ import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.PlayerConfig;
 import de.legoshi.td2core.gui.GlobalLBGUI;
 import de.legoshi.td2core.gui.SectionGUI;
+import de.legoshi.td2core.gui.SettingsGUI;
 import de.legoshi.td2core.listener.item.ItemInteractManager;
 import de.legoshi.td2core.map.MapManager;
 import de.legoshi.td2core.map.ParkourMap;
@@ -82,12 +83,18 @@ public class ParkourListener implements Listener {
         if (ItemUtils.hasNbtId(itemStack, "unprac")) unPracticeClick(event);
         if (ItemUtils.hasNbtId(itemStack, "fly")) flyClick(event);
         if (ItemUtils.hasNbtId(itemStack, "help")) helpClick(event);
+        if (ItemUtils.hasNbtId(itemStack, "setting")) settingClick(event);
         if (ItemUtils.hasNbtId(itemStack, "leave")) mapLeaveClick(event);
         if (ItemUtils.hasNbtId(itemStack, "select")) selectClick(event);
         if (ItemUtils.hasNbtId(itemStack, "leaderboard")) leaderBoardClick(event);
         if (ItemUtils.hasNbtId(itemStack, "set")) setCPClick(event);
     }
-    
+
+    private void settingClick(PlayerInteractEvent event) {
+        event.setCancelled(true);
+        new SettingsGUI(configManager).openGui(event.getPlayer(), null);
+    }
+
     private void setCPClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         event.setCancelled(true);

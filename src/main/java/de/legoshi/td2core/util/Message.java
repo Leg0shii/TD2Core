@@ -66,6 +66,8 @@ public enum Message {
     BLOCK_DATA_NEXT_CHECKPOINT("§4Next checkpoint:§7 ({1}, {2}, {3})"),
     PLAYER_STEP_PROGRESS(" §7I'm not a checkpoint. I'm here to track your progress!"),
     ACTIVATED_CP("Activated checkpoint."),
+    PRACTICE_FLY_STATE_ON("Activated fly to be always enabled."),
+    PRACTICE_FLY_STATE_OFF("Activated fly to be always disabled."),
     DEACTIVATED_CP("Deactivated checkpoint."),
     ACTIVATE_INDEX_CP("§7Set the checkpoint number by typing §6/cp <number> §7or §6/cp -1 §7to deactivate."),
     DEACTIVATED_NO_SPRINT("No Sprint deactivated."),
@@ -107,7 +109,8 @@ public enum Message {
     HELP_MESSAGE_12("§7/lb [global] - §eShow the leaderboard of your current map (or the global lb)"),
     HELP_MESSAGE_13("§7/staff - §eSwitch to/from staff mode"),
     HELP_MESSAGE_14("§7/verify - §eVerify yourself in the discord (/discord)"),
-    HELP_MESSAGE_15("§7/discord - §eGet the discord link");
+    HELP_MESSAGE_15("§7/discord - §eGet the discord link"),
+    HELP_MESSAGE_16("§7/settings - §eOpen the setting GUI");
     
     private final String message;
     

@@ -1,5 +1,6 @@
 package de.legoshi.td2core.util;
 
+import net.minecraft.server.v1_12_R1.Item;
 import net.minecraft.server.v1_12_R1.MojangsonParser;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
@@ -35,7 +36,8 @@ public class CustomHeads {
     public static ItemStack crossMark = create("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQwYTE0MjA4NDRjZTIzN2E0NWQyZTdlNTQ0ZDEzNTg0MWU5ZjgyZDA5ZTIwMzI2N2NmODg5NmM4NTE1ZTM2MCJ9fX0=");
     public static ItemStack indexEnabled = create("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDZhNWRhNWE0ZDJiODIxM2IyZTk4ZTJjNWJlNWJkODlhNWM3OTE0OTJjYTdjNDZjMTc0ZDlhMTM3NmYwNTAzZCJ9fX0=");
     public static ItemStack indexDisabled = create("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzEwNTkxZTY5MDllNmEyODFiMzcxODM2ZTQ2MmQ2N2EyYzc4ZmEwOTUyZTkxMGYzMmI0MWEyNmM0OGMxNzU3YyJ9fX0=");
-    
+    public static ItemStack settingsHead = create("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTEyM2I4ODg0NmQ2NmUxY2ZlMmY2NjRhMzZhZDRhMjJiMWE0YzJmMmU0ZDI5NWY0MWZlNWU5MjliOWU3ZDgifX19");
+
     static {
         String versionString = Bukkit.getBukkitVersion();
         int[] version = Arrays.stream(versionString.substring(0, versionString.indexOf('-')).split("\\."))

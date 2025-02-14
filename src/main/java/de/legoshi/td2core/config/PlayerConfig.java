@@ -30,6 +30,10 @@ public class PlayerConfig extends ConfigAccessor {
             String decoded = property.getValue();
             getConfig().set(uuid + ".skin", decoded);
         }
+
+        if (!getConfig().contains(uuid + ".practice_not_always_active")) {
+            getConfig().set(uuid + ".practice_not_always_active", true);
+        }
         
         saveConfig();
     }
@@ -58,6 +62,14 @@ public class PlayerConfig extends ConfigAccessor {
     
     public boolean getTutorial(UUID uuid) {
         return !getConfig().getBoolean(uuid.toString() + ".tutorial");
+    }
+
+    public void setPracticeAlwaysActive(UUID uuid, boolean value) {
+        getConfig().set(uuid.toString() + ".practice_not_always_active", !value);
+    }
+
+    public boolean isPracticeAlwaysActive(UUID uuid) {
+        return !getConfig().getBoolean(uuid.toString() + ".practice_not_always_active");
     }
     
 }
