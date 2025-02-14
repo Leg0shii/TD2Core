@@ -20,6 +20,7 @@ import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -525,11 +526,13 @@ public class ParkourPlayer {
 
         Utils.sendActionBar(player, infoString + nextCPString + timeTillNext);
     }
-    
+
     public void clearPotionEffects() {
-        player.removePotionEffect(PotionEffectType.SPEED);
-        player.removePotionEffect(PotionEffectType.JUMP);
-        player.removePotionEffect(PotionEffectType.SLOW);
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            if (!effect.getType().equals(PotionEffectType.NIGHT_VISION)) {
+                player.removePotionEffect(effect.getType());
+            }
+        }
     }
     
 }
