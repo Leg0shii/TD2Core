@@ -56,7 +56,7 @@ public class MapGUI extends GUIPane {
     
     @Override
     protected void registerGuiElements() {
-        List<ParkourMap> parkourMaps = mapManager.getAll("section" + id);
+        List<ParkourMap> parkourMaps = mapManager.getAll(id);
         GuiElementGroup group = new GuiElementGroup('a');
     
         List<CompletableFuture<DynamicGuiElement>> futures = new ArrayList<>();

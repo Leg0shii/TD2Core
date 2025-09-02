@@ -30,6 +30,7 @@ commands:
       aliases: [lb, top]
     settings:
     colortest:
+    bonus:
 
 permissions:
   td2core:

@@ -23,11 +23,9 @@ import java.util.stream.Collectors;
 public class MapManager {
     
     private final ConcurrentHashMap<String, ParkourMap> pkMapHashMap;
-    private final FileConfiguration config;
     
-    public MapManager(ConfigManager configManager) {
+    public MapManager() {
         pkMapHashMap = new ConcurrentHashMap<>();
-        this.config = configManager.getConfig(MapConfig.class);
     }
     
     public void put(ParkourMap parkourMap) {
@@ -44,51 +42,59 @@ public class MapManager {
     public void remove(String mapName) {
         pkMapHashMap.remove(mapName);
     }
-    
+
     public void loadMaps() {
-        loadMapsFromConfig();
-        pkMapHashMap.keySet().forEach(this::loadMapStats);
-    }
-    
-    private void loadMapsFromConfig() {
-        config.getKeys(false).forEach(key -> {
-            String mapName;
-            for (int i = 1; true; i++) {
-                String indexKey = key + "." + i;
-                mapName = config.getString(indexKey + ".name");
-                if (mapName == null) break;
-                
+        String sqlString = "SELECT * FROM maps;";
+
+        try {
+            PreparedStatement preparedStatement = TD2Core.sql().prepare(sqlString);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            int currentSection = Integer.MAX_VALUE;
+            while (resultSet.next()) {
+                String mapName = resultSet.getString("mapname");
                 ParkourMap parkourMap = new ParkourMap(mapName);
-                parkourMap.setCategory(key);
-                parkourMap.setOrder(i);
-                parkourMap.setBuildTime(config.getString(indexKey + ".build"));
-                parkourMap.setWeight(config.getInt(indexKey + ".weight"));
-                parkourMap.setDisplayName(config.getString(indexKey + ".displayname"));
-                parkourMap.setHead(config.getString(indexKey + ".head"));
-                parkourMap.setEstimatedDifficulty(config.getInt(indexKey + ".estimated_difficulty"));
-                parkourMap.setStartLocation(Utils.getLocationFromString(config.getString(indexKey + ".start_location")));
-                parkourMap.setEndLocation(Utils.getLocationFromString(config.getString(indexKey + ".end_location")));
-                if (key.equals("section7")) {
-                    if (i != 1) {
+
+                int sectionNumber = resultSet.getInt("section");
+                int orderNumber = resultSet.getInt("order");
+                parkourMap.setCategory(sectionNumber);
+                parkourMap.setOrder(orderNumber);
+
+                String buildTime = resultSet.getDate("build_date").toString();
+                parkourMap.setBuildTime(buildTime);
+
+                parkourMap.setWeight(resultSet.getInt("weight"));
+                parkourMap.setDisplayName(resultSet.getString("display_name"));
+                parkourMap.setHead(resultSet.getString("head_value"));
+                parkourMap.setEstimatedDifficulty(resultSet.getInt("difficulty"));
+                parkourMap.setStartLocation(Utils.getLocationFromString(resultSet.getString("start_location")));
+                parkourMap.setEndLocation(Utils.getLocationFromString(resultSet.getString("end_location")));
+
+                if (sectionNumber == 6) {
+                    parkourMap.setRedstone(true);
+                }
+
+                if (sectionNumber == 7) {
+                    if (orderNumber != 1) {
                         List<PotionEffect> list = new ArrayList<>();
-                        list.add(new PotionEffect(PotionEffectType.SPEED, 10000000, i-2));
+                        list.add(new PotionEffect(PotionEffectType.SPEED, 10000000, orderNumber - 2));
                         parkourMap.setPotionEffects(list);
                     }
                 }
 
-                if (key.equals("section8")) {
+                if (sectionNumber == 8) {
                     List<PotionEffect> list = new ArrayList<>();
-                    list.add(new PotionEffect(PotionEffectType.JUMP, 10000000, i-1));
+                    list.add(new PotionEffect(PotionEffectType.JUMP, 10000000, orderNumber - 1));
                     parkourMap.setPotionEffects(list);
                 }
-                
-                if (key.equals("section6")) {
-                    parkourMap.setRedstone(true);
-                }
-                
+
                 put(parkourMap);
             }
-        });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        pkMapHashMap.keySet().forEach(this::loadMapStats);
     }
     
     public CompletableFuture<Boolean> hasPassed(Player player, ParkourMap parkourMap) {
@@ -109,11 +115,11 @@ public class MapManager {
         });
     }
     
-    public List<ParkourMap> getAll(String section) {
+    public List<ParkourMap> getAll(int section) {
         return pkMapHashMap
             .values()
             .stream()
-            .filter(parkourMap -> parkourMap.getCategory().equals(section))
+            .filter(parkourMap -> parkourMap.getCategory() == section)
             .sorted(Comparator.comparing(ParkourMap::getOrder))
             .collect(Collectors.toList());
     }

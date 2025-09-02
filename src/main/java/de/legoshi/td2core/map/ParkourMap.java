@@ -13,7 +13,7 @@ import java.util.List;
 public class ParkourMap {
     
     // config fields
-    public String category;
+    public int category;
     public String mapName;
     public String displayName;
     public String buildTime;

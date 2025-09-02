@@ -1,10 +1,17 @@
-08521f46-8bb8-43a8-9eb3-d3842c34473d:
-  LobbyKit:
-    '0': NETHER_STAR;§eSelect Map;select;-
-    '1': SKULL_ITEM;§eLeaderboard;leaderboard;-
-    '17': SKULL_ITEM;§dClick me for help;help;-
 72679223-8173-4693-8b5a-5574ce16a795:
   LobbyKit:
     '0': NETHER_STAR;§eSelect Map;select;-
     '4': SKULL_ITEM;§eLeaderboard;leaderboard;-
     '8': SKULL_ITEM;§dClick me for help;help;-
+08521f46-8bb8-43a8-9eb3-d3842c34473d:
+  LobbyKit:
+    '0': NETHER_STAR;§eSelect Map;select;-
+    '16': SKULL_ITEM;§eDein Kopf;;-
+    '1': SKULL_ITEM;§eLeaderboard;leaderboard;-
+    '17': SKULL_ITEM;§dClick me for help;help;-
+  ParkourKit:
+    '0': INK_SACK;§aBack to Checkpoint;cp;1
+    '1': SLIME_BALL;§ePractice;prac;-
+    '6': DIAMOND_SWORD;§eAlign Yourself;align;-
+    '7': SKULL_ITEM;§dClick me for help;help;-
+    '8': INK_SACK;§cBack to Lobby;leave;8

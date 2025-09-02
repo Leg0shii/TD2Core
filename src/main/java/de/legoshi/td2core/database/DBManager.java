@@ -1,13 +1,11 @@
 package de.legoshi.td2core.database;
 
-import de.legoshi.td2core.TD2Core;
 import de.legoshi.td2core.config.ConfigManager;
 import de.legoshi.td2core.config.DBConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DBManager {
@@ -95,7 +93,14 @@ public class DBManager {
                 "weight INT, " +
                 "total_cp INT, " +
                 "redstone TINYINT(1) DEFAULT 0, " +
-                "speedrun TINYINT(1) DEFAULT 0" +
+                "speedrun TINYINT(1) DEFAULT 0, " +
+                "display_name VARCHAR(255), " +
+                "build_date datetime, " +
+                "head_value VARCHAR(1024), " +
+                "difficulty INT, " +
+                "start_location VARCHAR(1024), " +
+                "end_location VARCHAR(1024), " +
+                "section INT DEFAULT -1" +
                 ");";
         mySQL.update(sql);
     }

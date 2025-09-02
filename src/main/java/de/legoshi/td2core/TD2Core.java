@@ -67,7 +67,7 @@ public final class TD2Core extends JavaPlugin {
         sessionManager = new SessionManager();
         dbManager = new DBManager(this, configManager);
         announcementManager = new AnnouncementManager(verifyManager, configManager);
-        mapManager = new MapManager(configManager);
+        mapManager = new MapManager();
         kitManager = new KitManager(configManager);
         permissionManager = new PermissionManager();
         playerManager = new PlayerManager(permissionManager, mapManager, sessionManager, kitManager, configManager);
@@ -134,6 +134,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("discord").setExecutor(new DiscordCommand());
         Bukkit.getPluginCommand("leaderboard").setExecutor(new LeaderboardCommand(playerManager, configManager));
         Bukkit.getPluginCommand("settings").setExecutor(new SettingsCommand(configManager));
+        Bukkit.getPluginCommand("bonus").setExecutor(new BonusCommand(mapManager, playerManager, sessionManager, configManager));
 
         Bukkit.getPluginCommand("colortest").setExecutor(new ColorTest());
     }
