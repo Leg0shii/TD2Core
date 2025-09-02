@@ -335,7 +335,7 @@ public class ParkourPlayer {
             currentParkourMap = null;
         }
 
-        if (playerState == PlayerState.PLOT) {
+        if (playerState == PlayerState.PLOT || playerState == PlayerState.PRACTICE) {
             clearPotionEffects();
         }
 
@@ -378,6 +378,7 @@ public class ParkourPlayer {
 
                 session.setSessionStarted(new Date(System.currentTimeMillis()));
                 player.setAllowFlight(false);
+                player.addPotionEffects(session.getCurrentEffects());
                 player.teleport(session.getLastPracLocation());
                 player.sendMessage(Message.PLAYER_SWITCH_TO_PARKOUR.getInfoMessage());
     

@@ -65,7 +65,8 @@ public class ParkourListener implements Listener {
                 onWoodTrapdoorClick(event);
             }
         }
-        
+
+        cakeEatClick(event);
         if (event.getHand() != null && event.getHand().equals(EquipmentSlot.OFF_HAND)) return;
         if (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) return;
 
@@ -351,6 +352,14 @@ public class ParkourListener implements Listener {
         if (!(event.getItem() == null || event.getItem().getType().equals(Material.AIR))) return;
         if (event.getClickedBlock().getType().equals(Material.TRAP_DOOR)) {
             event.setCancelled(true);
+        }
+    }
+
+    private void cakeEatClick(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.CAKE_BLOCK) {
+                event.setCancelled(true);
+            }
         }
     }
 

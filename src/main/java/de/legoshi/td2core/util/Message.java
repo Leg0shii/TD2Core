@@ -92,6 +92,8 @@ public enum Message {
     SUCCESS_REMOVE_BLOCK_DATA("Successfully removed the blockdata from block."),
     DISCORD_MESSAGE(" §7Join the official §6TD2-Discord: §ahttps://discord.gg/WjqfN2qzzT §7to view and compare your progress on this server!"),
     ERROR_IN_TUTORIAL("Please finish the tutorial before doing this."),
+    INFO_RESET_MESSAGE("§7 Are you sure you want to reset your progress? Type /reset again to confirm. §7(Expires in 10 seconds)"),
+    WARNING_RESET_MESSAGE("Your previous reset request expired. Type /reset again within 10 seconds to confirm the reset."),
     TUTORIAL_COMPLETED("You have finished the tutorial!"),
     
     HELP_MESSAGE("§7----- §6HELP §7------"),
