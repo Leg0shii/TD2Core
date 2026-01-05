@@ -16,6 +16,7 @@ import de.themoep.inventorygui.*;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import com.viaversion.viaversion.api.Via;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +107,15 @@ public class MapGUI extends GUIPane {
                         if (player.getPercentage() < 99) {
                             player.getPlayer().sendMessage(Message.NOT_WORTHY.getMessage());
                             this.current.close();
+                            return true;
+                        }
+                    }
+                    if (map.mapName.equals("XXL TD1")) {
+                        int version = Via.getAPI().getPlayerVersion(player.getPlayer().getUniqueId());
+                        boolean ok = (version == 335) || (version == 338) || (version == 340);
+
+                        if (!ok) {
+                            player.getPlayer().sendMessage(Message.PLAYER_VERSION_NOT_ALLOWED.getMessage());
                             return true;
                         }
                     }

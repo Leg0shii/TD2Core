@@ -37,6 +37,7 @@ public enum Message {
     SUCCESS_ADD_BLOCK_DATA(" Successfully added the blockdata to block."),
     BLOCK_DATA_ERROR_SYNTAX("Syntax error!"),
     PLAYER_VERSION_NOT_SUPPORTED("§cWARNING §7recommended versions: §6§l1.12-1.12.2§7.\nSome jumps might not be possible in other versions."),
+    PLAYER_VERSION_NOT_ALLOWED("§cWARNING §7this map can only be played in: §6§l1.12-1.12.2§7.\n"),
     PLAYER_NOT_ON_GROUND("You must be on the ground to do that."),
     TELEPORT("Teleported!"),
     NOT_A_NUMBER("Please only enter numbers."),
