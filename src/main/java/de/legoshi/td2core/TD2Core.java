@@ -128,7 +128,7 @@ public final class TD2Core extends JavaPlugin {
         Bukkit.getPluginCommand("hideall").setExecutor(new HideAllCommand(hideManager));
         Bukkit.getPluginCommand("showall").setExecutor(new ShowAllCommand(hideManager));
         Bukkit.getPluginCommand("verify").setExecutor(new VerifyCommand(verifyManager));
-        Bukkit.getPluginCommand("tp").setExecutor(new TPCommand());
+        Bukkit.getPluginCommand("tp").setExecutor(new TPCommand(playerManager));
         Bukkit.getPluginCommand("cp").setExecutor(new CPCountCommand(blockManager));
         Bukkit.getPluginCommand("cpeffect").setExecutor(new CPEffectCommand(blockManager, playerManager));
         Bukkit.getPluginCommand("discord").setExecutor(new DiscordCommand());

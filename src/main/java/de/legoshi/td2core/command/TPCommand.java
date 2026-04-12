@@ -1,6 +1,10 @@
 package de.legoshi.td2core.command;
 
+import de.legoshi.td2core.player.ParkourPlayer;
+import de.legoshi.td2core.player.PlayerManager;
+import de.legoshi.td2core.player.PlayerState;
 import de.legoshi.td2core.util.Message;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -9,7 +13,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public class TPCommand implements CommandExecutor {
+
+    private final PlayerManager playerManager;
     
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -18,12 +25,16 @@ public class TPCommand implements CommandExecutor {
             return true;
         }
         
-        if (!commandSender.hasPermission("td2core.tp")) {
+        Player player = (Player) commandSender;
+        ParkourPlayer parkourPlayer = playerManager.get(player);
+        PlayerState state = parkourPlayer.getPlayerState();
+
+        if (!commandSender.hasPermission("td2core.tp")
+                && state != PlayerState.PLOT
+                && state != PlayerState.PRACTICE) {
             commandSender.sendMessage(Message.ERROR_NO_PERMISSION.getWarningMessage());
             return true;
         }
-    
-        Player player = (Player) commandSender;
         Location location = player.getLocation();
         
         if (strings.length == 0) {
