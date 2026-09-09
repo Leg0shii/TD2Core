@@ -31,6 +31,10 @@ public class StaffCommand implements CommandExecutor {
         
         Player player = (Player) commandSender;
         ParkourPlayer parkourPlayer = playerManager.get(player);
+        if (parkourPlayer.getPlayerState() == PlayerState.PLOT) {
+            player.sendMessage(Message.NO_STAFF_IN_PLOT.getWarningMessage());
+            return false;
+        }
         if (parkourPlayer.getPlayerState() == PlayerState.STAFF) {
             if (parkourPlayer.getBukkitTask() != null) {
                 parkourPlayer.getBukkitTask().cancel();

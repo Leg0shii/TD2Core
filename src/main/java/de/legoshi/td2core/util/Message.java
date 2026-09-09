@@ -57,6 +57,8 @@ public enum Message {
     LOG_ACTIVATED("[{1}] **{2}** has activated SP({3}, {4}, {5}) in **{6}** with **{7}** fails."),
     LEADERBOARD_ENTRY("{1} {2}   - {3} completion.\n"),
     NOT_STAFF_MODE("§7You can't join a course while in staff mode. Use /staff to deactivate."),
+    PLOT_ONLY_FROM_LOBBY("§7You can only enter the plot world from the lobby."),
+    NO_STAFF_IN_PLOT("§7You can't use /staff in the plot world."),
     SPC_USAGE(" §7Use: §6/spc <x> <y> <z> [yaw] [pitch] §7or §6/spc §7to set precise coordinates."),
     POTION_USAGE(" §7Use: §6/cpeffect <speed/slowness/jumpboost> <strength> §7to set an effect. Use strength §60 §7to remove the effect."),
     SUCC_APPLIED_POTION("Successfully applied new potion effect."),

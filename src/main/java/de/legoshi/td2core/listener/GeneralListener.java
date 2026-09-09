@@ -152,6 +152,11 @@ public class GeneralListener implements Listener {
         if(!event.getFrom().getWorld().getName().equalsIgnoreCase("plotworld") &&
                 event.getTo().getWorld().getName().equalsIgnoreCase("plotworld")) {
             ParkourPlayer parkourPlayer = playerManager.get(event.getPlayer());
+            if (parkourPlayer.getPlayerState() != PlayerState.LOBBY) {
+                event.setCancelled(true);
+                event.getPlayer().sendMessage(Message.PLOT_ONLY_FROM_LOBBY.getWarningMessage());
+                return;
+            }
             parkourPlayer.switchPlayerState(PlayerState.PLOT);
         }
 

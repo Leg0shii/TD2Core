@@ -139,6 +139,7 @@ public class ParkourPlayer {
             session.setSessionStarted(new Date(System.currentTimeMillis()));
             
             Bukkit.getScheduler().runTask(TD2Core.getInstance(), () -> {
+                if (bukkitTask != null) bukkitTask.cancel();
                 bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), () -> updateActionBar(session), 0L, 1L);
                 
                 if (playerState == PlayerState.STAFF) {
@@ -154,7 +155,7 @@ public class ParkourPlayer {
                 }
 
                 updateNoSprint(session.isNoSprint());
-                player.addPotionEffects(map.getPotionEffects());
+                // player.addPotionEffects(map.getPotionEffects());
                 player.addPotionEffects(session.getCurrentEffects());
                 player.sendMessage(Message.PLAYER_MAP_JOIN.getInfoMessage(map.getMapName()));
             });
@@ -331,9 +332,6 @@ public class ParkourPlayer {
     
     public void switchPlayerState(PlayerState state) {
         ParkourSession session = sessionManager.get(player, currentParkourMap);
-        if (state == PlayerState.STAFF && playerState == PlayerState.PLOT) {
-            currentParkourMap = null;
-        }
 
         if (playerState == PlayerState.PLOT || playerState == PlayerState.PRACTICE) {
             clearPotionEffects();
@@ -416,9 +414,14 @@ public class ParkourPlayer {
             }
             case LOBBY: {
                 updateState(state);
-    
+
                 if (prevState == PlayerState.STAFF) {
                     Bukkit.getOnlinePlayers().forEach(TagCreator::updateRank);
+                }
+
+                if (prevState == PlayerState.PLOT || prevState == PlayerState.STAFF) {
+                    currentParkourMap = null;
+                    if (bukkitTask != null) bukkitTask.cancel();
                 }
 
                 permissionManager.allowPlotCommands(player);

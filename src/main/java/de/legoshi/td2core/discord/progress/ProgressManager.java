@@ -90,6 +90,7 @@ public class ProgressManager {
         section7.getProgressMaps().add(new Speed5());
 
         ProgressChannel section8 = new ProgressChannel(config.getString("section8"), guild);
+        section8.getProgressMaps().add(new Jump0());
         section8.getProgressMaps().add(new Jump1());
         section8.getProgressMaps().add(new Jump2());
         section8.getProgressMaps().add(new Jump3());
