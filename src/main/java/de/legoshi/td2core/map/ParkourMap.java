@@ -24,7 +24,7 @@ public class ParkourMap {
     private int cpCount;
     private int order;
     private int weight;
-    private int estimatedDifficulty;
+    private String difficulty;
     private boolean redstone;
     
     // dynamic fields

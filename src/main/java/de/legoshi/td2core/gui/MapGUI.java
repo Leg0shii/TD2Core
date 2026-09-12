@@ -141,7 +141,7 @@ public class MapGUI extends GUIPane {
             "   §eBuilt in: §7" + map.getBuildTime(),
             " ",
             "§6§l----Global Stats----",
-            "§6➤ §eDifficulty: §7" + Utils.difficultyString(map.getEstimatedDifficulty()),
+            "§6➤ §eDifficulty: §7" + map.getDifficulty(),
             "§6➤ §eTotal CPs: §7" + map.getCpCount(),
             "§6➤ §eGain: §7" + (double) map.getWeight() + " %",
             "§6➤ §eFastest Player: §7" + map.getFastestPlayer(),

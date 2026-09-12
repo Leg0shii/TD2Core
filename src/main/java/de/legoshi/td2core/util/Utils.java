@@ -123,12 +123,6 @@ public class Utils {
         return String.format("%02d:%02d.%03d", minutes, seconds, milliseconds);
     }
     
-    public static String difficultyString(double difficulty) {
-        String diffString = "★★★★★★★★★★";
-        diffString = ChatColor.GOLD + diffString.substring(0, (int) difficulty) + ChatColor.RESET + diffString.substring((int) difficulty, 10);
-        return diffString;
-    }
-    
     public static boolean isOnGround(Player p) {
         double[] allowedHeights = {0.0, 0.0625, 0.09375, 0.125, 0.1875, 0.25, 0.375, 0.5, 0.5625, 0.625, 0.75, 0.8125, 0.875, 0.9375};
         double playerHeight = p.getLocation().getY();

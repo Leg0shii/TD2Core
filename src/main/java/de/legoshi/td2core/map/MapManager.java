@@ -1,12 +1,9 @@
 package de.legoshi.td2core.map;
 
 import de.legoshi.td2core.TD2Core;
-import de.legoshi.td2core.config.ConfigManager;
-import de.legoshi.td2core.config.MapConfig;
 import de.legoshi.td2core.util.Utils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -66,7 +63,7 @@ public class MapManager {
                 parkourMap.setWeight(resultSet.getInt("weight"));
                 parkourMap.setDisplayName(resultSet.getString("display_name"));
                 parkourMap.setHead(resultSet.getString("head_value"));
-                parkourMap.setEstimatedDifficulty(resultSet.getInt("difficulty"));
+                parkourMap.setDifficulty(resultSet.getString("difficulty"));
                 parkourMap.setStartLocation(Utils.getLocationFromString(resultSet.getString("start_location")));
                 parkourMap.setEndLocation(Utils.getLocationFromString(resultSet.getString("end_location")));
 
