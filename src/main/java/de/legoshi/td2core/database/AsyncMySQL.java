@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.*;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -210,8 +211,10 @@ public class AsyncMySQL {
                 if (conn != null && !conn.isClosed()) {
                     return;
                 }
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                this.conn = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?useSSL=false&autoReconnect=true&connectTimeout=0&socketTimeout=0&characterEncoding=UTF-8&useUnicode=yes&useConfigs=maxPerformance", this.user, this.password);
+                Properties properties = new Properties();
+                properties.setProperty("user", this.user);
+                properties.setProperty("password", this.password);
+                this.conn = new com.mysql.cj.jdbc.Driver().connect("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&connectTimeout=0&socketTimeout=0&characterEncoding=UTF-8&useUnicode=yes&useConfigs=maxPerformance", properties);
             }
 
         }

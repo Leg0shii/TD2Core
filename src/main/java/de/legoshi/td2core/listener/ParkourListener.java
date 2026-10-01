@@ -237,7 +237,22 @@ public class ParkourListener implements Listener {
                 player.getInventory().remove(Material.COMPASS);
                 session.setNextCP(null);
             }
-        
+
+            int time = blockManager.getTimeTillNext(cpLocation);
+            if (time != -1) {
+                session.setTimeTillNextTicks(time);
+                session.setCurrTimeTillNext(System.currentTimeMillis());
+            } else {
+                session.setTimeTillNextTicks(-1);
+            }
+
+            session.setNoSprint(blockManager.isNoSprint(cpLocation));
+            parkourPlayer.updateNoSprint(session.isNoSprint());
+
+            parkourPlayer.clearPotionEffects();
+            session.setCurrentEffects((List<PotionEffect>) blockManager.getPotionEffects(cpLocation));
+            player.addPotionEffects(blockManager.getPotionEffects(cpLocation));
+
             if (pressurePlate == Material.IRON_PLATE || pressurePlate == Material.WOOD_PLATE || pressurePlate == Material.STONE_PLATE) {
                 event.setUseInteractedBlock(Event.Result.DENY);
                 
@@ -268,21 +283,6 @@ public class ParkourListener implements Listener {
                     }
                 }
             }
-
-            int time = blockManager.getTimeTillNext(cpLocation);
-            if (time != -1) {
-                session.setTimeTillNextTicks(time);
-                session.setCurrTimeTillNext(System.currentTimeMillis());
-            } else {
-                session.setTimeTillNextTicks(-1);
-            }
-
-            session.setNoSprint(blockManager.isNoSprint(cpLocation));
-            parkourPlayer.updateNoSprint(session.isNoSprint());
-
-            parkourPlayer.clearPotionEffects();
-            session.setCurrentEffects((List<PotionEffect>) blockManager.getPotionEffects(cpLocation));
-            player.addPotionEffects(blockManager.getPotionEffects(cpLocation));
 
             if (parkourPlayer.getPlayerState() == PlayerState.PLOT) return;
             if (pressurePlate == Material.IRON_PLATE) {

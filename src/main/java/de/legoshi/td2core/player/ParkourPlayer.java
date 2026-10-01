@@ -15,9 +15,13 @@ import de.legoshi.td2core.player.tag.TagCreator;
 import de.legoshi.td2core.util.Message;
 import de.legoshi.td2core.util.ScoreboardUtil;
 import de.legoshi.td2core.util.Utils;
+import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_12_R1.PlayerConnection;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -357,7 +361,7 @@ public class ParkourPlayer {
                 session.setLastPracLocation(player.getLocation());
                 
                 if (currentParkourMap.isRedstone()) {
-                    player.teleport(player.getLocation().add(100000, 0, 100000));
+                    teleportWithChunks(player.getLocation().add(100000, 0, 100000));
                 }
                 
                 session.setPracCPLocation(player.getLocation());
@@ -377,7 +381,11 @@ public class ParkourPlayer {
                 session.setSessionStarted(new Date(System.currentTimeMillis()));
                 player.setAllowFlight(false);
                 player.addPotionEffects(session.getCurrentEffects());
-                player.teleport(session.getLastPracLocation());
+                if (currentParkourMap.isRedstone()) {
+                    teleportWithChunks(session.getLastPracLocation());
+                } else {
+                    player.teleport(session.getLastPracLocation());
+                }
                 player.sendMessage(Message.PLAYER_SWITCH_TO_PARKOUR.getInfoMessage());
     
                 if (prevState == PlayerState.STAFF) {
@@ -477,6 +485,22 @@ public class ParkourPlayer {
         return session.getNextCP().equals(location);
     }
     
+    private void teleportWithChunks(Location location) {
+        Location target = location.clone();
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+        int chunkX = target.getBlockX() >> 4;
+        int chunkZ = target.getBlockZ() >> 4;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                Chunk chunk = target.getWorld().getChunkAt(chunkX + dx, chunkZ + dz);
+                chunk.load();
+                connection.sendPacket(new PacketPlayOutMapChunk(((CraftChunk) chunk).getHandle(), 65535));
+            }
+        }
+        player.teleport(target);
+        player.setFallDistance(0);
+    }
+
     private void updateState(PlayerState state) {
         kitManager.updatePlayerKitOrder(this);
         this.playerState = state;
