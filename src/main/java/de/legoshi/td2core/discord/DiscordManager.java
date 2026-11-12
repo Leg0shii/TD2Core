@@ -208,7 +208,7 @@ public class DiscordManager {
     }
     
     public void startLeaderboardScheduler() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TD2Core.getInstance(), this::updateLeaderboard, 20L, 20L * 60 * 10);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(TD2Core.getInstance(), this::updateLeaderboard, 20L, 20L * 60 * 10);
     }
     
     public void startProgressScheduler() {
